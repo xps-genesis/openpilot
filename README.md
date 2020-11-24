@@ -1,3 +1,36 @@
+
+XPS-FORK
+===========================================
+<br>**If you like my work, don't hesitate to donate- [Paypal-Me](https://paypal.me/ARUNVARADARAJAN)** <br>
+
+* This fork is maintained to support HKG community. The default branch tracks 
+the latest Master-ci updates.
+
+Notes -
+* Please feel free to add PR for support for non existing FP.
+
+* If you encounter "Car Unrecognized- Please verify fingerprint with the fork owner" 
+  message on the screen, please contact me directly on discord for help.
+
+* Even though the configuration is auto detected, there may be CAN ERROR in some cases, 
+please contact me directly on discord for help.
+
+* This branch uses a different tuning of PI controller for lat(steering). There is a
+non linear term added with respect to steering request which results in a smoother
+behavior.
+
+----------------------------------------------------------  
+* If you have git pull or update issues -
+  - Run a clean and reset command - `cd /data/openpilot && git clean -xdf && git reset --hard`
+  - Retry git pull - `cd /data/openpilot && git pull`
+___________________________________________________________
+* Check out OP-EDIT to edit tuning set up -
+  - To open OP-EDIT - `cd /data/openpilot && python op_edit.py`
+  - Enter your user name to track your changes.
+  - Modify values as required.
+
+**If you like my work, don't hesitate to donate- [Paypal-Me](https://paypal.me/ARUNVARADARAJAN)**
+____________________________________________
 [![](https://i.imgur.com/UelUjKAh.png)](#)
 
 Table of Contents
