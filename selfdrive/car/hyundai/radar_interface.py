@@ -54,7 +54,7 @@ class RadarInterface(RadarInterfaceBase):
 
     valid = cpt["SCC11"]['ObjValid']
     if valid:
-      for ii in range(2):
+      for ii in range(1):
         if ii not in self.pts:
           self.pts[ii] = car.RadarData.RadarPoint.new_message()
           self.pts[ii].trackId = self.track_id
