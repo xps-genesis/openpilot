@@ -1,8 +1,6 @@
 import os
 import math
 
-from numpy import interp, clip
-
 import cereal.messaging as messaging
 from selfdrive.swaglog import cloudlog
 from common.realtime import sec_since_boot
@@ -30,9 +28,7 @@ class LongitudinalMpc():
     self.prev_lead_status = False
     self.prev_lead_x = 0.0
     self.new_lead = False
-    self.v_lead = 0.
-    self.x_lead = 150.
-    self.last_TR = 1.8
+
     self.last_cloudlog_t = 0.0
 
   def send_mpc_solution(self, pm, qp_iterations, calculation_time):
@@ -72,8 +68,8 @@ class LongitudinalMpc():
     self.cur_state[0].x_ego = 0.0
 
     if lead is not None and lead.status:
-      self.x_lead = x_lead = lead.dRel
-      self.v_lead = v_lead = max(0.0, lead.vLead)
+      x_lead = lead.dRel
+      v_lead = max(0.0, lead.vLead)
       a_lead = lead.aLeadK
 
       if (v_lead < 0.1 or -a_lead / 2.0 > v_lead):
@@ -97,38 +93,10 @@ class LongitudinalMpc():
       self.cur_state[0].v_l = v_ego + 10.0
       a_lead = 0.0
       self.a_lead_tau = _LEAD_ACCEL_TAU
-      self.v_lead = 0.
-      self.x_lead = 0.
 
     # Calculate mpc
     t = sec_since_boot()
-    maxTR = interp(v_ego, BpTr, TrY)
-    if v_ego < 25. or self.x_lead < 25.:
-      maxTR = max(maxTR, interp((self.v_lead - v_ego), BpvlTr, TrvlY))
-
-    if self.v_lead < v_ego + .6 and v_ego > .3:
-      if self.x_lead < 25.:
-        maxTR *= 1.1
-        TR = self.last_TR + .01
-      elif self.v_lead - v_ego < -10.:
-        maxTR *= 0.75
-        TR = self.last_TR + .005
-      else:
-        TR = self.last_TR + .005
-    else:
-      if self.x_lead > 65.:
-        maxTR *= 0.85
-        TR = self.last_TR - .025
-      else:
-        TR = self.last_TR - .0025
-
-    TR = clip(TR, 0.7, maxTR)
-    if v_ego < 5. and self.v_lead > v_ego + .5:
-      TR = 0.25
-      TR = clip(TR, 0.25, maxTR)
-    self.last_TR = TR
-
-    n_its = self.libmpc.run_mpc(self.cur_state, self.mpc_solution, self.a_lead_tau, a_lead, TR)
+    n_its = self.libmpc.run_mpc(self.cur_state, self.mpc_solution, self.a_lead_tau, a_lead)
     duration = int((sec_since_boot() - t) * 1e9)
 
     if LOG_MPC:
