@@ -75,6 +75,7 @@ void WifiUI::refresh() {
   QObject::connect(connectButtons, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(handleButton(QAbstractButton*)));
 
   int i = 0;
+  int countWidgets = 0;
   for (Network &network : wifi->seen_networks){
     QHBoxLayout *hlayout = new QHBoxLayout;
     if(page * networks_per_page <= i && i < (page + 1) * networks_per_page){
@@ -105,7 +106,7 @@ void WifiUI::refresh() {
       vlayout->addWidget(w);
       w->setStyleSheet(R"(
         QLabel {
-          font-size: 40px;
+          font-size: 50px;
         }
         QPushButton:enabled {
           background-color: #114265;
@@ -117,16 +118,24 @@ void WifiUI::refresh() {
           background-color: #114265;
         }
       )");
+      countWidgets+=1;
     }
     i+=1;
   }
+
+  //Pad vlayout to prevert oversized network widgets in case of low visible network count
+  for(int i = countWidgets ; i < networks_per_page ; i++){
+    QWidget * w = new QWidget;
+    vlayout->addWidget(w);
+  }
+  
   QHBoxLayout *prev_next_buttons = new QHBoxLayout;
   QPushButton* prev = new QPushButton("Previous");
   prev->setEnabled(page);
   prev->setFixedHeight(100);
-
   QPushButton* next = new QPushButton("Next");
   next->setFixedHeight(100);
+  
   //If there are more visible networks then we can show, enable going to next page
   if(wifi->seen_networks.size() > (page + 1) * networks_per_page){
     next->setEnabled(true);
@@ -177,8 +186,10 @@ void WifiUI::connectToNetwork(Network n){
 }
 
 QString WifiUI::getStringFromUser(){
+  emit openKeyboard();
   swidget->setCurrentIndex(1);
   loop.exec();
+  emit closeKeyboard();
   swidget->setCurrentIndex(0);
   return text;
 }
