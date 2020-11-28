@@ -1,5 +1,6 @@
 import numpy as np
 from common.numpy_fast import clip, interp
+from common.op_params import opParams
 
 GainSaS_BP = [0., 3.9, 4., 5., 10., 20., 40.]
 Gain_g = [0.15, .065, .085, .1, .12, .14, .16]
@@ -69,7 +70,10 @@ class PIController:
   def update(self, setpoint, measurement, speed=0.0, check_saturation=True, override=False, feedforward=0., deadzone=0., freeze_integrator=False):
     self.speed = speed
 
-    self.nl_p = interp(abs(setpoint), GainSaS_BP, Gain_g) * interp(self.speed, GainV_BP, Gain_V)
+    if opParams().get('nonlinearsas'):
+      self.nl_p = interp(abs(setpoint), GainSaS_BP, Gain_g) * interp(self.speed, GainV_BP, Gain_V)
+    else:
+      self.nl_p = 0.
     setpoint = clip(setpoint, -120., 120.)
 
     error = float(apply_deadzone(setpoint - measurement, deadzone))
