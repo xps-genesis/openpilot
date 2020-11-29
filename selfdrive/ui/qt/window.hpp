@@ -13,6 +13,7 @@
 #include "offroad/onboarding.hpp"
 #include "ui/ui.hpp"
 
+
 class GLWindow : public QOpenGLWidget, protected QOpenGLFunctions {
   Q_OBJECT
 
