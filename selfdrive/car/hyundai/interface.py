@@ -152,9 +152,18 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.78
       ret.steerRatio = 14.4 * 1.15
     elif candidate == CAR.VELOSTER:
-      ret.mass = 2960. * CV.LB_TO_KG
-      ret.wheelbase = 2.69
+      ret.steerActuatorDelay = 0.1  # Default delay
+      ret.steerRateCost = 0.5
+      ret.steerLimitTimer = 0.4
+      ret.lateralTuning.pid.kf = 0.00005
+      ret.mass = 3558. * CV.LB_TO_KG # actual: 2987
+      ret.wheelbase = 2.80 # actual: 2.649
       ret.steerRatio = 13.75 * 1.15
+      ret.lateralTuning.pid.kpV = [0.25, 0.25, 0.25]
+      ret.lateralTuning.pid.kiBP = [0., 10., 30.]
+      ret.lateralTuning.pid.kiV = [0.05, 0.05, 0.05]
+      ret.lateralTuning.pid.kfBP = [0., 10., 30.]
+      ret.lateralTuning.pid.kfV = [0.00005, 0.00005, 0.00005]
     elif candidate in [CAR.KIA_NIRO_HEV, CAR.KIA_NIRO_EV]:
       ret.steerRatio = 13.73
       ret.mass = 1737. + STD_CARGO_KG
