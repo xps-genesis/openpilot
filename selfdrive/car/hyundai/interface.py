@@ -194,7 +194,9 @@ class CarInterface(CarInterfaceBase):
       ret.sccBus = -1
 
     ret.radarOffCan = (ret.sccBus == -1)
-    ret.radarTimeStep = .05
+
+    if ret.openpilotLongitudinalControl:
+      ret.radarTimeStep = .05
 
     ret.openpilotLongitudinalControl = Params().get('LongControlEnabled') == b'1' and not (ret.sccBus == 0)
 
