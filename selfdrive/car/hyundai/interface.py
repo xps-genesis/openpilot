@@ -194,9 +194,11 @@ class CarInterface(CarInterfaceBase):
       ret.sccBus = -1
 
     ret.radarOffCan = (ret.sccBus == -1)
-    ret.radarTimeStep = .05
 
     ret.openpilotLongitudinalControl = Params().get('LongControlEnabled') == b'1' and not (ret.sccBus == 0)
+
+    if ret.openpilotLongitudinalControl:
+      ret.radarTimeStep = .05
 
     if candidate in [ CAR.HYUNDAI_GENESIS, CAR.IONIQ_EV_LTD, CAR.IONIQ_HEV, CAR.KONA_EV, CAR.KIA_NIRO_EV, CAR.KIA_SORENTO, CAR.SONATA_2019,
                       CAR.KIA_OPTIMA, CAR.VELOSTER, CAR.KIA_STINGER, CAR.GENESIS_G70, CAR.SONATA_HEV, CAR.SANTA_FE, CAR.GENESIS_G80,
