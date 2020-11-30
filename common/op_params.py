@@ -65,7 +65,7 @@ class opParams:
                                                                 'increase the offset(max 0.12) if the vehicle is hugging right lane'
                                                                 'decrease the offset(min 0.0) if the vehicle is hugging left lane'),
                         'LCA_Min_Speed': Param(25.0, VT.number, 'The minimum speed for Lane Change Assist MPH/KPH'),
-                        'enableLKASbutton': Param(True, bool, 'general toggle to enable LKAS button, LKAS button press will cancel OP steer'),
+                        'enableLKASbutton': Param(False, bool, 'general toggle to enable LKAS button, LKAS button press will cancel OP steer'),
                         'Enable_INDI': Param(False, bool, 'Toggle to enable INDI tuning for lat control'),
                         'OuterLoopGain': Param(3.1, VT.number, 'Turn Aggressiveness'),
                         'InnerLoopGain': Param(2.1, VT.number, 'Over correction'),

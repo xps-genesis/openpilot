@@ -1,4 +1,6 @@
 import crcmod
+
+from common.op_params import opParams
 from selfdrive.car.hyundai.values import CAR, CHECKSUM
 
 hyundai_checksum = crcmod.mkCrcFun(0x11D, initCrc=0xFD, rev=False, xorOut=0xdf)
@@ -200,14 +202,15 @@ def create_fca12(packer):
 
 def create_mdps12(packer, frame, mdps12):
   values = mdps12
-  values["CF_Mdps_ToiActive"] = 0
-  values["CF_Mdps_ToiUnavail"] = 1
-  values["CF_Mdps_MsgCount2"] = frame % 0x100
-  values["CF_Mdps_Chksum2"] = 0
+  if opParams().get('enableLKASbutton'):
+    values["CF_Mdps_ToiActive"] = 0
+    values["CF_Mdps_ToiUnavail"] = 1
+    values["CF_Mdps_MsgCount2"] = frame % 0x100
+    values["CF_Mdps_Chksum2"] = 0
 
-  dat = packer.make_can_msg("MDPS12", 2, values)[2]
-  checksum = sum(dat) % 256
-  values["CF_Mdps_Chksum2"] = checksum
+    dat = packer.make_can_msg("MDPS12", 2, values)[2]
+    checksum = sum(dat) % 256
+    values["CF_Mdps_Chksum2"] = checksum
 
   return packer.make_can_msg("MDPS12", 2, values)
 
