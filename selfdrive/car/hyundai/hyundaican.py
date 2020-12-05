@@ -19,6 +19,7 @@ def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
   values["CF_Lkas_ActToi"] = steer_req
   values["CF_Lkas_ToiFlt"] = 0
   values["CF_Lkas_MsgCount"] = frame % 0x10
+  values["CF_Lkas_Chksum"] = 0
 
   if values["CF_Lkas_LdwsOpt_USM"] == 4:
     values["CF_Lkas_LdwsOpt_USM"] = 3

@@ -102,7 +102,7 @@ Supported Cars
 | Acura     | RDX 2020                      | All               | Stock            | 0mph               | 3mph              |
 | Honda     | Accord 2018-20                | All               | Stock            | 0mph               | 3mph              |
 | Honda     | Accord Hybrid 2018-20         | All               | Stock            | 0mph               | 3mph              |
-| Honda     | Civic Hatchback 2017-19       | Honda Sensing     | Stock            | 0mph               | 12mph             |
+| Honda     | Civic Hatchback 2017-21       | Honda Sensing     | Stock            | 0mph               | 12mph             |
 | Honda     | Civic Sedan/Coupe 2016-18     | Honda Sensing     | openpilot        | 0mph               | 12mph             |
 | Honda     | Civic Sedan/Coupe 2019-20     | All               | Stock            | 0mph               | 2mph<sup>2</sup>  |
 | Honda     | CR-V 2015-16                  | Touring           | openpilot        | 25mph<sup>1</sup>  | 12mph             |
@@ -126,7 +126,7 @@ Supported Cars
 | Lexus     | NX 2018                       | All               | Stock<sup>3</sup>| 0mph               | 0mph              |
 | Lexus     | NX Hybrid 2018                | All               | Stock<sup>3</sup>| 0mph               | 0mph              |
 | Lexus     | RX 2016-18                    | All               | Stock<sup>3</sup>| 0mph               | 0mph              |
-| Lexus     | RX 2020                       | All               | openpilot        | 0mph               | 0mph              |
+| Lexus     | RX 2020-21                    | All               | openpilot        | 0mph               | 0mph              |
 | Lexus     | RX Hybrid 2016-19             | All               | Stock<sup>3</sup>| 0mph               | 0mph              |
 | Lexus     | RX Hybrid 2020                | All               | openpilot        | 0mph               | 0mph              |
 | Toyota    | Avalon 2016-18                | TSS-P             | Stock<sup>3</sup>| 20mph<sup>1</sup>  | 0mph              |

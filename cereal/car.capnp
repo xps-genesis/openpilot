@@ -102,6 +102,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     cameraMalfunction @92;
     visiononlyWarning @ 94;
     belowSteerSpeedDing @ 95;
+    commIssueWarning @83;
 
     gasUnavailableDEPRECATED @3;
     dataNeededDEPRECATED @16;
@@ -115,7 +116,6 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     invalidGiraffeToyotaDEPRECATED @60;
     whitePandaUnsupportedDEPRECATED @81;
     startupGreyPandaDEPRECATED @82;
-    canErrorPersistentDEPRECATED @83;
     focusRecoverActiveDEPRECATED @86;
     neosUpdateRequiredDEPRECATED @88;
     modelLagWarningDEPRECATED @93;
@@ -405,6 +405,7 @@ struct CarParams {
   steerRateCost @33 :Float32; # Lateral MPC cost on steering rate
   steerControlType @34 :SteerControlType;
   radarOffCan @35 :Bool; # True when radar objects aren't visible on CAN
+  minSpeedCan @51 :Float32; # Minimum vehicle speed from CAN (below this value drops to 0)
 
   steerActuatorDelay @36 :Float32; # Steering wheel actuator delay in seconds
   openpilotLongitudinalControl @37 :Bool; # is openpilot doing the longitudinal control?
@@ -417,16 +418,16 @@ struct CarParams {
   communityFeature @46: Bool;  # true if a community maintained feature is detected
   fingerprintSource @49: FingerprintSource;
   networkLocation @50 :NetworkLocation;  # Where Panda/C2 is integrated into the car's CAN network
-  mdpsHarness @51: Bool;
-  sasBus @52: Int8;
-  fcaBus @53: Int8;
-  bsmAvailable @54: Bool;
-  lfaAvailable @55: Bool;
-  sccBus @56: Int8;
-  radarDisablePossible @57: Bool;
-  lvrAvailable @58: Bool;
-  evgearAvailable @59: Bool;
-  emsAvailable @60: Bool;
+  mdpsHarness @52: Bool;
+  sasBus @53: Int8;
+  fcaBus @54: Int8;
+  bsmAvailable @55: Bool;
+  lfaAvailable @56: Bool;
+  sccBus @57: Int8;
+  radarDisablePossible @58: Bool;
+  lvrAvailable @59: Bool;
+  evgearAvailable @60: Bool;
+  emsAvailable @61: Bool;
 
   struct LateralParams {
     torqueBP @0 :List(Int32);
