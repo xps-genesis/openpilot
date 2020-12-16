@@ -12,7 +12,7 @@ from selfdrive.car.car_helpers import get_car, get_startup_event, get_one_can
 from selfdrive.controls.lib.lane_planner import CAMERA_OFFSET
 from selfdrive.controls.lib.drive_helpers import update_v_cruise, initialize_v_cruise
 from selfdrive.controls.lib.longcontrol import LongControl, STARTING_TARGET_SPEED
-from selfdrive.controls.lib.latcontrol_pid import LatControlPID
+from selfdrive.controls.lib.latcontrol_pid import LatControlPID, LatControlPIDNL
 from selfdrive.controls.lib.latcontrol_indi import LatControlINDI
 from selfdrive.controls.lib.latcontrol_lqr import LatControlLQR
 from selfdrive.controls.lib.events import Events, ET
@@ -100,6 +100,8 @@ class Controls:
 
     if self.CP.lateralTuning.which() == 'pid':
       self.LaC = LatControlPID(self.CP)
+    elif self.CP.lateralTuning.which() == 'pidnl':
+      self.LaC = LatControlPIDNL(self.CP)
     elif self.CP.lateralTuning.which() == 'indi':
       self.LaC = LatControlINDI(self.CP)
     elif self.CP.lateralTuning.which() == 'lqr':
