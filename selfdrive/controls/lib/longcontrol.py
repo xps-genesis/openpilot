@@ -9,8 +9,6 @@ STOPPING_TARGET_SPEED_OFFSET = 0.01
 STARTING_TARGET_SPEED = 0.01
 BRAKE_THRESHOLD_TO_PID = 1.0
 
-STOPPING_BRAKE_RATE = 0.2  # brake_travel/s while trying to stop
-STARTING_BRAKE_RATE = 5.  # brake_travel/s while releasing on restart
 BRAKE_STOPPING_TARGET = 1.2 # apply at least this amount of brake to maintain the vehicle stationary
 
 RATE = 100.0
@@ -112,7 +110,7 @@ class LongControl():
     elif self.long_control_state == LongCtrlState.stopping:
       # Keep applying brakes until the car is stopped
       if not CS.standstill or output_gb > -BRAKE_STOPPING_TARGET:
-        output_gb -= STOPPING_BRAKE_RATE / RATE
+        output_gb -= CP.stoppingBrakeRate / RATE
       output_gb = clip(output_gb, -brake_max, gas_max)
 
       self.reset(CS.vEgo)
@@ -120,7 +118,7 @@ class LongControl():
     # Intention is to move again, release brake fast before handing control to PID
     elif self.long_control_state == LongCtrlState.starting:
       if output_gb < -0.2:
-        output_gb += STARTING_BRAKE_RATE / RATE
+        output_gb += CP.startingBrakeRate / RATE
       self.reset(CS.vEgo)
 
     self.last_output_gb = output_gb

@@ -2,9 +2,9 @@ import os
 import shutil
 import subprocess
 import sys
+import sysconfig
 import platform
 import numpy as np
-from sysconfig import get_paths
 
 TICI = os.path.isfile('/TICI')
 Decider('MD5-timestamp')
@@ -89,10 +89,12 @@ else:
       "#cereal",
       "#selfdrive/common",
       "/usr/local/lib",
+      "/usr/local/opt/openssl/lib",
       "/System/Library/Frameworks/OpenGL.framework/Libraries",
     ]
     cflags += ["-DGL_SILENCE_DEPRECATION"]
     cxxflags += ["-DGL_SILENCE_DEPRECATION"]
+    cpppath += ["/usr/local/opt/openssl/include"]
   else:
     libpath = [
       "#phonelibs/snpe/x86_64-linux-clang",
@@ -123,10 +125,6 @@ else:
 
 # change pythonpath to this
 lenv["PYTHONPATH"] = Dir("#").path
-
-#Get the path for Python.h for cython linking
-python_path = get_paths()['include']
-numpy_path = np.get_include()
 
 env = Environment(
   ENV=lenv,
@@ -188,24 +186,20 @@ env = Environment(
     "#selfdrive/common",
   ],
   CYTHONCFILESUFFIX=".cpp",
-  tools=["default", "cython"]
+  COMPILATIONDB_USE_ABSPATH=True,
+  tools=["default", "cython", "compilation_db"],
 )
+
+if GetOption('test'):
+  env.CompilationDatabase('compile_commands.json')
 
 if os.environ.get('SCONS_CACHE'):
   cache_dir = '/tmp/scons_cache'
-
-  if os.getenv('CI'):
-    branch = os.getenv('GIT_BRANCH')
-
-    if QCOM_REPLAY:
-      cache_dir = '/tmp/scons_cache_qcom_replay'
-    elif branch is not None and branch != 'master':
-      cache_dir_branch = '/tmp/scons_cache_' + branch
-      if not os.path.isdir(cache_dir_branch) and os.path.isdir(cache_dir):
-        shutil.copytree(cache_dir, cache_dir_branch)
-      cache_dir = cache_dir_branch
-  elif TICI:
+  if TICI:
     cache_dir = '/data/scons_cache'
+
+  if QCOM_REPLAY:
+    cache_dir = '/tmp/scons_cache_qcom_replay'
 
   CacheDir(cache_dir)
 
@@ -230,22 +224,20 @@ def abspath(x):
     # rpath works elsewhere
     return x[0].path.rsplit("/", 1)[1][:-3]
 
-#Cython build enviroment
+# Cython build enviroment
+py_include = sysconfig.get_paths()['include']
 envCython = env.Clone()
-envCython["CPPPATH"] += [python_path, numpy_path]
+envCython["CPPPATH"] += [py_include, np.get_include()]
 envCython["CCFLAGS"] += ["-Wno-#warnings", "-Wno-deprecated-declarations"]
 
-python_libs = []
+envCython["LIBS"] = []
 if arch == "Darwin":
-  envCython["LINKFLAGS"]=["-bundle", "-undefined", "dynamic_lookup"]
+  envCython["LINKFLAGS"] = ["-bundle", "-undefined", "dynamic_lookup"]
 elif arch == "aarch64":
-  envCython["LINKFLAGS"]=["-shared"]
-
-  python_libs.append(os.path.basename(python_path))
+  envCython["LINKFLAGS"] = ["-shared"]
+  envCython["LIBS"] = [os.path.basename(py_include)]
 else:
-  envCython["LINKFLAGS"]=["-pthread", "-shared"]
-
-envCython["LIBS"] = python_libs
+  envCython["LINKFLAGS"] = ["-pthread", "-shared"]
 
 Export('envCython')
 

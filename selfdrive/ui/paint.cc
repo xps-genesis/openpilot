@@ -22,7 +22,7 @@ extern "C"{
 // TODO: this is also hardcoded in common/transformations/camera.py
 // TODO: choose based on frame input size
 #ifdef QCOM2
-const float y_offset = 0.0;
+const float y_offset = 150.0;
 const float zoom = 1.1;
 const mat3 intrinsic_matrix = (mat3){{
   2648.0, 0.0, 1928.0/2,
@@ -41,7 +41,7 @@ const mat3 intrinsic_matrix = (mat3){{
 
 // Projects a point in car to space to the corresponding point in full frame
 // image space.
-bool car_space_to_full_frame(const UIState *s, float in_x, float in_y, float in_z, float *out_x, float *out_y) {
+bool car_space_to_full_frame(const UIState *s, float in_x, float in_y, float in_z, float *out_x, float *out_y, float margin=0.0) {
   const vec4 car_space_projective = (vec4){{in_x, in_y, in_z, 1.}};
   // We'll call the car space point p.
   // First project into normalized image coordinates with the extrinsics matrix.
@@ -55,7 +55,7 @@ bool car_space_to_full_frame(const UIState *s, float in_x, float in_y, float in_
   *out_x = KEp.v[0] / KEp.v[2];
   *out_y = KEp.v[1] / KEp.v[2];
 
-  return *out_x >= 0 && *out_x <= s->fb_w && *out_y >= 0 && *out_y <= s->fb_h;
+  return *out_x >= -margin && *out_x <= s->fb_w + margin && *out_y >= -margin && *out_y <= s->fb_h + margin;
 }
 
 
@@ -169,12 +169,13 @@ static void update_track_data(UIState *s, const cereal::ModelDataV2::XYZTData::R
 
 
   vertex_data *v = &pvd->v[0];
+  const float margin = 500.0f;
   for (int i = 0; line.getX()[i] <= path_length and i < TRAJECTORY_SIZE; i++) {
-    v += car_space_to_full_frame(s, line.getX()[i], -line.getY()[i] - off, -line.getZ()[i], &v->x, &v->y);
+    v += car_space_to_full_frame(s, line.getX()[i], -line.getY()[i] - off, -line.getZ()[i], &v->x, &v->y, margin);
     max_idx = i;
   }
   for (int i = max_idx; i >= 0; i--) {
-    v += car_space_to_full_frame(s, line.getX()[i], -line.getY()[i] + off, -line.getZ()[i], &v->x, &v->y);
+    v += car_space_to_full_frame(s, line.getX()[i], -line.getY()[i] + off, -line.getZ()[i], &v->x, &v->y, margin);
   }
   pvd->cnt = v - pvd->v;
 }
@@ -220,12 +221,13 @@ static void update_line_data(UIState *s, const cereal::ModelDataV2::XYZTData::Re
   // TODO check that this doesn't overflow max vertex buffer
   int max_idx;
   vertex_data *v = &pvd->v[0];
+  const float margin = 500.0f;
   for (int i = 0; ((i < TRAJECTORY_SIZE) and (line.getX()[i] < fmax(MIN_DRAW_DISTANCE, max_distance))); i++) {
-    v += car_space_to_full_frame(s, line.getX()[i], -line.getY()[i] - off, -line.getZ()[i] + 1.22, &v->x, &v->y);
+    v += car_space_to_full_frame(s, line.getX()[i], -line.getY()[i] - off, -line.getZ()[i] + 1.22, &v->x, &v->y, margin);
     max_idx = i;
   }
   for (int i = max_idx - 1; i > 0; i--) {
-    v += car_space_to_full_frame(s, line.getX()[i], -line.getY()[i] + off, -line.getZ()[i] + 1.22, &v->x, &v->y);
+    v += car_space_to_full_frame(s, line.getX()[i], -line.getY()[i] + off, -line.getZ()[i] + 1.22, &v->x, &v->y, margin);
   }
   pvd->cnt = v - pvd->v;
 }
@@ -233,6 +235,7 @@ static void update_line_data(UIState *s, const cereal::ModelDataV2::XYZTData::Re
 
 static void ui_draw_vision_lane_lines(UIState *s) {
   const UIScene *scene = &s->scene;
+
   // paint lanelines
   line_vertices_data *pvd_ll = &s->lane_line_vertices[0];
   for (int ll_idx = 0; ll_idx < 4; ll_idx++) {
@@ -752,24 +755,22 @@ static void ui_draw_vision_footer(UIState *s) {
   bb_ui_draw_UI(s);
 }
 
-void ui_draw_vision_alert(UIState *s, cereal::ControlsState::AlertSize va_size, UIStatus va_color,
-                          const char* va_text1, const char* va_text2) {
+static void ui_draw_vision_alert(UIState *s) {
   static std::map<cereal::ControlsState::AlertSize, const int> alert_size_map = {
       {cereal::ControlsState::AlertSize::NONE, 0},
       {cereal::ControlsState::AlertSize::SMALL, 241},
       {cereal::ControlsState::AlertSize::MID, 390},
       {cereal::ControlsState::AlertSize::FULL, s->fb_h}};
-
   const UIScene *scene = &s->scene;
-  bool longAlert1 = strlen(va_text1) > 15;
+  bool longAlert1 = scene->alert_text1.length() > 15;
 
-  NVGcolor color = bg_colors[va_color];
+  NVGcolor color = bg_colors[s->status];
   color.a *= s->alert_blinking_alpha;
-  int alr_s = alert_size_map[va_size];
+  int alr_s = alert_size_map[scene->alert_size];
 
   const int alr_x = scene->viz_rect.x - bdr_s;
   const int alr_w = scene->viz_rect.w + (bdr_s*2);
-  const int alr_h = alr_s+(va_size==cereal::ControlsState::AlertSize::NONE?0:bdr_s);
+  const int alr_h = alr_s+(scene->alert_size==cereal::ControlsState::AlertSize::NONE?0:bdr_s);
   const int alr_y = s->fb_h-alr_h;
 
   ui_draw_rect(s->vg, alr_x, alr_y, alr_w, alr_h, color);
@@ -781,20 +782,20 @@ void ui_draw_vision_alert(UIState *s, cereal::ControlsState::AlertSize va_size, 
   nvgFillColor(s->vg, COLOR_WHITE);
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
 
-  if (va_size == cereal::ControlsState::AlertSize::SMALL) {
-    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2+15, va_text1, 40*2.5, COLOR_WHITE, s->font_sans_semibold);
-  } else if (va_size == cereal::ControlsState::AlertSize::MID) {
-    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2-45, va_text1, 48*2.5, COLOR_WHITE, s->font_sans_bold);
-    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2+75, va_text2, 36*2.5, COLOR_WHITE, s->font_sans_regular);
-  } else if (va_size == cereal::ControlsState::AlertSize::FULL) {
+  if (scene->alert_size == cereal::ControlsState::AlertSize::SMALL) {
+    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2+15, scene->alert_text1.c_str(), 40*2.5, COLOR_WHITE, s->font_sans_semibold);
+  } else if (scene->alert_size == cereal::ControlsState::AlertSize::MID) {
+    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2-45, scene->alert_text1.c_str(), 48*2.5, COLOR_WHITE, s->font_sans_bold);
+    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2+75, scene->alert_text2.c_str(), 36*2.5, COLOR_WHITE, s->font_sans_regular);
+  } else if (scene->alert_size == cereal::ControlsState::AlertSize::FULL) {
     nvgFontSize(s->vg, (longAlert1?72:96)*2.5);
     nvgFontFaceId(s->vg, s->font_sans_bold);
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-    nvgTextBox(s->vg, alr_x, alr_y+(longAlert1?360:420), alr_w-60, va_text1, NULL);
+    nvgTextBox(s->vg, alr_x, alr_y+(longAlert1?360:420), alr_w-60, scene->alert_text1.c_str(), NULL);
     nvgFontSize(s->vg, 48*2.5);
     nvgFontFaceId(s->vg,  s->font_sans_regular);
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BOTTOM);
-    nvgTextBox(s->vg, alr_x, alr_h-(longAlert1?300:360), alr_w-60, va_text2, NULL);
+    nvgTextBox(s->vg, alr_x, alr_h-(longAlert1?300:360), alr_w-60, scene->alert_text2.c_str(), NULL);
   }
 }
 
@@ -814,23 +815,18 @@ static void ui_draw_vision_frame(UIState *s) {
 
 static void ui_draw_vision(UIState *s) {
   const UIScene *scene = &s->scene;
-
-  // Draw augmented elements
-  if (!scene->frontview && scene->world_objects_visible) {
-    ui_draw_world(s);
-  }
-  // Set Speed, Current Speed, Status/Events
   if (!scene->frontview) {
+    // Draw augmented elements
+    if (scene->world_objects_visible) {
+      ui_draw_world(s);
+    }
+    // Set Speed, Current Speed, Status/Events
     ui_draw_vision_header(s);
+    if (scene->alert_size == cereal::ControlsState::AlertSize::NONE) {
+      ui_draw_vision_footer(s);
+    }
   } else {
     ui_draw_driver_view(s);
-  }
-
-  if (scene->alert_size != cereal::ControlsState::AlertSize::NONE) {
-    ui_draw_vision_alert(s, scene->alert_size, s->status,
-                         scene->alert_text1.c_str(), scene->alert_text2.c_str());
-  } else if (!scene->frontview) {
-    ui_draw_vision_footer(s);
   }
 }
 
@@ -847,12 +843,12 @@ void ui_draw(UIState *s) {
     s->scene.viz_rect.w -= sbr_w;
   }
 
-  const bool draw_vision = s->started && s->active_app == cereal::UiLayoutState::App::NONE &&
-                           s->status != STATUS_OFFROAD && s->vision_connected;
+  const bool draw_vision = s->started && s->status != STATUS_OFFROAD &&
+                           s->active_app == cereal::UiLayoutState::App::NONE;
 
   // GL drawing functions
   ui_draw_background(s);
-  if (draw_vision) {
+  if (draw_vision && s->vision_connected) {
     ui_draw_vision_frame(s);
   }
   glEnable(GL_BLEND);
@@ -862,8 +858,12 @@ void ui_draw(UIState *s) {
   // NVG drawing functions - should be no GL inside NVG frame
   nvgBeginFrame(s->vg, s->fb_w, s->fb_h, 1.0f);
   ui_draw_sidebar(s);
-  if (draw_vision) {
+  if (draw_vision && s->vision_connected) {
     ui_draw_vision(s);
+  }
+
+  if (draw_vision && s->scene.alert_size != cereal::ControlsState::AlertSize::NONE) {
+    ui_draw_vision_alert(s);
   }
   nvgEndFrame(s->vg);
   glDisable(GL_BLEND);
@@ -1045,7 +1045,7 @@ void ui_nvg_init(UIState *s) {
 
   const mat4 frame_transform = {{
     zx, 0.0, 0.0, 0.0,
-    0.0, zy, 0.0, -y_offset / s->video_rect.h * zy,
+    0.0, zy, 0.0, -y_offset / s->video_rect.h * 2,
     0.0, 0.0, 1.0, 0.0,
     0.0, 0.0, 0.0, 1.0,
   }};

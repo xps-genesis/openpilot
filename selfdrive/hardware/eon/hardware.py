@@ -6,7 +6,7 @@ import struct
 import subprocess
 
 from cereal import log
-from common.hardware_base import HardwareBase
+from selfdrive.hardware.base import HardwareBase
 
 NetworkType = log.ThermalData.NetworkType
 NetworkStrength = log.ThermalData.NetworkStrength
@@ -61,6 +61,10 @@ def getprop(key):
 
 
 class Android(HardwareBase):
+  def get_os_version(self):
+    with open("/VERSION") as f:
+      return f.read().strip()
+
   def get_sound_card_online(self):
     return (os.path.isfile('/proc/asound/card0/state') and
             open('/proc/asound/card0/state').read().strip() == 'ONLINE')
@@ -97,6 +101,12 @@ class Android(HardwareBase):
       *reason_args,
       "i32", "1"  # wait
     ])
+
+  def uninstall(self):
+    with open('/cache/recovery/command', 'w') as f:
+      f.write('--wipe_data\n')
+    # IPowerManager.reboot(confirm=false, reason="recovery", wait=true)
+    self.reboot(reason="recovery")
 
   def get_sim_info(self):
     # Used for athena

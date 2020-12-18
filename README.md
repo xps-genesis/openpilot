@@ -131,6 +131,7 @@ Supported Cars
 | Lexus     | RX Hybrid 2020                | All               | openpilot        | 0mph               | 0mph              |
 | Toyota    | Avalon 2016-18                | TSS-P             | Stock<sup>3</sup>| 20mph<sup>1</sup>  | 0mph              |
 | Toyota    | Camry 2018-20                 | All               | Stock            | 0mph<sup>4</sup>   | 0mph              |
+| Toyota    | Camry 2021                    | All               | openpilot        | 0mph               | 0mph              |
 | Toyota    | Camry Hybrid 2018-20          | All               | Stock            | 0mph<sup>4</sup>   | 0mph              |
 | Toyota    | C-HR 2017-19                  | All               | Stock            | 0mph               | 0mph              |
 | Toyota    | C-HR Hybrid 2017-19           | All               | Stock            | 0mph               | 0mph              |
@@ -139,9 +140,9 @@ Supported Cars
 | Toyota    | Corolla Hatchback 2019-20     | All               | openpilot        | 0mph               | 0mph              |
 | Toyota    | Corolla Hybrid 2020-21        | All               | openpilot        | 0mph               | 0mph              |
 | Toyota    | Highlander 2017-19            | All               | Stock<sup>3</sup>| 0mph               | 0mph              |
-| Toyota    | Highlander 2020               | All               | openpilot        | 0mph               | 0mph              |
+| Toyota    | Highlander 2020-21            | All               | openpilot        | 0mph               | 0mph              |
 | Toyota    | Highlander Hybrid 2017-19     | All               | Stock<sup>3</sup>| 0mph               | 0mph              |
-| Toyota    | Highlander Hybrid 2020        | All               | openpilot        | 0mph               | 0mph              |
+| Toyota    | Highlander Hybrid 2020-21     | All               | openpilot        | 0mph               | 0mph              |
 | Toyota    | Prius 2016-20                 | TSS-P             | Stock<sup>3</sup>| 0mph               | 0mph              |
 | Toyota    | Prius 2021                    | All               | openpilot        | 0mph               | 0mph              |
 | Toyota    | Prius Prime 2017-20           | All               | Stock<sup>3</sup>| 0mph               | 0mph              |
@@ -176,7 +177,8 @@ Community Maintained Cars and Features
 | Holden    | Astra 2017<sup>1</sup>        | Adaptive Cruise   | openpilot        | 0mph               | 7mph         |
 | Hyundai   | Elantra 2017-19               | SCC + LKAS        | Stock            | 19mph              | 34mph        |
 | Hyundai   | Genesis 2015-16               | SCC + LKAS        | Stock            | 19mph              | 37mph        |
-| Hyundai   | Ioniq Electric 2019-20        | SCC + LKAS        | Stock            | 0mph               | 32mph        |
+| Hyundai   | Ioniq Electric 2019           | SCC + LKAS        | Stock            | 0mph               | 32mph        |
+| Hyundai   | Ioniq Electric 2020           | SCC + LKAS        | Stock            | 0mph               | 0mph         |
 | Hyundai   | Kona 2020                     | SCC + LKAS        | Stock            | 0mph               | 0mph         |
 | Hyundai   | Kona EV 2019                  | SCC + LKAS        | Stock            | 0mph               | 0mph         |
 | Hyundai   | Santa Fe 2019                 | All               | Stock            | 0mph               | 0mph         |
