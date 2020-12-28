@@ -1,10 +1,6 @@
 #pragma once
 
 #include <QWidget>
-#include <QButtonGroup>
-#include <QVBoxLayout>
-#include <QStackedWidget>
-#include <QTimer>
 #include <QNetworkReply>
 
 
@@ -15,6 +11,5 @@ public:
   explicit DriveStats(QWidget *parent = 0);
 
 private:
-  QFrame *f;
   void replyFinished(QNetworkReply *l);
 };
