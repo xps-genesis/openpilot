@@ -110,7 +110,7 @@ typedef struct UIScene {
 
   bool is_rhd;
   bool frontview;
-  bool uilayout_sidebarcollapsed;
+  bool sidebar_collapsed;
   // responsive layout
   Rect viz_rect;
   int ui_viz_ro;

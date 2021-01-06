@@ -996,7 +996,7 @@ BO_ 1342 LKAS12: 6 LDWS_LKAS
  SG_ CF_LkasTsrSpeed_Display_Navi : 24|8@1+ (1.0,0.0) [0.0|255.0] ""  BCM,CLU
  SG_ CF_Lkas_TsrAddinfo_Display : 32|2@1+ (1.0,0.0) [0.0|3.0] ""  CLU
  SG_ CF_LkasDawStatus : 40|3@1+ (1,0) [0|7] "" CLU
- SG_ CF_Lkas_Daw_USM : 39|3@1+ (1,0) [0|7] "" CLU
+ SG_ CF_Lkas_Daw_USM : 37|3@1+ (1,0) [0|7] "" CLU
 
 BO_ 1338 TMU_GW_E_01: 8 CLU
  SG_ CF_Gway_TeleReqDrLock : 0|2@1+ (1.0,0.0) [0.0|3.0] ""  BCM
@@ -1602,9 +1602,9 @@ BO_ 1173 YRS13: 8 ACU
  SG_ YRS_SeralNo : 16|48@1+ (1,0) [0|281474976710655] "" iBAU
 
 BO_ 870 366_EMS: 8 EMS
- SG_ N : 7|16@0+ (1,0.25) [0|16383.75] "rpm" XXX
- SG_ EMS_Related : 23|16@0+ (1,0) [0|65535] "" XXX
- SG_ TQFR : 39|8@0+ (0.390625,0) [0|99.6094] "%" XXX
+ SG_ TQI_1 : 0|8@1+ (0.390625,0) [0|99.6094] "%" MDPS
+ SG_ N : 8|16@1+ (0.25,0.0) [0.0|16383.75] "rpm" MDPS
+ SG_ TQI_2 : 24|8@1+ (0.390625,0) [0|99.6094] "%" MDPS
  SG_ VS : 40|8@1+ (1,0) [0|255] "km/h" MDPS
  SG_ SWI_IGK : 48|1@0+ (1,0) [0|1] "" XXX
 
