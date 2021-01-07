@@ -13,7 +13,6 @@
 #include "common/utilpp.h"
 #include "messaging.hpp"
 
-
 int main() {
   ExitHandler do_exit;
 

@@ -16,7 +16,6 @@
 #include "ui.hpp"
 #include "paint.hpp"
 
-
 int write_param_float(float param, const char* param_name, bool persistent_param) {
   char s[16];
   int size = snprintf(s, sizeof(s), "%f", param);

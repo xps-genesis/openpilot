@@ -118,6 +118,8 @@ static void draw_lead(UIState *s, const cereal::RadarState::LeadData::Reader &le
   float leadBuff = 40.;
   float d_rel = lead.getDRel();
   float v_rel = lead.getVRel();
+  float y_rel = lead.getYRel();
+
   if (d_rel < leadBuff) {
     fillAlpha = 255*(1.0-(d_rel/leadBuff));
     if (v_rel < 0) {
