@@ -142,7 +142,13 @@ typedef struct UIScene {
   track_vertices_data track_vertices;
   line_vertices_data lane_line_vertices[4];
   line_vertices_data road_edge_vertices[2];
-  
+
+  int lead_status;
+  float lead_d_rel, lead_y_rel, lead_v_rel;
+
+  int lead_status2;
+  float lead_d_rel2, lead_y_rel2, lead_v_rel2;
+
   // ui add
   bool rightblindspot;
   bool leftblindspot;
