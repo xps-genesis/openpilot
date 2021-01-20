@@ -52,12 +52,13 @@ class CarInterface(CarInterfaceBase):
     ret.longitudinalTuning.kfBP = [0., 5., 10., 20., 30.]
     ret.longitudinalTuning.kfV = [1., 1., 1., .75, .5]
 
-    ret.lateralTuning.pid.kpBP = [0., 10., 30.]
-    ret.lateralTuning.pid.kpV = [0.01, 0.02, 0.03]
-    ret.lateralTuning.pid.kiBP = [0., 10., 30.]
-    ret.lateralTuning.pid.kiV = [0.001, 0.0015, 0.002]
-    ret.lateralTuning.pid.kfBP = [0., 10., 30.]
-    ret.lateralTuning.pid.kfV = [0.000015, 0.00002, 0.000025]
+    ret.lateralTuning.init('pidnl')
+    ret.lateralTuning.pidnl.kpBP = [0., 10., 30.]
+    ret.lateralTuning.pidnl.kpV = [0.01, 0.02, 0.03]
+    ret.lateralTuning.pidnl.kiBP = [0., 10., 30.]
+    ret.lateralTuning.pidnl.kiV = [0.001, 0.0015, 0.002]
+    ret.lateralTuning.pidnl.kfBP = [0., 10., 30.]
+    ret.lateralTuning.pidnl.kfV = [0.000015, 0.00002, 0.000025]
 
     if opParams().get('Enable_INDI'):
       ret.lateralTuning.init('indi')
@@ -167,12 +168,12 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 3558. * CV.LB_TO_KG # actual: 2987
       ret.wheelbase = 2.80 # actual: 2.649
       ret.steerRatio = 13.75 * 1.15
-      ret.lateralTuning.pid.kpBP = [0., 10., 30.]
-      ret.lateralTuning.pid.kpV = [0.25, 0.25, 0.25]
-      ret.lateralTuning.pid.kiBP = [0., 10., 30.]
-      ret.lateralTuning.pid.kiV = [0.05, 0.05, 0.05]
-      ret.lateralTuning.pid.kfBP = [0., 10., 30.]
-      ret.lateralTuning.pid.kfV = [0.00005, 0.00005, 0.00005]
+      ret.lateralTuning.pidnl.kpBP = [0., 10., 30.]
+      ret.lateralTuning.pidnl.kpV = [0.25, 0.25, 0.25]
+      ret.lateralTuning.pidnl.kiBP = [0., 10., 30.]
+      ret.lateralTuning.pidnl.kiV = [0.05, 0.05, 0.05]
+      ret.lateralTuning.pidnl.kfBP = [0., 10., 30.]
+      ret.lateralTuning.pidnl.kfV = [0.00005, 0.00005, 0.00005]
     elif candidate in [CAR.KIA_NIRO_HEV, CAR.KIA_NIRO_EV]:
       ret.steerRatio = 13.73
       ret.mass = 1737. + STD_CARGO_KG
