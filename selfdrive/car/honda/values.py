@@ -933,6 +933,7 @@ FW_VERSIONS = {
       b'37805-5YF-A230\x00\x00',
       b'37805-5YF-A420\x00\x00',
       b'37805-5YF-A430\x00\x00',
+      b'37805-5YF-C210\x00\x00',
     ],
     (Ecu.vsa, 0x18da28f1, None): [
       b'57114-TJB-A040\x00\x00',
@@ -952,10 +953,13 @@ FW_VERSIONS = {
     ],
     (Ecu.combinationMeter, 0x18da60f1, None): [
       b'78109-TJB-AB10\x00\x00',
+      b'78109-TJB-AD10\x00\x00',
       b'78109-TJB-AF10\x00\x00',
+      b'78109-TJB-AW10\x00\x00',
     ],
     (Ecu.srs, 0x18da53f1, None): [
       b'77959-TJB-A040\x00\x00',
+      b'77959-TJB-A210\x00\x00',
     ],
     (Ecu.electricBrakeBooster, 0x18da2bf1, None): [
       b'46114-TJB-A050\x00\x00',
@@ -963,21 +967,25 @@ FW_VERSIONS = {
     ],
     (Ecu.gateway, 0x18daeff1, None): [
       b'38897-TJB-A110\x00\x00',
+      b'38897-TJB-A120\x00\x00',
     ],
     (Ecu.eps, 0x18da30f1, None): [
       b'39990-TJB-A030\x00\x00',
+      b'39990-TJB-A040\x00\x00',
     ],
   },
   CAR.RIDGELINE: {
     (Ecu.eps, 0x18da30f1, None): [
       b'39990-T6Z-A020\x00\x00',
       b'39990-T6Z-A030\x00\x00',
+      b'39990-T6Z-A050\x00\x00',
     ],
     (Ecu.fwdCamera, 0x18dab0f1, None): [
       b'36161-T6Z-A020\x00\x00',
       b'36161-T6Z-A310\x00\x00',
       b'36161-T6Z-A420\x00\x00',
       b'36161-T6Z-A520\x00\x00',
+      b'36161-T6Z-A620\x00\x00',
       b'36161-TJZ-A120\x00\x00',
     ],
     (Ecu.gateway, 0x18daeff1, None): [
@@ -988,6 +996,7 @@ FW_VERSIONS = {
       b'78109-T6Z-A420\x00\x00',
       b'78109-T6Z-A510\x00\x00',
       b'78109-T6Z-A710\x00\x00',
+      b'78109-T6Z-AA10\x00\x00',
       b'78109-TJZ-A510\x00\x00',
     ],
     (Ecu.srs, 0x18da53f1, None): [
@@ -1051,6 +1060,7 @@ FW_VERSIONS = {
     (Ecu.combinationMeter, 0x18da60f1, None): [
       b'78109-THX-A110\x00\x00',
       b'78109-THX-A210\x00\x00',
+      b'78109-THX-A220\x00\x00',
       b'78109-THX-C220\x00\x00',
     ],
   },
