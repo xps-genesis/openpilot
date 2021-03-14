@@ -16,6 +16,7 @@ class CarController():
     self.steer_rate_limited = False
     self.timer = 0
     self.steerErrorMod = False
+    self.steer_type = int(0)
 
     self.packer = CANPacker(dbc_name)
 
@@ -57,13 +58,14 @@ class CarController():
 
     self.apply_steer_last = apply_steer
 
-    if enabled and not CS.apaFault:
+    if CS.out.standStill:
       self.steer_type = wp_type
-    else:
-      self.steer_type = int(0)
 
     if wp_type != 2:
       self.steerErrorMod = CS.steerError
+      self.steer_type = int(0)
+    elif CS.apaFault:
+      self.steer_type = int(0)
 
     self.apaActive = CS.apasteerOn and self.steer_type == 2
 
