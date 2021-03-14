@@ -37,14 +37,14 @@ class CarController():
       wp_type = int(0)
 
     if enabled:
-      if self.timer < 99 and (wp_type == 2 or (wp_type ==1 and CS.out.vEgo < 65)):
+      if self.timer < 299 and (wp_type == 2 or (wp_type ==1 and CS.out.vEgo < 65)):
         self.timer += 1
       else:
-        self.timer = 99
+        self.timer = 299
     else:
       self.timer = 0
 
-    lkas_active = self.timer == 99
+    lkas_active = self.timer == 299
 
 # steer torque
     new_steer = actuators.steer * CarControllerParams.STEER_MAX
