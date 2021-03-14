@@ -69,7 +69,7 @@ class CarController():
     else:
       self.steer_type = int(0)
 
-    if self.steer_type != 2:
+    if wp_type != 2:
       self.steerErrorMod = CS.steerError
 
     self.apaActive = CS.apasteerOn and self.steer_type == 2
