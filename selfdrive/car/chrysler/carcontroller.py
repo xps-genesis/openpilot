@@ -58,7 +58,7 @@ class CarController():
 
     self.apply_steer_last = apply_steer
 
-    if CS.out.standStill:
+    if CS.out.standstill:
       self.steer_type = wp_type
 
     if wp_type != 2:
