@@ -86,7 +86,7 @@ class CarController():
     if (self.ccframe % 2 == 0):  # 0.25s period
       if (CS.lkas_car_model != -1):
         new_msg = create_lkas_hud(
-            self.packer, CS.out.gearShifter, self.apaActive, CS.apaFault, hud_alert, on,
+            self.packer, CS.out.gearShifter, self.apaActive, CS.apaFault, hud_alert, lkas_active,
             self.hud_count, CS.lkas_car_model, self.steer_type)
         can_sends.append(new_msg)
         self.hud_count += 1
