@@ -27,11 +27,6 @@ class CarController():
       return []
 
     # *** compute control surfaces ***
-    # steer torque
-    new_steer = actuators.steer * CarControllerParams.STEER_MAX
-    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
-                                                   CS.out.steeringTorqueEps, CarControllerParams)
-    self.steer_rate_limited = new_steer != apply_steer
 
     spoof_speed = 0.
 
@@ -57,12 +52,19 @@ class CarController():
 
     lkas_active = self.timer == 99
 
+# steer torque
+    new_steer = actuators.steer * CarControllerParams.STEER_MAX
+    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
+                                                   CS.out.steeringTorqueEps, CarControllerParams)
     if not lkas_active:
       apply_steer = 0
 
+    self.steer_rate_limited = new_steer != apply_steer
+
+
     self.apply_steer_last = apply_steer
 
-    if lkas_active and not CS.apaFault:
+    if enabled and not CS.apaFault:
       self.steer_type = wp_type
     else:
       self.steer_type = int(0)
