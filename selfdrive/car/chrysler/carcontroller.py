@@ -33,16 +33,22 @@ class CarController():
                                                    CS.out.steeringTorqueEps, CarControllerParams)
     self.steer_rate_limited = new_steer != apply_steer
 
-    wp_speed = 180.
-    self.time_after_on += 1
-    wp_type = int(2)
-    on = self.time_after_on > 100
+    spoof_speed = 0.
+
+    if spoof_speed == 65.:
+      wp_type = int(1)
+    elif spoof_speed == 0.:
+      wp_type = int(2)
+    else:
+      wp_type = int(0)
 
     if CS.out.gearShifter == GearShifter.park or CS.out.gearShifter == GearShifter.reverse:
       self.time_after_on = 0
+    else:
+      self.time_after_on += 1
 
-    if on:
-      if self.timer < 99 and CS.out.vEgo < wp_speed:
+    if enabled and self.time_after_on > 100:
+      if self.timer < 99:
         self.timer += 1
       else:
         self.timer = 99
@@ -54,15 +60,15 @@ class CarController():
     if not lkas_active:
       apply_steer = 0
 
-    if on and CS.out.vEgo < wp_speed and not CS.apaFault:
+    self.apply_steer_last = apply_steer
+
+    if lkas_active and not CS.apaFault:
       self.steer_type = wp_type
     else:
       self.steer_type = int(0)
 
-    if on and self.steer_type != 2:
+    if self.steer_type != 2:
       self.steerErrorMod = CS.steerError
-
-    self.apply_steer_last = apply_steer
 
     self.apaActive = CS.apasteerOn and self.steer_type == 2
 
