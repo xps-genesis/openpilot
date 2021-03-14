@@ -16,7 +16,6 @@ class CarController():
     self.steer_rate_limited = False
     self.timer = 0
     self.steerErrorMod = False
-    self.time_after_on = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -37,13 +36,8 @@ class CarController():
     else:
       wp_type = int(0)
 
-    if CS.out.gearShifter == GearShifter.park or CS.out.gearShifter == GearShifter.reverse:
-      self.time_after_on = 0
-    else:
-      self.time_after_on += 1
-
-    if enabled and self.time_after_on > 100:
-      if self.timer < 99:
+    if enabled:
+      if self.timer < 99 and (wp_type == 2 or (wp_type ==1 and CS.out.vEgo < 65)):
         self.timer += 1
       else:
         self.timer = 99
@@ -60,7 +54,6 @@ class CarController():
       apply_steer = 0
 
     self.steer_rate_limited = new_steer != apply_steer
-
 
     self.apply_steer_last = apply_steer
 
