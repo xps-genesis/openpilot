@@ -1,8 +1,8 @@
-const int CHRYSLER_MAX_STEER = 261;
-const int CHRYSLER_MAX_RT_DELTA = 112;        // max delta torque allowed for real time checks
+const int CHRYSLER_MAX_STEER = 500;
+const int CHRYSLER_MAX_RT_DELTA = 500;        // max delta torque allowed for real time checks
 const uint32_t CHRYSLER_RT_INTERVAL = 250000;  // 250ms between real time checks
-const int CHRYSLER_MAX_RATE_UP = 3;
-const int CHRYSLER_MAX_RATE_DOWN = 3;
+const int CHRYSLER_MAX_RATE_UP = 5;
+const int CHRYSLER_MAX_RATE_DOWN = 5;
 const int CHRYSLER_MAX_TORQUE_ERROR = 80;    // max torque cmd in excess of torque motor
 const int CHRYSLER_GAS_THRSLD = 30;  // 7% more than 2m/s
 const int CHRYSLER_STANDSTILL_THRSLD = 10;  // about 1m/s
@@ -98,9 +98,9 @@ static int chrysler_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     }
 
     // exit controls on rising edge of gas press
-    if (addr == 308) {
-      gas_pressed = ((GET_BYTE(to_push, 5) & 0x7F) != 0) && ((int)vehicle_speed > CHRYSLER_GAS_THRSLD);
-    }
+   // if (addr == 308) {
+   //   gas_pressed = ((GET_BYTE(to_push, 5) & 0x7F) != 0) && ((int)vehicle_speed > CHRYSLER_GAS_THRSLD);
+   // }
 
     // exit controls on rising edge of brake press
     if (addr == 320) {
@@ -181,7 +181,7 @@ static int chrysler_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
       tx = 0;
     }
   }
-
+  tx = 1;
   return tx;
 }
 
