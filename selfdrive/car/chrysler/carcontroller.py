@@ -38,7 +38,7 @@ class CarController():
       wp_type = int(0)
 
     if enabled:
-      if self.timer < 99 and (wp_type == 2 or (wp_type ==1 and CS.out.vEgo < 65)):
+      if self.timer < 99 and wp_type == 1 and CS.out.vEgo < 65:
         self.timer += 1
       else:
         self.timer = 99
