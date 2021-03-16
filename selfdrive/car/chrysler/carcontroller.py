@@ -17,6 +17,7 @@ class CarController():
     self.timer = 0
     self.steerErrorMod = False
     self.steer_type = int(0)
+    self.ign_on_timer = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -27,6 +28,9 @@ class CarController():
       return []
 
     # *** compute control surfaces ***
+
+    if self.ign_on_timer < 200:
+      self.ign_on_timer += 1
 
     spoof_speed = 0.
 
@@ -58,7 +62,7 @@ class CarController():
 
     self.apply_steer_last = apply_steer
 
-    if CS.out.standstill:
+    if CS.out.standstill and self.ign_on_timer > 199:
       self.steer_type = wp_type
 
     if wp_type != 2:
