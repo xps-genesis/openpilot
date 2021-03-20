@@ -17,7 +17,7 @@ class CarController():
     self.timer = 0
     self.steerErrorMod = False
     self.steer_type = int(0)
-    self.ign_on_timer = 0
+    self.on_timer = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -29,8 +29,10 @@ class CarController():
 
     # *** compute control surfaces ***
 
-    if self.ign_on_timer < 200:
-      self.ign_on_timer += 1
+    if CS.apa_led_status == 1:
+      self.on_timer = 0
+    if self.on_timer < 200:
+      self.on_timer += 1
 
     spoof_speed = 0.
 
@@ -62,13 +64,16 @@ class CarController():
 
     self.apply_steer_last = apply_steer
 
-    if CS.out.standstill and self.ign_on_timer > 199:
+    if CS.out.standstill:
       self.steer_type = wp_type
+
+
 
     if wp_type != 2:
       self.steerErrorMod = CS.steerError
       self.steer_type = int(0)
-    elif CS.apaFault:
+    elif CS.apaFault or CS.out.gearShifter not in (GearShifter.drive, GearShifter.low) or \
+            abs(CS.out.steeringAngleDeg) > 150. or self.on_timer < 200:
       self.steer_type = int(0)
 
     self.apaActive = CS.apasteerOn and self.steer_type == 2

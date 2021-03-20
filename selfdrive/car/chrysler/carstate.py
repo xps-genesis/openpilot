@@ -64,6 +64,7 @@ class CarState(CarStateBase):
     self.lkas_counter = cp_cam.vl["LKAS_COMMAND"]['COUNTER']
     self.lkas_car_model = cp_cam.vl["LKAS_HUD"]['CAR_MODEL']
     self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]['LKAS_STATUS_OK']
+    self.apa_led_status = cp.vl["AUTO_PARK_SIGNALS_3"]['AUTO_PARK_LED']
 
     return ret
 
@@ -99,6 +100,7 @@ class CarState(CarStateBase):
       ("SEATBELT_DRIVER_UNLATCHED", "SEATBELT_STATUS", 0),
       ("AUTO_PARK_HAS_CONTROL_2", "EPS_STATUS", 1),
       ("APA_STEER_FAULT", "EPS_STATUS", 1),
+      ("AUTO_PARK_LED", "AUTO_PARK_SIGNALS_3", 0),
     ]
 
     checks = [
