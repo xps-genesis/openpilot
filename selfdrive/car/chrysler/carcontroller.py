@@ -28,9 +28,6 @@ class CarController():
       return []
 
     # *** compute control surfaces ***
-
-    if CS.apa_steer_status:
-      self.on_timer = 0
     if self.on_timer < 200:
       self.on_timer += 1
 
@@ -67,13 +64,11 @@ class CarController():
     if CS.out.standstill:
       self.steer_type = wp_type
 
-
-
     if wp_type != 2:
       self.steerErrorMod = CS.steerError
       self.steer_type = int(0)
     elif CS.apaFault or CS.out.gearShifter not in (GearShifter.drive, GearShifter.low) or \
-            abs(CS.out.steeringAngleDeg) > 330. or self.on_timer < 200:
+            abs(CS.out.steeringAngleDeg) > 330. or self.on_timer < 200 or CS.apa_steer_status:
       self.steer_type = int(0)
 
     self.apaActive = CS.apasteerOn and self.steer_type == 2

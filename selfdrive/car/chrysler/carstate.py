@@ -64,7 +64,7 @@ class CarState(CarStateBase):
     self.lkas_counter = cp_cam.vl["LKAS_COMMAND"]['COUNTER']
     self.lkas_car_model = cp_cam.vl["LKAS_HUD"]['CAR_MODEL']
     self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]['LKAS_STATUS_OK']
-    self.apa_steer_status = bool(cp.vl["AUTO_PARK_REQUEST"]['APA_STEER_ACT'])
+    self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]['APA_STEER_ACT'] == 1  
 
     return ret
 
