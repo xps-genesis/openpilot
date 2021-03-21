@@ -23,6 +23,9 @@ LANE_CHANGE_TIME_MAX = 10.
 MAX_CURVATURE_RATES = [0.03762194918267951, 0.003441203371932992]
 MAX_CURVATURE_RATE_SPEEDS = [0, 35]
 
+sadBP = [0., 5., 10., 26., 50.]
+sadV = [.0, .05, .1, .15, .4]
+
 DESIRES = {
   LaneChangeDirection.none: {
     LaneChangeState.off: log.LateralPlan.Desire.none,
@@ -178,8 +181,10 @@ class LateralPlanner():
     self.cur_state.psi = 0.0
     self.cur_state.curvature = interp(DT_MDL, self.t_idxs[:MPC_N + 1], self.mpc_solution.curvature)
 
+    sad = interp(v_ego, sadBP, sadV)
+
     # TODO this needs more thought, use .2s extra for now to estimate other delays
-    delay = CP.steerActuatorDelay + .2
+    delay = sad + .2
     current_curvature = self.mpc_solution.curvature[0]
     psi = interp(delay, self.t_idxs[:MPC_N + 1], self.mpc_solution.psi)
     next_curvature_rate = self.mpc_solution.curvature_rate[0]
