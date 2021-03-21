@@ -6,8 +6,8 @@ Ecu = car.CarParams.Ecu
 
 class CarControllerParams:
   STEER_MAX = 400         # 262 faults
-  STEER_DELTA_UP = 4      # 3 is stock. 100 is fine. 200 is too much it seems
-  STEER_DELTA_DOWN = 7    # no faults on the way down it seems
+  STEER_DELTA_UP = 2      # 3 is stock. 100 is fine. 200 is too much it seems
+  STEER_DELTA_DOWN = 2    # no faults on the way down it seems
   STEER_ERROR_MAX = 80
 
 
