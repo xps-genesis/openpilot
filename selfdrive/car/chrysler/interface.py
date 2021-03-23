@@ -25,20 +25,20 @@ class CarInterface(CarInterfaceBase):
     ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
     ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0., 10.], [0., 30.]]
     ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.01, 0.03], [0.02, 0.03]]
-    ret.lateralTuning.pid.kf = 0.00003   # full torque for 10 deg at 80mph means 0.00007818594
+    ret.lateralTuning.pid.kf = 0.000025   # full torque for 10 deg at 80mph means 0.00007818594
     ret.steerActuatorDelay = 0.5
     ret.steerRateCost = 0.2
     ret.steerLimitTimer = 0.7
 
-    #ret.lateralTuning.init('indi')
-   # ret.lateralTuning.indi.innerLoopGainBP = [0.]
-   # ret.lateralTuning.indi.innerLoopGainV = [4.]
-  #  ret.lateralTuning.indi.outerLoopGainBP = [0.]
-   # ret.lateralTuning.indi.outerLoopGainV = [4.]
-  #  ret.lateralTuning.indi.timeConstantBP = [0.]
-  #  ret.lateralTuning.indi.timeConstantV = [1.5]
-  #  ret.lateralTuning.indi.actuatorEffectivenessBP = [0.]
-  #  ret.lateralTuning.indi.actuatorEffectivenessV = [1.5]
+    ret.lateralTuning.init('indi')
+    ret.lateralTuning.indi.innerLoopGainBP = [0.]
+    ret.lateralTuning.indi.innerLoopGainV = [4.]
+    ret.lateralTuning.indi.outerLoopGainBP = [0.]
+    ret.lateralTuning.indi.outerLoopGainV = [3.]
+    ret.lateralTuning.indi.timeConstantBP = [0.]
+    ret.lateralTuning.indi.timeConstantV = [1.5]
+    ret.lateralTuning.indi.actuatorEffectivenessBP = [0.]
+    ret.lateralTuning.indi.actuatorEffectivenessV = [2.]
 
     if candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
       ret.wheelbase = 2.91  # in meters
