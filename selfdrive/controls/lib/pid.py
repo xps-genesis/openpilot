@@ -2,10 +2,10 @@ import numpy as np
 from common.numpy_fast import clip, interp
 
 GainSaS_BP = [0., 1., 3., 5., 10., 20., 40.]
-Gain_g = [.05, .06, .07, .01, .02, .02, .02]
+Gain_g = [.05, .03, .02, .01, .01, .01, .02]
 
 GainV_BP = [0., 20., 20.01, 30.]
-Gain_V = [0.6, .85, .9, 1.]
+Gain_V = [0.3, .5, .7, 1.]
 
 def apply_deadzone(error, deadzone):
   if error > deadzone:
