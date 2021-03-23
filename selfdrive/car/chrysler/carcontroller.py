@@ -50,8 +50,8 @@ class CarController():
 
     lkas_active = self.timer == 99
 
-# steer torque
-    new_steer = actuators.steer * CarControllerParams.STEER_MAX
+    # steer torque
+    new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
     apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
                                                    CS.out.steeringTorqueEps, CarControllerParams)
     if not lkas_active:
