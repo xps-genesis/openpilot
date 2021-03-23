@@ -25,9 +25,9 @@ class CarInterface(CarInterfaceBase):
     ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
     ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0., 10., 30.], [0., 30.]]
     ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.01, 0.03, 0.06], [0.02, 0.03]]
-    ret.lateralTuning.pid.kf = 0.000022   # full torque for 10 deg at 80mph means 0.00007818594
+    ret.lateralTuning.pid.kf = 0.00002   # full torque for 10 deg at 80mph means 0.00007818594
     ret.steerActuatorDelay = 0.1
-    ret.steerRateCost = 0.2
+    ret.steerRateCost = 0.4
     ret.steerLimitTimer = 0.7
 
    # ret.lateralTuning.init('indi')
