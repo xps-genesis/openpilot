@@ -98,9 +98,9 @@ static int chrysler_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     }
 
     // exit controls on rising edge of gas press
-   // if (addr == 308) {
-   //   gas_pressed = ((GET_BYTE(to_push, 5) & 0x7F) != 0) && ((int)vehicle_speed > CHRYSLER_GAS_THRSLD);
-   // }
+    if (addr == 308) {
+      gas_pressed = ((GET_BYTE(to_push, 5) & 0x7F) != 0) && ((int)vehicle_speed > CHRYSLER_GAS_THRSLD);
+    }
 
     // exit controls on rising edge of brake press
     if (addr == 320) {
