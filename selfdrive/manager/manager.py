@@ -38,6 +38,11 @@ def manager_init():
     ("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')),
     ("OpenpilotEnabledToggle", "1"),
     ("VisionRadarToggle", "0"),
+    ("RadarDisableEnabled", "0"),
+    ("MdpsHarnessEnabled", "0"),
+    ("SccEnabled", "1"),
+    ("EnableOPwithCC", "1"),
+    ("SccHarnessPresent", "0"),
     ("IsDriverViewEnabled", "0"),
   ]
 
