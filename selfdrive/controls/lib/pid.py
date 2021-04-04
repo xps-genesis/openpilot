@@ -86,7 +86,7 @@ class PIController:
     self.p = error * (self.k_p + self.nl_p)
     self.f = feedforward * self.k_f
 
-    self.d = 0.0
+    self.d = 0.
     if len(self.errors) >= 5:  # makes sure list is long enough
       self.d = (error - self.errors[-5]) / 5  # get deriv in terms of 100hz (tune scale doesn't change)
       self.d *= self.k_d

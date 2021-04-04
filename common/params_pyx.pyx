@@ -55,6 +55,7 @@ keys = {
   b"LastUpdateTime": [TxType.PERSISTENT],
   b"LiveParameters": [TxType.PERSISTENT],
   b"OpenpilotEnabledToggle": [TxType.PERSISTENT],
+  b"LongControlEnabled": [TxType.PERSISTENT],
   b"RadarDisableEnabled": [TxType.PERSISTENT],
   b"MdpsHarnessEnabled": [TxType.PERSISTENT],
   b"SccEnabled": [TxType.PERSISTENT],

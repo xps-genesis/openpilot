@@ -37,6 +37,7 @@ def manager_init():
     ("IsLdwEnabled", "0"),
     ("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')),
     ("OpenpilotEnabledToggle", "1"),
+    ("LongControlEnabled", "0"),
     ("VisionRadarToggle", "0"),
     ("RadarDisableEnabled", "0"),
     ("MdpsHarnessEnabled", "0"),
