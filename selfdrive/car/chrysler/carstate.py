@@ -67,6 +67,7 @@ class CarState(CarStateBase):
     self.lkas_car_model = cp_cam.vl["LKAS_HUD"]['CAR_MODEL']
     self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]['LKAS_STATUS_OK']
     self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]['APA_STEER_ACT'] == 1
+    self.veh_on = cp.vl["HYBRID_ECU"]['VEH_ON'] == 1
 
     return ret
 
@@ -103,6 +104,7 @@ class CarState(CarStateBase):
       ("AUTO_PARK_HAS_CONTROL_2", "EPS_STATUS", 1),
       ("APA_STEER_FAULT", "EPS_STATUS", 1),
       ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
+      ("HYBRID_ECU", "VEH_ON", 0),
     ]
 
     checks = [
