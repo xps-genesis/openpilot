@@ -75,7 +75,8 @@ class CarController():
 
     if wp_type != 2:
       self.steerErrorMod = CS.steerError
-      self.steer_type = int(0)
+      if self.steerErrorMod:
+        self.steer_type = int(0)
     elif CS.apaFault or CS.out.gearShifter not in (GearShifter.drive, GearShifter.low) or \
             abs(CS.out.steeringAngleDeg) > 330. or self.on_timer < 200 or CS.apa_steer_status:
       self.steer_type = int(0)
