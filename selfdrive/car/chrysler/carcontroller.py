@@ -105,7 +105,7 @@ class CarController():
       if (CS.lkas_car_model != -1):
         new_msg = create_lkas_hud(
             self.packer, CS.out.gearShifter, lkas_active, hud_alert,
-            self.hud_count, CS.lkas_car_model)
+            self.hud_count, CS.lkas_car_model, self.steer_type)
         can_sends.append(new_msg)
         self.hud_count += 1
     #new_msg = create_lkas_command(self.packer, int(apply_steer), self.gone_fast_yet, frame)
