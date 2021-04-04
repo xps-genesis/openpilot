@@ -63,11 +63,11 @@ QWidget * toggles_panel() {
                                            "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
                                            "../assets/offroad/icon_road.png"));
   toggles_list->addWidget(new ParamControl("LkasFullRangeAvailable",
-                                           "\U0001f96e Allow Chrysler to use steer to 0 \U0001f96e",
-                                           "needs WP setup",
+                                           "Chrysler steer to 0 \U0001f96e",
+                                           "needs WP setup to steer to 0 speed",
                                            "../assets/offroad/icon_road.png"));
   toggles_list->addWidget(new ParamControl("ChryslerMangoMode",
-                                           "\U0001f96d Allow Chrysler to use high steer torque \U0001f96d",
+                                           "Chrysler Mango Mode \U0001f96d",
                                            "needs WP setup to allow high torq",
                                            "../assets/offroad/icon_road.png"));
 
