@@ -1,6 +1,6 @@
 from selfdrive.car import apply_toyota_steer_torque_limits
 from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, \
-                                               create_wheel_buttons
+  create_wheel_buttons, create_apa_hud
 from selfdrive.car.chrysler.values import CAR, CarControllerParams
 from opendbc.can.packer import CANPacker
 from selfdrive.car.interfaces import GearShifter
@@ -40,6 +40,8 @@ class CarController():
       wp_type = int(2)
 
     if enabled:
+      if CS.out.steeringAngleDeg > 50. and wp_type == 1 and self.timer > 97:
+        self.timer = 97
       if self.timer < 99 and wp_type == 1 and CS.out.vEgo < 65:
         self.timer += 1
       else:
