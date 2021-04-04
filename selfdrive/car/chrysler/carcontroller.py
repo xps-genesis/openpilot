@@ -28,7 +28,7 @@ class CarController():
       return []
 
     # *** compute control surfaces ***
-    if self.on_timer < 200 and CS.veh_on:
+    if self.on_timer < 200: # and CS.veh_on:
       self.on_timer += 1
 
     spoof_speed = 0.
