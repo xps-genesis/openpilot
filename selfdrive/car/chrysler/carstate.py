@@ -104,7 +104,7 @@ class CarState(CarStateBase):
       ("AUTO_PARK_HAS_CONTROL_2", "EPS_STATUS", 1),
       ("APA_STEER_FAULT", "EPS_STATUS", 1),
       ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
-      ("HYBRID_ECU", "VEH_ON", 0),
+      ("VEH_ON", "HYBRID_ECU", 0),
     ]
 
     checks = [
