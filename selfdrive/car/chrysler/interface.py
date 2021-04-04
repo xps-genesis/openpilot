@@ -23,12 +23,13 @@ class CarInterface(CarInterfaceBase):
     ret.wheelbase = 3.089  # in meters for Pacifica Hybrid 2017
     ret.steerRatio = 16.2  # Pacifica Hybrid 2017
     ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
-    ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[9., 20.], [9., 20.]]
-    ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15, 0.30], [0.03, 0.05]]
-    ret.lateralTuning.pid.kf = 0.00006   # full torque for 10 deg at 80mph means 0.00007818594
+    ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kdBP = [[0., 10.], [0., 30.], [0., 30.]]
+    ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV, ret.lateralTuning.pid.kdV = [[0.01, 0.03], [0.02, 0.03], [0.1, 1.]]
+
+    ret.lateralTuning.pid.kf = 0.00002   # full torque for 10 deg at 80mph means 0.00007818594
     ret.steerActuatorDelay = 0.1
-    ret.steerRateCost = 0.7
-    ret.steerLimitTimer = 0.4
+    ret.steerRateCost = 0.4
+    ret.steerLimitTimer = 0.7
 
     if candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
       ret.wheelbase = 2.91  # in meters
@@ -40,7 +41,8 @@ class CarInterface(CarInterfaceBase):
     ret.minSteerSpeed = 3.8  # m/s
     if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
       # TODO allow 2019 cars to steer down to 13 m/s if already engaged.
-      ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
+      #ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
+      ret.minSteerSpeed = 0. # m/s 17 on the way up, 13 on the way down once engaged.
 
     # starting with reasonable value for civic and scaling by mass and wheelbase
     ret.rotationalInertia = scale_rot_inertia(ret.mass, ret.wheelbase)
@@ -66,12 +68,14 @@ class CarInterface(CarInterfaceBase):
     # speeds
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
+    ret.steerError = self.CC.steerErrorMod
+
     # events
     events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low],
                                        gas_resume_speed=2.)
 
-    if ret.vEgo < self.CP.minSteerSpeed:
-      events.add(car.CarEvent.EventName.belowSteerSpeed)
+#    if ret.vEgo < self.CP.minSteerSpeed:
+#      events.add(car.CarEvent.EventName.belowSteerSpeed)
 
     ret.events = events.to_msg()
 

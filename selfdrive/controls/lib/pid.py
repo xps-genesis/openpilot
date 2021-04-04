@@ -81,7 +81,6 @@ class PIController:
       self.nl_p = interp(abs(setpoint), GainSaS_BP, Gain_g) * interp(self.speed, GainV_BP, Gain_V)
     else:
       self.nl_p = 0.
-    setpoint = clip(setpoint, -120., 120.)
 
     error = float(apply_deadzone(setpoint - measurement, deadzone))
     self.p = error * (self.k_p + self.nl_p)
