@@ -30,7 +30,7 @@ def create_apa_hud(packer, gear, apa_active, apa_fault, hud_alert, enabled, hud_
     "STEER_TYPE": steer_type,
     }
 
-def create_lkas_hud(packer, gear, lkas_active, hud_alert, hud_count, lkas_car_model):
+def create_lkas_hud(packer, gear, lkas_active, hud_alert, hud_count, lkas_car_model, steer_type):
   # LKAS_HUD 0x2a6 (678) Controls what lane-keeping icon is displayed.
 
   if hud_alert == VisualAlert.steerRequired:
@@ -58,6 +58,7 @@ def create_lkas_hud(packer, gear, lkas_active, hud_alert, hud_count, lkas_car_mo
     "CAR_MODEL": lkas_car_model,  # byte 1
     "LKAS_LANE_LINES": lines,  # byte 2, last 4 bits
     "LKAS_ALERTS": alerts,  # byte 3, last 4 bits
+    "STEER_TYPE": steer_type,
     }
 
   return packer.make_can_msg("LKAS_HUD", 0, values)  # 0x2a6
