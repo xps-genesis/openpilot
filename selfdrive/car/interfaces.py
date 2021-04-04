@@ -80,6 +80,9 @@ class CarInterfaceBase():
     ret.longitudinalTuning.kpV = [1.]
     ret.longitudinalTuning.kiBP = [0.]
     ret.longitudinalTuning.kiV = [1.]
+    ret.longitudinalTuning.kfBP = [0.]
+    ret.longitudinalTuning.kfV = [1.]
+
     ret.lateralTuning.pid.kdBP = [0.]
     ret.lateralTuning.pid.kdV = [0.1]
     ret.lateralTuning.pid.kdBP = [0.]
