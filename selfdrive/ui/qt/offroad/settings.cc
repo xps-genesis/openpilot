@@ -62,6 +62,14 @@ QWidget * toggles_panel() {
                                            "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
                                            "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
                                            "../assets/offroad/icon_road.png"));
+  toggles_list->addWidget(new ParamControl("LkasFullRangeAvailable",
+                                           "\U0001f96e Allow Chrysler to use steer to 0 \U0001f96e",
+                                           "needs WP setup",
+                                           "../assets/offroad/icon_road.png"));
+  toggles_list->addWidget(new ParamControl("ChryslerMangoMode",
+                                           "\U0001f96d Allow Chrysler to use high steer torque \U0001f96d",
+                                           "needs WP setup to allow high torq",
+                                           "../assets/offroad/icon_road.png"));
 
   bool record_lock = Params().getBool("RecordFrontLock");
   record_toggle->setEnabled(!record_lock);

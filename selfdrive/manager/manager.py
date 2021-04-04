@@ -45,6 +45,8 @@ def manager_init():
     ("EnableOPwithCC", "1"),
     ("SccHarnessPresent", "0"),
     ("IsDriverViewEnabled", "0"),
+    ("LkasFullRangeAvailable", "1"),
+    ("ChryslerMangoMode", "1"),
   ]
 
   if params.get("RecordFrontLock", encoding='utf-8') == "1":

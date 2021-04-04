@@ -4,6 +4,7 @@ from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_comm
 from selfdrive.car.chrysler.values import CAR, CarControllerParams
 from opendbc.can.packer import CANPacker
 from selfdrive.car.interfaces import GearShifter
+from common.params import Params
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
@@ -28,17 +29,15 @@ class CarController():
       return []
 
     # *** compute control surfaces ***
-    if self.on_timer < 200: # and CS.veh_on:
+    if self.on_timer < 200 and CS.veh_on:
       self.on_timer += 1
 
-    spoof_speed = 0.
+    wp_type = int(0)
 
-    if spoof_speed == 65.:
+    if Params().get('LkasFullRangeAvailable') == b'1':
       wp_type = int(1)
-    elif spoof_speed == 0.:
+    if Params().get('ChryslerMangoMode') == b'1':
       wp_type = int(2)
-    else:
-      wp_type = int(0)
 
     if enabled:
       if self.timer < 99 and wp_type == 1 and CS.out.vEgo < 65:
