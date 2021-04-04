@@ -12,7 +12,7 @@ class CarController():
     self.prev_frame = -1
     self.hud_count = 0
     self.car_fingerprint = CP.carFingerprint
-    self.gone_fast_yet = False
+#    self.gone_fast_yet = False
     self.steer_rate_limited = False
     self.timer = 0
     self.steerErrorMod = False
@@ -109,7 +109,8 @@ class CarController():
             self.hud_count, CS.lkas_car_model, self.steer_type)
         can_sends.append(new_msg)
         self.hud_count += 1
-    new_msg = create_lkas_command(self.packer, int(apply_steer), self.gone_fast_yet, frame)
+    #new_msg = create_lkas_command(self.packer, int(apply_steer), self.gone_fast_yet, frame)
+    new_msg = create_lkas_command(self.packer, int(apply_steer), lkas_active, frame)
     can_sends.append(new_msg)
 
     self.ccframe += 1
