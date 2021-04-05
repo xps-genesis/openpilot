@@ -72,7 +72,7 @@ class opParams:
                         'RCTimeConstant': Param(1.4, VT.number, 'Time constant'),
                         'ActuatorEffectiveness': Param(2., VT.number, 'Sensitivity of the actuator, increase for less pingpong, decrease if weak steering'),
                         'smartMDPS': Param(True, bool, 'Toggle to enable smart MDPS'),
-                        'nonlinearsas': Param(False, bool, 'Toggle to enable non linear desired steering angle based tune'),
+                        'nonlinearsas': Param(True, bool, 'Toggle to enable non linear desired steering angle based tune'),
                         }
 
 
