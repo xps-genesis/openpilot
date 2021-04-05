@@ -6,7 +6,7 @@ GainSaS_BP = [0., 3.9, 4., 5., 10., 20., 40.]
 Gain_g = [0.05, .065, .085, .1, .12, .14, .16]
 
 GainV_BP = [0., 20., 20.01, 30.]
-Gain_V = [0., 0., 0., 0.]
+Gain_V = [0.6, .85, 1.05, 1.2]
 
 def apply_deadzone(error, deadzone):
   if error > deadzone:
