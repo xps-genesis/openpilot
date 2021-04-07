@@ -153,7 +153,11 @@ class CarInterface(CarInterfaceBase):
     elif candidate in [CAR.KONA_HEV, CAR.KONA_EV]:
       ret.mass = 1685. + STD_CARGO_KG
       ret.wheelbase = 2.7
-      ret.steerRatio = 13.73 * 1.15
+      ret.steerRatio = 13.73  # Spec // used by comma https://github.com/commaai/openpilot/blob/release2/selfdrive/car/hyundai/interface.py#L107
+      ret.lateralTuning.pid.kf = 0.00006
+      tire_stiffness_factor = 0.385
+      ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0.], [0.]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.25], [0.05]]
     elif candidate in [CAR.IONIQ_HEV, CAR.IONIQ_EV_LTD]:
       ret.mass = 1490. + STD_CARGO_KG
       ret.wheelbase = 2.7
