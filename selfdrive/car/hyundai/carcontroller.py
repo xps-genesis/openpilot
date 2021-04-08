@@ -88,6 +88,7 @@ class CarController():
     self.lfainFingerprint = CP.lfaAvailable
     self.vdiff = 0
     self.resumebuttoncnt = 0
+    self.lastresumeframe = 0
     self.fca11supcnt = self.fca11inc = self.fca11alivecnt = self.fca11cnt13 = self.scc11cnt = self.scc12cnt = 0
     self.counter_init = False
     self.fca11maxcnt = 0xD
@@ -98,7 +99,6 @@ class CarController():
     self.enabled = False
     self.sm = messaging.SubMaster(['controlsState'])
     self.steer_wind_down = False
-    self.last_resume_frame = 0
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert,
              left_lane, right_lane, left_lane_depart, right_lane_depart,
