@@ -9,6 +9,7 @@ from selfdrive.controls.lib.lateral_mpc import libmpc_py
 from selfdrive.controls.lib.drive_helpers import MPC_COST_LAT, MPC_N, CAR_ROTATION_RADIUS
 from selfdrive.controls.lib.lane_planner import LanePlanner, TRAJECTORY_SIZE
 from selfdrive.config import Conversions as CV
+from selfdrive.hardware import TICI
 import cereal.messaging as messaging
 from cereal import log
 
@@ -17,14 +18,14 @@ LaneChangeDirection = log.LateralPlan.LaneChangeDirection
 
 LOG_MPC = os.environ.get('LOG_MPC', False)
 
-LANE_CHANGE_SPEED_MIN = 45 * CV.MPH_TO_MS
+LANE_CHANGE_SPEED_MIN = 19 * CV.MPH_TO_MS
 LANE_CHANGE_TIME_MAX = 10.
 # this corresponds to 80deg/s and 20deg/s steering angle in a toyota corolla
 MAX_CURVATURE_RATES = [0.03762194918267951, 0.003441203371932992]
 MAX_CURVATURE_RATE_SPEEDS = [0, 35]
 
 sadBP = [0., 5., 10., 22., 25., 30.]
-sadV = [.0, .05, .1, .1, .15, .25]
+sadV = [.0, .05, .1, .2, .35, .45]
 
 DESIRES = {
   LaneChangeDirection.none: {
@@ -50,14 +51,17 @@ DESIRES = {
 
 class LateralPlanner():
   def __init__(self, CP):
-    self.LP = LanePlanner()
+    params = Params()
+
+    wide_camera = (params.get('EnableWideCamera') == b'1') if TICI else False
+    self.LP = LanePlanner(wide_camera)
 
     self.last_cloudlog_t = 0
     self.steer_rate_cost = CP.steerRateCost
 
     self.setup_mpc()
     self.solution_invalid_cnt = 0
-    self.use_lanelines = Params().get('EndToEndToggle') != b'1'
+    self.use_lanelines = not params.get_bool('EndToEndToggle')
     self.lane_change_state = LaneChangeState.off
     self.lane_change_direction = LaneChangeDirection.none
     self.lane_change_timer = 0.0
@@ -66,13 +70,14 @@ class LateralPlanner():
     self.desire = log.LateralPlan.Desire.none
 
     self.path_xyz = np.zeros((TRAJECTORY_SIZE,3))
+    self.path_xyz_stds = np.ones((TRAJECTORY_SIZE,3))
     self.plan_yaw = np.zeros((TRAJECTORY_SIZE,))
     self.t_idxs = np.arange(TRAJECTORY_SIZE)
     self.y_pts = np.zeros(TRAJECTORY_SIZE)
 
   def setup_mpc(self):
     self.libmpc = libmpc_py.libmpc
-    self.libmpc.init(MPC_COST_LAT.PATH, MPC_COST_LAT.HEADING, self.steer_rate_cost)
+    self.libmpc.init()
 
     self.mpc_solution = libmpc_py.ffi.new("log_t *")
     self.cur_state = libmpc_py.ffi.new("state_t *")
@@ -97,6 +102,8 @@ class LateralPlanner():
       self.path_xyz = np.column_stack([md.position.x, md.position.y, md.position.z])
       self.t_idxs = np.array(md.position.t)
       self.plan_yaw = list(md.orientation.z)
+    if len(md.orientation.xStd) == TRAJECTORY_SIZE:
+      self.path_xyz_stds = np.column_stack([md.position.xStd, md.position.yStd, md.position.zStd])
 
     # Lane change logic
     one_blinker = sm['carState'].leftBlinker != sm['carState'].rightBlinker
@@ -164,8 +171,10 @@ class LateralPlanner():
       self.LP.lll_prob *= self.lane_change_ll_prob
       self.LP.rll_prob *= self.lane_change_ll_prob
     if self.use_lanelines:
+      std_cost_mult = np.clip(abs(self.path_xyz[0,1]/self.path_xyz_stds[0,1]), 0.5, 5.0)
       d_path_xyz = self.LP.get_d_path(v_ego, self.t_idxs, self.path_xyz)
     else:
+      std_cost_mult = 1.0
       d_path_xyz = self.path_xyz
     y_pts = np.interp(v_ego * self.t_idxs[:MPC_N + 1], np.linalg.norm(d_path_xyz, axis=1), d_path_xyz[:,1])
     heading_pts = np.interp(v_ego * self.t_idxs[:MPC_N + 1], np.linalg.norm(self.path_xyz, axis=1), self.plan_yaw)
@@ -173,6 +182,7 @@ class LateralPlanner():
 
     assert len(y_pts) == MPC_N + 1
     assert len(heading_pts) == MPC_N + 1
+    self.libmpc.set_weights(std_cost_mult*MPC_COST_LAT.PATH, 0.0, CP.steerRateCost)
     self.libmpc.run_mpc(self.cur_state, self.mpc_solution,
                         float(v_ego),
                         CAR_ROTATION_RADIUS,
@@ -187,7 +197,7 @@ class LateralPlanner():
     sad = interp(v_ego, sadBP, sadV)
 
     # TODO this needs more thought, use .2s extra for now to estimate other delays
-    delay = CP.steerActuatorDelay + .2
+    delay = CP.steerActuatorDelay + sad
     current_curvature = self.mpc_solution.curvature[0]
     psi = interp(delay, self.t_idxs[:MPC_N + 1], self.mpc_solution.psi)
     next_curvature_rate = self.mpc_solution.curvature_rate[0]
@@ -212,7 +222,7 @@ class LateralPlanner():
     mpc_nans = any(math.isnan(x) for x in self.mpc_solution.curvature)
     t = sec_since_boot()
     if mpc_nans:
-      self.libmpc.init(MPC_COST_LAT.PATH, MPC_COST_LAT.HEADING, CP.steerRateCost)
+      self.libmpc.init()
       self.cur_state.curvature = measured_curvature
 
       if t > self.last_cloudlog_t + 5.0:
