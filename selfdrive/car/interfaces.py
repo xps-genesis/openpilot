@@ -128,6 +128,9 @@ class CarInterfaceBase():
     elif cs_out.steerWarning:
       events.add(EventName.steerTempUnavailable)
 
+    if cs_out.hightorqUnavailable:
+      events.add(EventName.hightorqsteerUnavailable)
+
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0.
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
