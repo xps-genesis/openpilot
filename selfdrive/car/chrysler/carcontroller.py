@@ -71,8 +71,9 @@ class CarController():
     elif CS.apaFault or CS.out.gearShifter not in (GearShifter.drive, GearShifter.low) or \
             abs(CS.out.steeringAngleDeg) > 330. or self.on_timer < 200 or CS.apa_steer_status:
       self.steer_type = int(0)
-      if CS.out.gearShifter in (GearShifter.drive, GearShifter.low) and not CS.apaFault:
-        self.hightorqUnavailable = True
+    
+    if self.steer_type == int(0) and CS.out.gearShifter in (GearShifter.drive, GearShifter.low) and not CS.apaFault:
+      self.hightorqUnavailable = True
 
     self.apaActive = CS.apasteerOn and self.steer_type == 2
 
