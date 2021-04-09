@@ -458,12 +458,12 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
 
   EventName.hightorqsteerUnavailable: {
     ET.PERMANENT: Alert(
-      "Steering Not Enabled",
-      "Bring the vehicle to stop to re-enable",
+      "Mango Mode Not Enabled",
+      "Bring the vehicle to stop in fwd gear to re-enable",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOWEST, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
   },
-  
+
   EventName.fanMalfunction: {
     ET.PERMANENT: NormalPermanentAlert("Fan Malfunction", "Contact Support"),
   },
