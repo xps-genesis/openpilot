@@ -74,7 +74,6 @@ class PIController():
     self.saturated = False
     self.control = 0
     self.errors = []
-    self.maxP = 0.03
 
   def update(self, setpoint, measurement, speed=0.0, check_saturation=True, override=False, feedforward=0., deadzone=0., freeze_integrator=False):
     self.speed = speed
@@ -86,8 +85,6 @@ class PIController():
 
     error = float(apply_deadzone(setpoint - measurement, deadzone))
     self.p = error * (self.k_p + self.nl_p)
-    if Params().get_bool('ChryslerMangoMode'):
-      self.p = min(self.p, self.maxP) #avoid wobble
     self.f = feedforward * self.k_f
 
     self.d = 0.
