@@ -62,7 +62,14 @@ QWidget * toggles_panel() {
                                            "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
                                            "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
                                            "../assets/offroad/icon_road.png"));
-
+  toggles_list->addWidget(new ParamControl("LkasFullRangeAvailable",
+                                           "Chrysler steer to 0 \U0001f96e",
+                                           "needs WP setup to steer to 0 speed",
+                                           "../assets/offroad/icon_road.png"));
+  toggles_list->addWidget(new ParamControl("ChryslerMangoMode",
+                                           "Chrysler Mango Mode \U0001f96d",
+                                           "needs WP setup to allow high torq",
+                                           "../assets/offroad/icon_road.png"));
 #ifdef QCOM2
   toggles_list->addWidget(horizontal_line());
   toggles_list->addWidget(new ParamControl("EnableWideCamera",

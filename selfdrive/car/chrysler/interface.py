@@ -26,23 +26,23 @@ class CarInterface(CarInterfaceBase):
     ret.steerRatio = 16.2  # Pacifica Hybrid 2017
     ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
 
-    if Params().get('ChryslerMangoMode') == b'0':
+    if not Params().get_bool('ChryslerMangoMode'):
       ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[9., 20.], [9., 20.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1, 0.15], [0.02, 0.03]]
       ret.lateralTuning.pid.kfBP = [0.]
       ret.lateralTuning.pid.kfV = [0.00005]   # full torque for 10 deg at 80mph means 0.00007818594
     else:
-      ret.lateralTuning.pid.kpBP = [0., 10.]
-      ret.lateralTuning.pid.kpV = [0.01, 0.03]
+      ret.lateralTuning.pid.kpBP = [0., 30.]
+      ret.lateralTuning.pid.kpV = [0.05, 0.1]
 
       ret.lateralTuning.pid.kiBP = [0., 30.]
       ret.lateralTuning.pid.kiV = [0.02, 0.03]
 
-      ret.lateralTuning.pid.kdBP = [0., 30.]
-      ret.lateralTuning.pid.kdV = [1., 5.]
+      ret.lateralTuning.pid.kdBP = [0.]
+      ret.lateralTuning.pid.kdV = [.5]
 
-      ret.lateralTuning.pid.kfBP = [0., 30.]
-      ret.lateralTuning.pid.kfV = [0.00002, 0.000025]   # full torque for 10 deg at 80mph means 0.00007818594
+      ret.lateralTuning.pid.kfBP = [0.]
+      ret.lateralTuning.pid.kfV = [0.00002]   # full torque for 10 deg at 80mph means 0.00007818594
 
     ret.steerActuatorDelay = 0.01
     ret.steerRateCost = 0.4
