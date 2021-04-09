@@ -160,6 +160,7 @@ struct CarState {
   stockAeb @30 :Bool;
   stockFcw @31 :Bool;
   espDisabled @32 :Bool;
+  hightorqUnavailable @37 :Bool;
 
   # cruise state
   cruiseState @10 :CruiseState;
