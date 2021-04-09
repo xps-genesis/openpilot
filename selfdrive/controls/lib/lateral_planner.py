@@ -101,7 +101,7 @@ class LateralPlanner():
       self.path_xyz_stds = np.column_stack([md.position.xStd, md.position.yStd, md.position.zStd])
 
     # Lane change logic
-    one_blinker = sm['carState'].leftBlinker != sm['carState'].rightBlinker
+    one_blinker = (sm['carState'].leftBlinker != sm['carState'].rightBlinker) and (sm['carState'].rightBlinker or sm['carState'].leftBlinker)
     below_lane_change_speed = v_ego < LANE_CHANGE_SPEED_MIN
 
     if sm['carState'].leftBlinker:
