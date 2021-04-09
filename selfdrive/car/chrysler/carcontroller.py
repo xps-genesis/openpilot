@@ -18,6 +18,7 @@ class CarController():
     self.steerErrorMod = False
     self.steer_type = int(0)
     self.on_timer = 0
+    self.hightorqsteerUnavailable = False
 
     self.packer = CANPacker(dbc_name)
 
