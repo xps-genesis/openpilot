@@ -745,10 +745,9 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
 
   EventName.hightorqsteerUnavailable: {
     ET.PERMANENT: Alert(
-      "APA mode disabled, bring the vehicle to stop to Auto enable",
-      "",
-      AlertStatus.normal, AlertSize.small,
-      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
+      "Steering Not Enabled",
+      "Bring the vehicle to stop to reenable",
+      AlertStatus.normal, AlertSize.mid,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
   },
-
 }
