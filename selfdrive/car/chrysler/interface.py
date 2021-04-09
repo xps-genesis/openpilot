@@ -5,6 +5,8 @@ from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness,
 from selfdrive.car.interfaces import CarInterfaceBase
 from common.params import Params
 
+EventName = car.CarEvent.EventName
+
 class CarInterface(CarInterfaceBase):
   @staticmethod
   def compute_gb(accel, speed):
@@ -84,7 +86,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.steerError = self.CC.steerErrorMod
     if self.CC.hightorqsteerUnavailable:
-      events.add(car.CarEvent.EventName.hightorqsteerUnavailable)
+      events.add(EventName.hightorqsteerUnavailable)
 
     # events
     events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low],
