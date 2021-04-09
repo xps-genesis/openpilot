@@ -74,7 +74,7 @@ class PIController():
     self.saturated = False
     self.control = 0
     self.errors = []
-    self.maxP = 0.02
+    self.maxP = 0.03
 
   def update(self, setpoint, measurement, speed=0.0, check_saturation=True, override=False, feedforward=0., deadzone=0., freeze_integrator=False):
     self.speed = speed
