@@ -30,6 +30,8 @@ def manager_init():
     ("IsUploadRawEnabled", "1"),
     ("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')),
     ("OpenpilotEnabledToggle", "1"),
+    ("LkasFullRangeAvailable", "1"),
+    ("ChryslerMangoMode", "1"),
   ]
 
   if params.get_bool("RecordFrontLock"):

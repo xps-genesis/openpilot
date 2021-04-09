@@ -743,4 +743,12 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
     ET.NO_ENTRY: NoEntryAlert("Cruise Fault: Restart the Car"),
   },
 
+  EventName.hightorqsteerUnavailable: {
+    ET.PERMANENT: Alert(
+      "APA mode disabled, bring the vehicle to stop to Auto enable",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
+  },
+
 }

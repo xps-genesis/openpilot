@@ -3,7 +3,7 @@ from cereal import car
 from selfdrive.car.chrysler.values import CAR
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
-
+from common.params import Params
 
 class CarInterface(CarInterfaceBase):
   @staticmethod
@@ -23,22 +23,28 @@ class CarInterface(CarInterfaceBase):
     ret.wheelbase = 3.089  # in meters for Pacifica Hybrid 2017
     ret.steerRatio = 16.2  # Pacifica Hybrid 2017
     ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
-    ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0., 10.], [0., 30.]]
-    ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.01, 0.03], [0.02, 0.03]]
-    ret.lateralTuning.pid.kf = 0.00002   # full torque for 10 deg at 80mph means 0.00007818594
-    ret.steerActuatorDelay = 0.1
+
+    if Params().get('ChryslerMangoMode') == b'0':
+      ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[9., 20.], [9., 20.]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1, 0.15], [0.02, 0.03]]
+      ret.lateralTuning.pid.kfBP = [0.]
+      ret.lateralTuning.pid.kfV = [0.00005]   # full torque for 10 deg at 80mph means 0.00007818594
+    else:
+      ret.lateralTuning.pid.kpBP = [0., 10.]
+      ret.lateralTuning.pid.kpV = [0.01, 0.03]
+
+      ret.lateralTuning.pid.kiBP = [0., 30.]
+      ret.lateralTuning.pid.kiV = [0.02, 0.03]
+
+      ret.lateralTuning.pid.kdBP = [0.]
+      ret.lateralTuning.pid.kdV = [1.]
+
+      ret.lateralTuning.pid.kfBP = [0.]
+      ret.lateralTuning.pid.kfV = [0.00002]   # full torque for 10 deg at 80mph means 0.00007818594
+
+    ret.steerActuatorDelay = 0.01
     ret.steerRateCost = 0.4
     ret.steerLimitTimer = 0.7
-
-   # ret.lateralTuning.init('indi')
-  #  ret.lateralTuning.indi.innerLoopGainBP = [0.]
-  #  ret.lateralTuning.indi.innerLoopGainV = [1.2]
-  #  ret.lateralTuning.indi.outerLoopGainBP = [0.]
-  #  ret.lateralTuning.indi.outerLoopGainV = [1.]
-  #  ret.lateralTuning.indi.timeConstantBP = [0.]
-  #  ret.lateralTuning.indi.timeConstantV = [1.5]
-  #  ret.lateralTuning.indi.actuatorEffectivenessBP = [0.]
-   # ret.lateralTuning.indi.actuatorEffectivenessV = [3.]
 
     if candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
       ret.wheelbase = 2.91  # in meters
@@ -64,7 +70,7 @@ class CarInterface(CarInterfaceBase):
     return ret
 
   # returns a car.CarState
-  def update(self, c, can_strings):
+  def update(self, c, can_strings, events=None):
     # ******************* do can recv *******************
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
@@ -77,6 +83,8 @@ class CarInterface(CarInterfaceBase):
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
     ret.steerError = self.CC.steerErrorMod
+    if self.CC.hightorqsteerUnavailable:
+      events.add(car.CarEvent.EventName.hightorqsteerUnavailable)
 
     # events
     events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low],
