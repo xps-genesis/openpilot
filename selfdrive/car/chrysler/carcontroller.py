@@ -18,7 +18,7 @@ class CarController():
     self.steerErrorMod = False
     self.steer_type = int(0)
     self.on_timer = 0
-    self.hightorqsteerUnavailable = False
+    self.hightorqUnavailable = False
 
     self.packer = CANPacker(dbc_name)
 
@@ -33,7 +33,7 @@ class CarController():
       self.on_timer += 1
 
     wp_type = int(0)
-    self.hightorqsteerUnavailable = False
+    self.hightorqUnavailable = False
 
     if Params().get_bool('LkasFullRangeAvailable'):
       wp_type = int(1)
@@ -71,7 +71,7 @@ class CarController():
     elif CS.apaFault or CS.out.gearShifter not in (GearShifter.drive, GearShifter.low) or \
             abs(CS.out.steeringAngleDeg) > 330. or self.on_timer < 200 or CS.apa_steer_status:
       self.steer_type = int(0)
-      self.hightorqsteerUnavailable = True
+      self.hightorqUnavailable = True
 
     self.apaActive = CS.apasteerOn and self.steer_type == 2
 
