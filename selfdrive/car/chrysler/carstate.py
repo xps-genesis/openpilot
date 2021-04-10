@@ -73,7 +73,7 @@ class CarState(CarStateBase):
     self.veh_on = cp.vl["HYBRID_ECU"]['VEH_ON'] == 1
     self.acc_hold = cp.vl["ACC_2"]['ACC_STATUS_1'] == 1
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
-    self.wheel_button_counter = copy.copy(cp.vl["WHEEL_BUTTONS"]['COUNTER'])
+    self.wheel_button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
 
     return ret
 
