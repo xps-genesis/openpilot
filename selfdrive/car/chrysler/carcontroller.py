@@ -20,7 +20,6 @@ class CarController():
     self.steer_type = int(0)
     self.on_timer = 0
     self.hightorqUnavailable = False
-    self.prev_lead_dist = 0
     self.acc_stop_timer = 0
 
     self.packer = CANPacker(dbc_name)
@@ -95,19 +94,24 @@ class CarController():
 
    # if pcm_cancel_cmd:
    #   # TODO: would be better to start from frame_2b3
-   #   new_msg = create_wheel_buttons(self.packer, self.ccframe, cancel=True, resume=False)
+   #   new_msg = create_wheel_buttons(self.packer, self.ccframe, True, False)
    #   can_sends.append(new_msg)
     self.resume_press = False
     if CS.acc_hold and CS.out.standstill:
       self.acc_stop_timer += 1
       if self.acc_stop_timer > 180:
         self.resume_press = True
+    else:
+      self.acc_stop_timer = 0
 
-    if enabled and self.resume_press and CS.lead_dist > self.prev_lead_dist or CS.lead_dist > 4:
-      new_msg = create_wheel_buttons(self.packer, self.ccframe, cancel=False, resume=True)
+    if enabled and self.resume_press and CS.lead_dist > 4:
+      self.wheel_button_counter += 1
+      self.wheel_button_counter %= 0xF
+      new_msg = create_wheel_buttons(self.packer, self.wheel_button_counter, False, True)
       can_sends.append(new_msg)
+    else:
+      self.wheel_button_counter = CS.wheel_button_counter
 
-    self.prev_lead_dist = CS.lead_dist
     # LKAS_HEARTBIT is forwarded by Panda so no need to send it here.
     # frame is 100Hz (0.01s period)
     if (self.ccframe % 2 == 0) and wp_type == 2:  # 0.02s period

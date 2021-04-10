@@ -1,3 +1,5 @@
+from copy import copy
+
 from cereal import car
 from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine
@@ -71,6 +73,7 @@ class CarState(CarStateBase):
     self.veh_on = cp.vl["HYBRID_ECU"]['VEH_ON'] == 1
     self.acc_hold = cp.vl["ACC_2"]['ACC_STATUS_1'] == 1
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
+    self.wheel_button_counter = copy.copy(cp.vl["WHEEL_BUTTONS"]['COUNTER'])
 
     return ret
 
@@ -112,6 +115,7 @@ class CarState(CarStateBase):
       ("ACC_STATUS_1", "ACC_2", 0),
       ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
       ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
+      ("WHEEL_BUTTONS", "COUNTER", 0),
     ]
 
     checks = [
