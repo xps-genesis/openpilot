@@ -124,7 +124,7 @@ class LateralPlanner():
         self.pre_auto_LCA_timer += DT_MDL
       else:
         self.pre_auto_LCA_timer = 0
-      torque_applied = (1.1 > self.pre_auto_LCA_timer > 0.6 and not blindspot_detected) or \
+      torque_applied = (1.9 > self.pre_auto_LCA_timer > 1.4 and not blindspot_detected) or \
                        (sm['carState'].steeringPressed and
                         ((sm['carState'].steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or
                         (sm['carState'].steeringTorque < 0 and self.lane_change_direction == LaneChangeDirection.right)))
@@ -146,6 +146,7 @@ class LateralPlanner():
 
       # starting
       elif self.lane_change_state == LaneChangeState.laneChangeStarting:
+        self.pre_auto_LCA_timer = 0.
         # fade out over .5s
         self.lane_change_ll_prob = max(self.lane_change_ll_prob - DT_MDL, 0.0)
         # 98% certainty
@@ -154,6 +155,7 @@ class LateralPlanner():
 
       # finishing
       elif self.lane_change_state == LaneChangeState.laneChangeFinishing:
+        self.pre_auto_LCA_timer = 0.
         # fade in laneline over 1s
         self.lane_change_ll_prob = min(self.lane_change_ll_prob + DT_MDL, 1.0)
         if one_blinker and self.lane_change_ll_prob > 0.99:

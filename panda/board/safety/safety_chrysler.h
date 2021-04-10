@@ -178,7 +178,7 @@ static int chrysler_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
   // FORCE CANCEL: only the cancel button press is allowed
   if (addr == 571) {
     if ((GET_BYTE(to_send, 0) != 1) || ((GET_BYTE(to_send, 1) & 1) == 1)) {
-      tx = 0;
+      tx = 1;
     }
   }
 
