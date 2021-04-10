@@ -70,7 +70,7 @@ class CarState(CarStateBase):
     self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]['APA_STEER_ACT'] == 1
     self.veh_on = cp.vl["HYBRID_ECU"]['VEH_ON'] == 1
     self.acc_hold = cp.vl["ACC_2"]['ACC_STATUS_1'] == 1
-    self.lead_dist = cp.vl["LEAD_DIST"]['DASHBOARD']
+    self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
 
     return ret
 
