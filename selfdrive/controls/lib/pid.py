@@ -1,7 +1,6 @@
 import numpy as np
 from common.numpy_fast import clip, interp
 from common.op_params import opParams
-from common.params import Params
 
 GainSaS_BP = [0., 3.9, 4., 5., 10., 20., 40.]
 Gain_g = [0.05, .065, .085, .1, .12, .14, .16]
