@@ -94,7 +94,7 @@ class CarController():
 
     #*** control msgs ***
 
-    if pcm_cancel_cmd and CS.out.cruiseState.enabled:
+    if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
       self.cancel_counter += 1
       self.cancel_counter %= 0xF
       new_msg = create_wheel_buttons(self.packer, self.cancel_counter, True, False)
@@ -104,18 +104,17 @@ class CarController():
     self.resume_press = False
     if CS.acc_hold and CS.out.standstill:
       self.acc_stop_timer += 1
-      if self.acc_stop_timer > 180:
+      if self.acc_stop_timer > 200:
         self.resume_press = True
-      elif self.acc_stop_timer > 200:
-        self.acc_stop_timer = 0
     else:
       self.acc_stop_timer = 0
 
-    if not pcm_cancel_cmd and enabled and self.resume_press and CS.lead_dist > 3:
+    if enabled and self.resume_press and CS.lead_dist > 4:
       self.resume_counter += 1
       self.resume_counter %= 0xF
-      new_msg = create_wheel_buttons(self.packer, self.resume_counter, False, True)
-      can_sends.append(new_msg)
+      if self.resume_counter < 5:
+        new_msg = create_wheel_buttons(self.packer, self.resume_counter, False, True)
+        can_sends.append(new_msg)
     else:
       self.resume_counter = CS.wheel_button_counter
 
