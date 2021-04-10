@@ -61,11 +61,16 @@ class CarState(CarStateBase):
 
     ret.genericToggle = bool(cp.vl["STEERING_LEVERS"]['HIGH_BEAM_FLASH'])
 
+    ret.leftBlindspot = 7 > cp.vl["BLIND_SPOT_LEFT"]['BLIND_SPOT_WARNINGS'] > 0
+    ret.rightBlindspot = 7 > cp.vl["BLIND_SPOT_RIGHT"]['BLIND_SPOT_WARNINGS'] > 0
+
     self.lkas_counter = cp_cam.vl["LKAS_COMMAND"]['COUNTER']
     self.lkas_car_model = cp_cam.vl["LKAS_HUD"]['CAR_MODEL']
     self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]['LKAS_STATUS_OK']
     self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]['APA_STEER_ACT'] == 1
     self.veh_on = cp.vl["HYBRID_ECU"]['VEH_ON'] == 1
+    self.acc_hold = cp.vl["ACC_2"]['ACC_STATUS_1'] == 1
+    self.lead_dist = cp.vl["LEAD_DIST"]['DASHBOARD']
 
     return ret
 
@@ -92,6 +97,7 @@ class CarState(CarStateBase):
       ("ACC_STATUS_2", "ACC_2", 0),
       ("HIGH_BEAM_FLASH", "STEERING_LEVERS", 0),
       ("ACC_SPEED_CONFIG_KPH", "DASHBOARD", 0),
+      ("LEAD_DIST", "DASHBOARD", 0),
       ("CRUISE_STATE", "DASHBOARD", 0),
       ("TORQUE_DRIVER", "EPS_STATUS", 0),
       ("TORQUE_MOTOR", "EPS_STATUS", 0),
@@ -103,6 +109,9 @@ class CarState(CarStateBase):
       ("APA_STEER_FAULT", "EPS_STATUS", 1),
       ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
       ("VEH_ON", "HYBRID_ECU", 0),
+      ("ACC_STATUS_1", "ACC_2", 0),
+      ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
+      ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
     ]
 
     checks = [

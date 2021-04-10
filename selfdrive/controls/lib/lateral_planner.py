@@ -101,7 +101,7 @@ class LateralPlanner():
       self.path_xyz_stds = np.column_stack([md.position.xStd, md.position.yStd, md.position.zStd])
 
     # Lane change logic
-    one_blinker = (sm['carState'].leftBlinker != sm['carState'].rightBlinker) and (sm['carState'].rightBlinker or sm['carState'].leftBlinker)
+    one_blinker = sm['carState'].leftBlinker != sm['carState'].rightBlinker
     below_lane_change_speed = v_ego < LANE_CHANGE_SPEED_MIN
 
     if sm['carState'].leftBlinker:
@@ -117,11 +117,12 @@ class LateralPlanner():
       blindspot_detected = ((sm['carState'].leftBlindspot and self.lane_change_direction == LaneChangeDirection.left) or
                             (sm['carState'].rightBlindspot and self.lane_change_direction == LaneChangeDirection.right))
 
-      if not blindspot_detected:
+      if blindspot_detected:
+        self.pre_auto_LCA_timer = -1.4
+      elif one_blinker:
         self.pre_auto_LCA_timer += DT_MDL
       else:
-        self.pre_auto_LCA_timer = -1.4
-
+        self.pre_auto_LCA_timer = 0
       torque_applied = (1.1 > self.pre_auto_LCA_timer > 0.6 and not blindspot_detected) or \
                        (sm['carState'].steeringPressed and
                         ((sm['carState'].steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or

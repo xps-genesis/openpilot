@@ -31,9 +31,9 @@ def create_apa_hud(packer, apa_active, apa_fault, enabled, lkas_car_model, steer
 def create_lkas_hud(packer, gear, lkas_active, hud_alert, hud_count, lkas_car_model, steer_type):
   # LKAS_HUD 0x2a6 (678) Controls what lane-keeping icon is displayed.
 
-  if hud_alert == VisualAlert.steerRequired:
-    msg = b'\x00\x00\x00\x03\x00\x00\x00\x00'
-    return make_can_msg(0x2a6, msg, 0)
+#  if hud_alert == VisualAlert.steerRequired:
+#    msg = b'\x00\x00\x00\x03\x00\x00\x00\x00'
+#    return make_can_msg(0x2a6, msg, 0)
 
   color = 1  # default values are for park or neutral in 2017 are 0 0, but trying 1 1 for 2019
   lines = 1
@@ -72,10 +72,11 @@ def create_lkas_command(packer, apply_steer, lkas_active, frame):
   return packer.make_can_msg("LKAS_COMMAND", 0, values)
 
 
-def create_wheel_buttons(packer, frame, cancel=False):
+def create_wheel_buttons(packer, frame, cancel=False, resume=False):
   # WHEEL_BUTTONS (571) Message sent to cancel ACC.
   values = {
     "ACC_CANCEL": cancel,
+    "ACC_RESUME": resume,
     "COUNTER": frame % 10
   }
   return packer.make_can_msg("WHEEL_BUTTONS", 0, values)
