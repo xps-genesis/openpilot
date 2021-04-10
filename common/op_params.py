@@ -62,8 +62,8 @@ class opParams:
 
     VT = ValueTypes()
     self.fork_params = {'enableLKASbutton': Param(False, bool, 'general toggle to enable LKAS button, LKAS button press will cancel OP steer'),
-                        'smartMDPS': Param(True, bool, 'Toggle to enable smart MDPS'),
-                        'nonlinearsas': Param(True, bool, 'Toggle to enable non linear desired steering angle based tune'),
+                        'smartMDPS': Param(False, bool, 'Toggle to enable smart MDPS'),
+                        'nonlinearsas': Param(False, bool, 'Toggle to enable non linear desired steering angle based tune'),
                         }
 
 
