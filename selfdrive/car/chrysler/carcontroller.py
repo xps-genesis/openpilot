@@ -21,6 +21,8 @@ class CarController():
     self.on_timer = 0
     self.hightorqUnavailable = False
     self.acc_stop_timer = 0
+    self.resume_counter = 0
+    self.cancel_counter = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -56,6 +58,7 @@ class CarController():
     new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
     apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
                                                    CS.out.steeringTorqueEps, CarControllerParams)
+
     if not Params().get_bool('ChryslerMangoMode') and not Params().get_bool('LkasFullRangeAvailable'):
       moving_fast = CS.out.vEgo > CS.CP.minSteerSpeed  # for status message
       if CS.out.vEgo > (CS.CP.minSteerSpeed - 0.5):  # for command high bit
@@ -69,7 +72,6 @@ class CarController():
         apply_steer = 0
 
     self.steer_rate_limited = new_steer != apply_steer
-
     self.apply_steer_last = apply_steer
 
     if CS.out.standstill:
@@ -92,25 +94,30 @@ class CarController():
 
     #*** control msgs ***
 
-   # if pcm_cancel_cmd:
-   #   # TODO: would be better to start from frame_2b3
-   #   new_msg = create_wheel_buttons(self.packer, self.ccframe, True, False)
-   #   can_sends.append(new_msg)
+    if pcm_cancel_cmd and CS.out.cruiseState.enabled:
+      self.cancel_counter += 1
+      self.cancel_counter %= 0xF
+      new_msg = create_wheel_buttons(self.packer, self.cancel_counter, True, False)
+      can_sends.append(new_msg)
+      self.cancel_counter = CS.wheel_button_counter
+
     self.resume_press = False
     if CS.acc_hold and CS.out.standstill:
       self.acc_stop_timer += 1
       if self.acc_stop_timer > 180:
         self.resume_press = True
+      elif self.acc_stop_timer > 200:
+        self.acc_stop_timer = 0
     else:
       self.acc_stop_timer = 0
 
-    if enabled and self.resume_press and CS.lead_dist > 4:
-      self.wheel_button_counter += 1
-      self.wheel_button_counter %= 0xF
-      new_msg = create_wheel_buttons(self.packer, self.wheel_button_counter, False, True)
+    if not pcm_cancel_cmd and enabled and self.resume_press and CS.lead_dist > 3:
+      self.resume_counter += 1
+      self.resume_counter %= 0xF
+      new_msg = create_wheel_buttons(self.packer, self.resume_counter, False, True)
       can_sends.append(new_msg)
     else:
-      self.wheel_button_counter = CS.wheel_button_counter
+      self.resume_counter = CS.wheel_button_counter
 
     # LKAS_HEARTBIT is forwarded by Panda so no need to send it here.
     # frame is 100Hz (0.01s period)
