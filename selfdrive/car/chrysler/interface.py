@@ -3,7 +3,7 @@ from cereal import car
 from selfdrive.car.chrysler.values import CAR
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
-
+from common.params import Params
 
 class CarInterface(CarInterfaceBase):
   @staticmethod
