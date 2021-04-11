@@ -10,6 +10,7 @@ from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX
 from selfdrive.controls.lib.events import Events
 from selfdrive.controls.lib.vehicle_model import VehicleModel
+from common.op_params import opParams
 
 GearShifter = car.CarState.GearShifter
 EventName = car.CarEvent.EventName
@@ -132,8 +133,9 @@ class CarInterfaceBase():
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
     #if (cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
-    if (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
-      events.add(EventName.pedalPressed)
+    if not opParams().get('brakedisengageDisable'):
+      if (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
+        events.add(EventName.pedalPressed)
 
     # we engage when pcm is active (rising edge)
     if pcm_enable and self.CP.enableCruise:

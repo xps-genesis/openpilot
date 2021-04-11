@@ -74,7 +74,8 @@ class opParams:
                         'smartMDPS': Param(True, bool, 'Toggle to enable smart MDPS'),
                         'nonlinearsas': Param(True, bool, 'Toggle to enable non linear desired steering angle based tune'),
                         'nonudgeLCA': Param(True, bool, 'Toggle to enable no nudge lane change'),
-                        'nonudgeLCAspeed': Param(35, int, 'speed-mph above which no nudge lca is allowed')
+                        'nonudgeLCAspeed': Param(35, int, 'speed-mph above which no nudge lca is allowed'),
+                        'brakedisengageDisable': Param(False, bool, 'Toggle to allow op with brake'),
                         }
 
 
