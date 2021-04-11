@@ -345,14 +345,6 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
       Priority.LOWEST, VisualAlert.steerRequired, AudibleAlert.none, .0, .0, .1),
   },
 
-  EventName.steerTempUnavailableMute: {
-    ET.WARNING: Alert(
-      "TAKE CONTROL",
-      "Steering Temporarily Unavailable",
-      AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.none, AudibleAlert.none, .2, .2, .2),
-  },
-
   EventName.preDriverDistracted: {
     ET.WARNING: Alert(
       "KEEP EYES ON ROAD: Driver Distracted",
