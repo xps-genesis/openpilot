@@ -21,7 +21,7 @@ class CarInterface(CarInterfaceBase):
 
     # Speed conversion:              20, 45 mph
     ret.wheelbase = 3.089  # in meters for Pacifica Hybrid 2017
-    ret.steerRatio = 16.2  # Pacifica Hybrid 2017
+    ret.steerRatio = 14.2  # Pacifica Hybrid 2017
     ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
 
     if not Params().get_bool('ChryslerMangoMode'):
@@ -31,13 +31,13 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kfV = [0.00005]   # full torque for 10 deg at 80mph means 0.00007818594
     else:
       ret.lateralTuning.pid.kpBP = [0., 10.]
-      ret.lateralTuning.pid.kpV = [0.04, 0.05]
+      ret.lateralTuning.pid.kpV = [0.035, 0.04]
 
       ret.lateralTuning.pid.kiBP = [0., 30.]
       ret.lateralTuning.pid.kiV = [0.02, 0.03]
 
       ret.lateralTuning.pid.kdBP = [0.]
-      ret.lateralTuning.pid.kdV = [.1]
+      ret.lateralTuning.pid.kdV = [.3]
 
       ret.lateralTuning.pid.kfBP = [0.]
       ret.lateralTuning.pid.kfV = [0.000015]   # full torque for 10 deg at 80mph means 0.00007818594
