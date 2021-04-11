@@ -49,8 +49,8 @@ def manager_init():
     ("ChryslerMangoMode", "1"),
   ]
 
-  if params.get("RecordFrontLock", encoding='utf-8') == "1":
-    params.put("RecordFront", "1")
+  if params.get_bool("RecordFrontLock"):
+    params.put_bool("RecordFront", True)
 
   # set unset params
   for k, v in default_params:
@@ -59,7 +59,7 @@ def manager_init():
 
   # is this dashcam?
   if os.getenv("PASSIVE") is not None:
-    params.put("Passive", str(int(os.getenv("PASSIVE"))))
+    params.put_bool("Passive", bool(int(os.getenv("PASSIVE"))))
 
   if params.get("Passive") is None:
     raise Exception("Passive must be set to continue")
@@ -131,7 +131,7 @@ def manager_thread():
       not_run.append("loggerd")
 
     started = sm['deviceState'].started
-    driverview = params.get("IsDriverViewEnabled") == b"1"
+    driverview = params.get_bool("IsDriverViewEnabled")
     ensure_running(managed_processes.values(), started, driverview, not_run)
 
     # trigger an update after going offroad
@@ -151,7 +151,7 @@ def manager_thread():
     pm.send('managerState', msg)
 
     # Exit main loop when uninstall is needed
-    if params.get("DoUninstall", encoding='utf8') == "1":
+    if params.get_bool("DoUninstall"):
       break
 
 
@@ -180,7 +180,7 @@ def main():
   finally:
     manager_cleanup()
 
-  if Params().get("DoUninstall", encoding='utf8') == "1":
+  if Params().get_bool("DoUninstall"):
     cloudlog.warning("uninstalling")
     HARDWARE.uninstall()
 

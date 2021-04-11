@@ -7,7 +7,7 @@ Ecu = car.CarParams.Ecu
 
 class CarControllerParams:
   if Params().get('ChryslerMangoMode') == b'1':
-    STEER_MAX = 400         # 262 faults
+    STEER_MAX = 250         # 262 faults
     STEER_DELTA_UP = 2      # 3 is stock. 100 is fine. 200 is too much it seems
     STEER_DELTA_DOWN = 2    # no faults on the way down it seems
   else:

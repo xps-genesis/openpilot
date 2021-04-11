@@ -64,7 +64,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     belowSteerSpeed @46;
     lowBattery @48;
     vehicleModelInvalid @50;
-    controlsFailed @51;
+    accFaulted @51;
     sensorDataInvalid @52;
     commIssue @53;
     tooDistracted @54;
@@ -123,6 +123,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     neosUpdateRequiredDEPRECATED @88;
     modelLagWarningDEPRECATED @93;
     startupOneplusDEPRECATED @82;
+    steerTempUnavailableMuteDEPRECATED @35;
   }
 }
 
