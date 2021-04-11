@@ -23,7 +23,7 @@ class CarController():
     self.acc_stop_timer = 0
     self.resume_counter = 0
     self.cancel_counter = 0
-    self.pause_control_until_frame = 0
+    self.pause_button_spoof = 0
     self.last_button_counter = 0
 
     self.packer = CANPacker(dbc_name)
@@ -98,24 +98,26 @@ class CarController():
 
     self.resume_press = False
     if CS.acc_hold and CS.out.standstill:
+      self.lock_lead_at_stop = CS.lead_dist
       self.acc_stop_timer += 1
       if self.acc_stop_timer > 180:
         self.resume_press = True
     else:
       self.acc_stop_timer = 0
+      self.lock_lead_at_stop = 0
 
-    if CS.accCancelButton or CS.accFollowDecButton or CS.accFollowIncButton:
-      self.pause_control_until_frame = self.ccframe + 100  # Avoid pushing multiple buttons at the same time
+    if CS.acc_button_pressed:
+      self.pause_button_spoof = self.ccframe + 50
 
     button_counter_change = CS.button_counter != self.last_button_counter
     if button_counter_change:
       self.last_button_counter = CS.button_counter
 
-    if (self.ccframe % 10 < 5) and button_counter_change and self.ccframe >= self.pause_control_until_frame:
+    if (self.ccframe % 10 < 5) and button_counter_change and self.ccframe >= self.pause_button_spoof:
       button_type = None
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
         button_type = 'ACC_CANCEL'
-      elif enabled and self.resume_press and CS.lead_dist > 3 and not CS.out.brakePressed:
+      elif enabled and self.resume_press and CS.lead_dist > self.lock_lead_at_stop and not CS.out.brakePressed:
         button_type = 'ACC_RESUME'
 
       if button_type is not None:
