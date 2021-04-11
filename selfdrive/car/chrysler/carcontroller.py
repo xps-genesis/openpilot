@@ -24,6 +24,7 @@ class CarController():
     self.resume_counter = 0
     self.cancel_counter = 0
     self.pause_control_until_frame = 0
+    self.last_button_counter = 0
 
     self.packer = CANPacker(dbc_name)
 
