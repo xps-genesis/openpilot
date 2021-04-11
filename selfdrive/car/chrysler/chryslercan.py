@@ -72,11 +72,11 @@ def create_lkas_command(packer, apply_steer, lkas_active, frame):
   return packer.make_can_msg("LKAS_COMMAND", 0, values)
 
 
-def create_wheel_buttons(packer, counter, cancel, resume):
+def create_wheel_buttons(packer, counter, button_type):
   # WHEEL_BUTTONS (571) Message sent to cancel ACC.
   values = {
-    "ACC_CANCEL": cancel,
-    "ACC_RESUME": resume,
+    "ACC_CANCEL": button_type == 1,
+    "ACC_RESUME": button_type == 2,
     "COUNTER": counter
   }
   return packer.make_can_msg("WHEEL_BUTTONS", 0, values)

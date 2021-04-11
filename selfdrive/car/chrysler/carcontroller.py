@@ -94,29 +94,26 @@ class CarController():
 
     #*** control msgs ***
 
-    if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
-      self.cancel_counter += 1
-      self.cancel_counter %= 0xF
-      new_msg = create_wheel_buttons(self.packer, self.cancel_counter, True, False)
-      can_sends.append(new_msg)
-      self.cancel_counter = CS.wheel_button_counter
-
     self.resume_press = False
     if CS.acc_hold and CS.out.standstill:
       self.acc_stop_timer += 1
-      if self.acc_stop_timer > 200:
+      if self.acc_stop_timer > 180:
         self.resume_press = True
     else:
       self.acc_stop_timer = 0
 
-    if enabled and self.resume_press and CS.lead_dist > 4:
-      self.resume_counter += 1
-      self.resume_counter %= 0xF
-      if self.resume_counter < 5:
-        new_msg = create_wheel_buttons(self.packer, self.resume_counter, False, True)
-        can_sends.append(new_msg)
-    else:
-      self.resume_counter = CS.wheel_button_counter
+    button_type = None
+
+    if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
+      button_type = 1
+    elif enabled and self.resume_press and CS.lead_dist > 3 and (self.ccframe % 10 <= 4):
+      button_type = 2
+
+    self.button_counter = (CS.wheel_button_counter + 1) % 0xF
+
+    if button_type is not None:
+      new_msg = create_wheel_buttons(self.packer, self.button_counter, button_type)
+      can_sends.append(new_msg)
 
     # LKAS_HEARTBIT is forwarded by Panda so no need to send it here.
     # frame is 100Hz (0.01s period)
