@@ -21,7 +21,7 @@ class CarInterface(CarInterfaceBase):
 
     # Speed conversion:              20, 45 mph
     ret.wheelbase = 3.089  # in meters for Pacifica Hybrid 2017
-    ret.steerRatio = 14.2  # Pacifica Hybrid 2017
+    ret.steerRatio = 16.2  # Pacifica Hybrid 2017
     ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
 
     if not Params().get_bool('ChryslerMangoMode'):
@@ -31,19 +31,19 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kfV = [0.00005]   # full torque for 10 deg at 80mph means 0.00007818594
     else:
       ret.lateralTuning.pid.kpBP = [0., 10.]
-      ret.lateralTuning.pid.kpV = [0.01, 0.03]
+      ret.lateralTuning.pid.kpV = [0.01, 0.035]
 
       ret.lateralTuning.pid.kiBP = [0., 30.]
       ret.lateralTuning.pid.kiV = [0.02, 0.03]
 
       ret.lateralTuning.pid.kdBP = [0.]
-      ret.lateralTuning.pid.kdV = [.3]
+      ret.lateralTuning.pid.kdV = [.5]
 
       ret.lateralTuning.pid.kfBP = [0.]
       ret.lateralTuning.pid.kfV = [0.00002]   # full torque for 10 deg at 80mph means 0.00007818594
 
     ret.steerActuatorDelay = 0.01
-    ret.steerRateCost = 0.4
+    ret.steerRateCost = 0.35
     ret.steerLimitTimer = 0.7
 
     if candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
