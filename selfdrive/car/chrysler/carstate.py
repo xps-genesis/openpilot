@@ -76,7 +76,7 @@ class CarState(CarStateBase):
     self.button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
 
     self.acc_button_pressed = bool(cp.vl["WHEEL_BUTTONS"]['ACC_CANCEL']) \
-                              or bool(cp.vl["WHEEL_BUTTONS"]['ACC_RESUME']) \
+                          #    or bool(cp.vl["WHEEL_BUTTONS"]['ACC_RESUME']) \
                               or bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_INC']) \
                               or bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_DEC']) \
                               or bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_DEC']) \
