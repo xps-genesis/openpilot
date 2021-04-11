@@ -63,8 +63,8 @@ QWidget * toggles_panel() {
                                            "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
                                            "../assets/offroad/icon_road.png"));
   toggles_list->addWidget(new ParamControl("EnableOPwithCC",
-                                           "Enable OP without SCC",
-                                           "Enable using set-+ switch",
+                                           "Enable OP with SCC",
+                                           "Use set-+ switch  when toggle off",
                                            "../assets/offroad/icon_road.png"));
   toggles_list->addWidget(new ParamControl("MdpsHarnessEnabled",
                                            "MDPS harness is installed",

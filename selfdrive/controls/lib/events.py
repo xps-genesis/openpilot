@@ -338,6 +338,7 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
 
   EventName.vehicleModelInvalid: {
     ET.NO_ENTRY: NoEntryAlert("Vehicle Parameter Identification Failed"),
+    ET.SOFT_DISABLE: SoftDisableAlert("Vehicle Parameter Identification Failed"),
     ET.WARNING: Alert(
       "Vehicle Parameter Identification Failed",
       "",
@@ -521,11 +522,7 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
   },
 
   EventName.steerTempUnavailable: {
-    ET.WARNING: Alert(
-      "TAKE CONTROL",
-      "Steering Temporarily Unavailable",
-      AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 3.),
+    ET.SOFT_DISABLE: SoftDisableAlert("Steering Temporarily Unavailable"),
     ET.NO_ENTRY: NoEntryAlert("Steering Temporarily Unavailable",
                               duration_hud_alert=0.),
   },
