@@ -104,7 +104,7 @@ class CarController():
 
     button_type = None
 
-    if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
+    if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled and (self.ccframe % 10 <= 4):
       button_type = 1
     elif enabled and self.resume_press and CS.lead_dist > 3 and (self.ccframe % 10 <= 4):
       button_type = 2
