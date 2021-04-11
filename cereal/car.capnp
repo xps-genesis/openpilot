@@ -53,7 +53,6 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     lowSpeedLockout @31;
     plannerError @32;
     debugAlert @34;
-    steerTempUnavailableMute @35;
     resumeRequired @36;
     preDriverDistracted @37;
     promptDriverDistracted @38;
