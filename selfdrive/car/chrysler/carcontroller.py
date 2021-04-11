@@ -23,6 +23,7 @@ class CarController():
     self.acc_stop_timer = 0
     self.resume_counter = 0
     self.cancel_counter = 0
+    self.pause_control_until_frame = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -102,18 +103,23 @@ class CarController():
     else:
       self.acc_stop_timer = 0
 
-    button_type = None
+    if CS.accCancelButton or CS.accFollowDecButton or CS.accFollowIncButton:
+      self.pause_control_until_frame = self.ccframe + 100  # Avoid pushing multiple buttons at the same time
 
-    if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
-      button_type = 1
-    elif enabled and self.resume_press and CS.lead_dist > 3 and (self.ccframe % 10 <= 4):
-      button_type = 2
+    button_counter_change = CS.button_counter != self.last_button_counter
+    if button_counter_change:
+      self.last_button_counter = CS.button_counter
 
-    self.button_counter = (CS.wheel_button_counter + 1) % 0xF
+    if (self.ccframe % 10 < 5) and button_counter_change and self.ccframe >= self.pause_control_until_frame:
+      button_type = None
+      if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
+        button_type = 'ACC_CANCEL'
+      elif enabled and self.resume_press and CS.lead_dist > 3 and not CS.out.brakePressed:
+        button_type = 'ACC_RESUME'
 
-    if button_type is not None:
-      new_msg = create_wheel_buttons(self.packer, self.button_counter, button_type)
-      can_sends.append(new_msg)
+      if button_type is not None:
+        new_msg = create_wheel_buttons(self.packer, CS.button_counter + 1, button_type)
+        can_sends.append(new_msg)
 
     # LKAS_HEARTBIT is forwarded by Panda so no need to send it here.
     # frame is 100Hz (0.01s period)

@@ -75,6 +75,10 @@ class CarState(CarStateBase):
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
     self.wheel_button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
 
+    self.accCancelButton = bool(cp.vl["WHEEL_BUTTONS"]['ACC_CANCEL'])
+    self.accFollowDecButton = bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_DEC'])
+    self.accFollowIncButton = bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_INC'])
+
     return ret
 
   @staticmethod
@@ -116,6 +120,13 @@ class CarState(CarStateBase):
       ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
       ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
       ("COUNTER", "WHEEL_BUTTONS", 0),
+      ("ACC_RESUME", "WHEEL_BUTTONS", 0),
+      ("ACC_CANCEL", "WHEEL_BUTTONS", 0),
+      ("ACC_SPEED_INC", "WHEEL_BUTTONS", 0),
+      ("ACC_SPEED_DEC", "WHEEL_BUTTONS", 0),
+      ("ACC_FOLLOW_INC", "WHEEL_BUTTONS", 0),
+      ("ACC_FOLLOW_DEC", "WHEEL_BUTTONS", 0),
+      ("ACC_DISTANCE_CONFIG_2", "DASHBOARD", 0),
     ]
 
     checks = [
