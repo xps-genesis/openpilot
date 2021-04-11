@@ -21,6 +21,18 @@
 
 QWidget * toggles_panel() {
   QVBoxLayout *toggles_list = new QVBoxLayout();
+  toggles_list->addWidget(new ParamControl("EnableOPwithCC",
+                                           "Enable OP with SCC",
+                                           "Use set-+ switch  when toggle off",
+                                           "../assets/offroad/icon_road.png"));
+  toggles_list->addWidget(new ParamControl("MdpsHarnessEnabled",
+                                           "MDPS harness is installed",
+                                           "type1 or typ2 panda requried",
+                                           "../assets/offroad/icon_road.png"));
+  toggles_list->addWidget(new ParamControl("SccEnabled",
+                                           "Car has SCC",
+                                           "Does your car come stock with SCC, if not toggle off",
+                                           "../assets/offroad/icon_road.png"));
 
   toggles_list->addWidget(new ParamControl("OpenpilotEnabledToggle",
                                             "Enable openpilot",
@@ -62,15 +74,6 @@ QWidget * toggles_panel() {
                                            "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
                                            "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
                                            "../assets/offroad/icon_road.png"));
-  toggles_list->addWidget(new ParamControl("EnableOPwithCC",
-                                           "Enable OP with SCC",
-                                           "Use set-+ switch  when toggle off",
-                                           "../assets/offroad/icon_road.png"));
-  toggles_list->addWidget(new ParamControl("MdpsHarnessEnabled",
-                                           "MDPS harness is installed",
-                                           "type1 or typ2 panda requried",
-                                           "../assets/offroad/icon_road.png"));
-
 
 #ifdef QCOM2
   toggles_list->addWidget(horizontal_line());
