@@ -25,6 +25,7 @@ class CarController():
     self.cancel_counter = 0
     self.pause_button_spoof = 0
     self.last_button_counter = 0
+    self.lock_lead_at_stop = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -98,13 +99,12 @@ class CarController():
 
     self.resume_press = False
     if CS.acc_hold and CS.out.standstill:
-      self.lock_lead_at_stop = CS.lead_dist
       self.acc_stop_timer += 1
       if self.acc_stop_timer > 180:
         self.resume_press = True
     else:
       self.acc_stop_timer = 0
-      self.lock_lead_at_stop = 0
+      self.lock_lead_at_stop = CS.lead_dist
 
     if CS.acc_button_pressed:
       self.pause_button_spoof = self.ccframe + 50
