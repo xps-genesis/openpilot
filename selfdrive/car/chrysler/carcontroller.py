@@ -21,11 +21,9 @@ class CarController():
     self.on_timer = 0
     self.hightorqUnavailable = False
     self.acc_stop_timer = 0
-    self.resume_counter = 0
-    self.cancel_counter = 0
-    self.pause_button_spoof = 0
-    self.last_button_counter = 0
-    self.lock_lead_at_stop = 0
+    self.stop_button_spam = 0
+    self.wheel_button_counter_prev = 0
+    self.lead_dist_at_stop = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -100,28 +98,28 @@ class CarController():
     self.resume_press = False
     if CS.acc_hold and CS.out.standstill:
       self.acc_stop_timer += 1
-      if self.acc_stop_timer > 180:
+      if self.acc_stop_timer > 180: # send resume spam at 1.8 sec; looks like ACC auto resumes by itself if lead moves within 2 seconds
         self.resume_press = True
     else:
       self.acc_stop_timer = 0
-      self.lock_lead_at_stop = CS.lead_dist
+      self.lead_dist_at_stop = CS.lead_dist
 
     if CS.acc_button_pressed:
-      self.pause_button_spoof = self.ccframe + 50
+      self.stop_button_spam = self.ccframe + 50 # stop spamming for 500msec if driver pressed ant acc steering wheel button
 
-    button_counter_change = CS.button_counter != self.last_button_counter
-    if button_counter_change:
-      self.last_button_counter = CS.button_counter
+    wheel_button_counter_change = CS.wheel_button_counter != self.wheel_button_counter_prev
+    if wheel_button_counter_change:
+      self.wheel_button_counter_prev = CS.wheel_button_counter
 
-    if (self.ccframe % 10 < 5) and button_counter_change and self.ccframe >= self.pause_button_spoof:
+    if (self.ccframe % 10 < 5) and wheel_button_counter_change and self.ccframe >= self.stop_button_spam:
       button_type = None
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
         button_type = 'ACC_CANCEL'
-      elif enabled and self.resume_press and CS.lead_dist > self.lock_lead_at_stop and not CS.out.brakePressed:
+      elif enabled and self.resume_press and CS.lead_dist > self.lead_dist_at_stop and not CS.out.gasPressed:
         button_type = 'ACC_RESUME'
 
       if button_type is not None:
-        new_msg = create_wheel_buttons(self.packer, CS.button_counter + 1, button_type)
+        new_msg = create_wheel_buttons(self.packer, CS.wheel_button_counter + 1, button_type)
         can_sends.append(new_msg)
 
     # LKAS_HEARTBIT is forwarded by Panda so no need to send it here.

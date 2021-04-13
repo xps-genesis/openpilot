@@ -73,9 +73,10 @@ class CarState(CarStateBase):
     self.veh_on = cp.vl["HYBRID_ECU"]['VEH_ON'] == 1
     self.acc_hold = cp.vl["ACC_2"]['ACC_STATUS_1'] == 1
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
-    self.button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
+    self.wheel_button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
 
     self.acc_button_pressed = bool(cp.vl["WHEEL_BUTTONS"]['ACC_CANCEL']) \
+                              or bool(cp.vl["WHEEL_BUTTONS"]['ACC_RESUME']) \
                               or bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_INC']) \
                               or bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_DEC']) \
                               or bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_DEC']) \
@@ -108,6 +109,7 @@ class CarState(CarStateBase):
       ("LEAD_DIST", "DASHBOARD", 0),
       ("CRUISE_STATE", "DASHBOARD", 0),
       ("TORQUE_DRIVER", "EPS_STATUS", 0),
+      ("DRIVER_TAKEOVER", "EPS_STATUS", 0),
       ("TORQUE_MOTOR", "EPS_STATUS", 0),
       ("LKAS_STATE", "EPS_STATUS", 1),
       ("COUNTER", "EPS_STATUS", -1),
