@@ -64,9 +64,9 @@ class opParams:
     self.fork_params = {'enableLKASbutton': Param(False, bool, 'general toggle to enable LKAS button, LKAS button press will cancel OP steer'),
                         'smartMDPS': Param(False, bool, 'Toggle to enable smart MDPS'),
                         'nonlinearsas': Param(False, bool, 'Toggle to enable non linear desired steering angle based tune'),
-                        'nonudgeLCA': Param(False, bool, 'Toggle to enable no nudge lane change'),
+                        'nonudgeLCA': Param(True, bool, 'Toggle to enable no nudge lane change'),
                         'nonudgeLCAspeed': Param(35, int, 'speed-mph above which no nudge lca is allowed'),
-                        'brakereleaseAutoResume': Param(True, bool, 'Toggle to enable auto resume ACC on brake release')
+                        'brakereleaseAutoResume': Param(False, bool, 'Toggle to enable auto resume ACC on brake release')
                         }
 
 
