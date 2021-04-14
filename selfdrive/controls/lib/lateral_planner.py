@@ -1,7 +1,7 @@
 import os
 import math
 import numpy as np
-from common.realtime import sec_since_boot, DT_MDL
+from common.realtime import sec_since_boot, DT_MDL, DT_CTRL
 from common.numpy_fast import interp, clip
 from selfdrive.swaglog import cloudlog
 from selfdrive.controls.lib.lateral_mpc import libmpc_py
@@ -126,7 +126,7 @@ class LateralPlanner():
         self.pre_auto_LCA_timer = 0
       torque_applied = (1.9 > self.pre_auto_LCA_timer > 1.4 and not blindspot_detected) or \
                        (sm['carState'].steeringPressed and
-                        ((sm['carState'].steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or
+                       ((sm['carState'].steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or
                         (sm['carState'].steeringTorque < 0 and self.lane_change_direction == LaneChangeDirection.right)))
 
       lane_change_prob = self.LP.l_lane_change_prob + self.LP.r_lane_change_prob
@@ -148,8 +148,8 @@ class LateralPlanner():
       # starting
       elif self.lane_change_state == LaneChangeState.laneChangeStarting:
         self.pre_auto_LCA_timer = 0.
-        # fade out over .5s
-        self.lane_change_ll_prob = max(self.lane_change_ll_prob - DT_MDL, 0.0)
+        # fade out over 2.5s
+        self.lane_change_ll_prob = max(self.lane_change_ll_prob - 4*DT_CTRL, 0.0)
         # 98% certainty
         if lane_change_prob < 0.02 and self.lane_change_ll_prob < 0.01:
           self.lane_change_state = LaneChangeState.laneChangeFinishing
@@ -157,8 +157,8 @@ class LateralPlanner():
       # finishing
       elif self.lane_change_state == LaneChangeState.laneChangeFinishing:
         self.pre_auto_LCA_timer = 0.
-        # fade in laneline over 1s
-        self.lane_change_ll_prob = min(self.lane_change_ll_prob + DT_MDL, 1.0)
+        # fade in laneline over 0.5s
+        self.lane_change_ll_prob = min(self.lane_change_ll_prob + 2*DT_MDL, 1.0)
         if one_blinker and self.lane_change_ll_prob > 0.99:
           self.lane_change_state = LaneChangeState.preLaneChange
         elif self.lane_change_ll_prob > 0.99:

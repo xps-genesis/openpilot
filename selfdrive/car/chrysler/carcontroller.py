@@ -1,3 +1,4 @@
+from common.op_params import opParams
 from selfdrive.car import apply_toyota_steer_torque_limits
 from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, \
                                                create_wheel_buttons, create_apa_hud
@@ -116,6 +117,8 @@ class CarController():
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
         button_type = 'ACC_CANCEL'
       elif enabled and self.resume_press and CS.lead_dist > self.lead_dist_at_stop and not CS.out.gasPressed:
+        button_type = 'ACC_RESUME'
+      elif not CS.out.brakePressed and CS.out.cruiseState.available and opParams().get('brakereleaseAutoResume'):
         button_type = 'ACC_RESUME'
 
       if button_type is not None:
