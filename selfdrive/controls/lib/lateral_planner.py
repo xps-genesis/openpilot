@@ -118,12 +118,15 @@ class LateralPlanner():
       blindspot_detected = ((sm['carState'].leftBlindspot and self.lane_change_direction == LaneChangeDirection.left) or
                             (sm['carState'].rightBlindspot and self.lane_change_direction == LaneChangeDirection.right))
 
-      if not blindspot_detected and opParams().get('nonudgeLCA') and v_ego > opParams().get('nonudgeLCAspeed') * CV.MPH_TO_MS:
-        self.pre_auto_LCA_timer += DT_MDL
+      if self.lane_change_state == LaneChangeState.preLaneChange and opParams().get('nonudgeLCA') and v_ego > opParams().get('nonudgeLCAspeed') * CV.MPH_TO_MS:
+        if not blindspot_detected:
+          self.pre_auto_LCA_timer += DT_MDL
+        else:
+          self.pre_auto_LCA_timer = -1.4
       else:
-        self.pre_auto_LCA_timer = -1.4
+        self.pre_auto_LCA_timer = 0.
 
-      torque_applied = (1.9 > self.pre_auto_LCA_timer > 1.4 and not blindspot_detected) or \
+      torque_applied = (1.4 > self.pre_auto_LCA_timer > .9 and not blindspot_detected) or \
                        (sm['carState'].steeringPressed and
                        ((sm['carState'].steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or
                         (sm['carState'].steeringTorque < 0 and self.lane_change_direction == LaneChangeDirection.right)))
@@ -139,23 +142,20 @@ class LateralPlanner():
       # pre
       elif self.lane_change_state == LaneChangeState.preLaneChange:
         if not one_blinker or below_lane_change_speed:
-          self.pre_auto_LCA_timer = 0.
           self.lane_change_state = LaneChangeState.off
         elif torque_applied and not blindspot_detected:
           self.lane_change_state = LaneChangeState.laneChangeStarting
 
       # starting
       elif self.lane_change_state == LaneChangeState.laneChangeStarting:
-        self.pre_auto_LCA_timer = 0.
-        # fade out over 2.5s
-        self.lane_change_ll_prob = max(self.lane_change_ll_prob - 4*DT_CTRL, 0.0)
+        # fade out over 5s
+        self.lane_change_ll_prob = max(self.lane_change_ll_prob - 2*DT_CTRL, 0.0)
         # 98% certainty
         if lane_change_prob < 0.02 and self.lane_change_ll_prob < 0.01:
           self.lane_change_state = LaneChangeState.laneChangeFinishing
 
       # finishing
       elif self.lane_change_state == LaneChangeState.laneChangeFinishing:
-        self.pre_auto_LCA_timer = 0.
         # fade in laneline over 0.5s
         self.lane_change_ll_prob = min(self.lane_change_ll_prob + 2*DT_MDL, 1.0)
         if one_blinker and self.lane_change_ll_prob > 0.99:
