@@ -118,7 +118,7 @@ class CarController():
         button_type = 'ACC_CANCEL'
       elif enabled and self.resume_press and CS.lead_dist > self.lead_dist_at_stop:
         button_type = 'ACC_RESUME'
-      elif not CS.out.brakePressed and not CS.out.cruiseState.enabled and CS.out.cruiseState.available and opParams().get('brakereleaseAutoResume') and CS.out.gasPressed and CS.out.gearShifter in GearShifter.drive:
+      elif not CS.out.brakePressed and not CS.out.cruiseState.enabled and CS.out.cruiseState.available and opParams().get('brakereleaseAutoResume') and CS.out.gasPressed and CS.out.gearShifter == GearShifter.drive:
         button_type = 'ACC_RESUME'
 
       if button_type is not None:
