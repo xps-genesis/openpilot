@@ -118,7 +118,7 @@ class LateralPlanner():
       blindspot_detected = ((sm['carState'].leftBlindspot and self.lane_change_direction == LaneChangeDirection.left) or
                             (sm['carState'].rightBlindspot and self.lane_change_direction == LaneChangeDirection.right))
 
-      if not blindspot_detected and opParams().get('nonudgeLCA') and v_ego > opParams().get('nonudgeLCA') * CV.MPH_TO_MS:
+      if not blindspot_detected and opParams().get('nonudgeLCA') and v_ego > opParams().get('nonudgeLCAspeed') * CV.MPH_TO_MS:
         self.pre_auto_LCA_timer += DT_MDL
       else:
         self.pre_auto_LCA_timer = -1.4
