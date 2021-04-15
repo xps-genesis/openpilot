@@ -120,7 +120,7 @@ class CarState(CarStateBase):
       ("APA_STEER_FAULT", "EPS_STATUS", 1),
       ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
       ("VEH_ON", "HYBRID_ECU", 0),
-      ("ACC_STATUS_1", "ACC_2", 0),
+      ("ACC_STOP", "ACC_2", 0),
       ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
       ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
       ("COUNTER", "WHEEL_BUTTONS", 0),
