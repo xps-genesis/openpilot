@@ -149,7 +149,7 @@ class CarState(CarStateBase):
       ("SEATBELT_STATUS", 2),
       ("DOORS", 1),
       ("TRACTION_BUTTON", 1),
-      ("BLIND_SPOT_WARNINGS", 1000),
+      ("BLIND_SPOT_WARNINGS", 1),
     ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
