@@ -49,7 +49,7 @@ class CarState(CarStateBase):
     ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(cp.vl['GEAR']['PRNDL'], None))
 
     ret.cruiseState.enabled = bool(cp.vl["ACC_2"]['ACC_ENABLED'])  # ACC is green.
-    ret.cruiseState.available = bool(cp.vl["ACC_2"]['ACC_AVAILABLE']) # FIXME: for now same as enabled
+    ret.cruiseState.available = bool(cp.vl["ACC_2"]['ACC_AVAILABLE'])
     ret.cruiseState.speed = cp.vl["DASHBOARD"]['ACC_SPEED_CONFIG_KPH'] * CV.KPH_TO_MS
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]['CRUISE_STATE'] in [1, 2]
@@ -149,6 +149,7 @@ class CarState(CarStateBase):
       ("SEATBELT_STATUS", 2),
       ("DOORS", 1),
       ("TRACTION_BUTTON", 1),
+      ("BLIND_SPOT_WARNINGS", 1000),
     ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)

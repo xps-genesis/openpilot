@@ -239,9 +239,9 @@ BO_ 838 NEW_MSG_346: 2 XXX
 BO_ 926 NEW_MSG_39e: 3 XXX
 
 BO_ 168 ACCEL_RELATED_a8: 8 XXX
- SG_ ACCEL_RELATED : 23|16@0+ (1,0) [0|65535] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
+ SG_ DRIVER_TORQ : 21|14@0+ (1.5625,-4604.688) [-4604.688|20970.3125] "" XXX
 
 BO_ 270 ACCEL_RELATED_10e: 8 XXX
  SG_ ACCEL_OR_RPM : 7|16@0+ (1,0) [0|255] "" XXX
@@ -250,10 +250,10 @@ BO_ 270 ACCEL_RELATED_10e: 8 XXX
  SG_ ELECTRIC_MOTOR : 23|16@0+ (1,0) [0|65535] "" XXX
 
 BO_ 291 ENERGY_RELATED_123: 8 XXX
- SG_ ENERGY_GAIN_LOSS : 18|11@0- (1,0) [0|255] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
  SG_ ENERGY_SMOOTHER_CURVE : 35|12@0+ (1,0) [0|2047] "" XXX
+ SG_ AXLE_TORQ : 20|13@0- (4,-7767) [-7767|24993] "NM" XXX
 
 BO_ 294 ENERGY_RELATED_126: 8 XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
@@ -293,9 +293,10 @@ BO_ 816 TRACTION_BUTTON: 8 XXX
  SG_ TRACTION_OFF : 19|1@0+ (1,0) [0|3] "" XXX
  SG_ TOGGLE_PARKSENSE : 52|1@0+ (1,0) [0|3] "" XXX
 
-BO_ 878 ACCEL_RELATED_36E: 8 XXX
- SG_ ACCEL_OR_RPM_2 : 15|8@0+ (1,0) [0|255] "" XXX
- SG_ ACCEL_OR_RPM_1 : 7|8@0+ (1,0) [0|255] "" XXX
+BO_ 878 HEV_POWER_USE_36E: 8 XXX
+ SG_ E_MOTOR_PWR : 7|8@0+ (1,-125) [-125|130] "KW" XXX
+ SG_ BATTERY_PWR_USE : 15|8@0+ (1,-125) [-126|130] "KW" XXX
+ SG_ ENGINE_PWR : 49|10@0+ (1,0) [0|1023] "KW" XXX
 
 BO_ 324 SPEED_2: 8 XXX
  SG_ SPEED_2 : 31|16@0+ (0.01,0) [0|255] "m/s" XXX
@@ -354,8 +355,8 @@ BO_ 500 ACC_2: 8 XXX
 BO_ 625 ACC_1: 8 XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
- SG_ ACC_TORQ : 38|15@0+ (1,0) [-7767|24999] "NM" XXX
  SG_ ACC_ENG_REQ : 39|1@0+ (1,0) [0|1] "" XXX
+ SG_ ACC_TORQ : 38|15@0+ (1,-7767) [-7767|24999] "NM" XXX
 
 BO_ 268 ACC_10c: 8 XXX
  SG_ BRAKE_PERHAPS : 48|1@0+ (1,0) [0|3] "" XXX
@@ -376,6 +377,9 @@ BO_ 512 NEW_MSG_200: 8 XXX
  SG_ INCREASING : 27|12@0+ (1,0) [0|127] "" XXX
  SG_ COUNTER : 51|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
+
+BO_ 654 HEV_HMI: 8 XXX
+ SG_ ELEC_MODE_PERCENT : 39|8@0+ (1,-100) [0|100] "%" XXX
 
 
 
@@ -420,8 +424,8 @@ CM_ SG_ 257 ENERGY_OR_RPM "perhaps energy consumption or RPMs";
 CM_ SG_ 571 CHECKSUM "standard checksum";
 CM_ SG_ 825 BEEP_339 "sent every 0.5s. 0050 is no beep. To beep send 4355 or 4155. Used by ParkSense warning.";
 CM_ SG_ 270 ELECTRIC_MOTOR "0x7fff indicates electric motor not in use";
-CM_ SG_ 291 ENERGY_GAIN_LOSS "unsure what this actually is";
 CM_ SG_ 291 ENERGY_SMOOTHER_CURVE "unsure what it is, but smoother";
+CM_ SG_ 291 AXLE_TORQ "Torq delivered by engine to the wheels";
 CM_ SG_ 308 ACCEL_134 "only set when human presses accel pedal";
 CM_ SG_ 532 NOISY_SLOWLY_DECREASING "perhaps battery but do not know";
 CM_ SG_ 816 TRACTION_OFF "set when traction off button is enabled";
@@ -439,8 +443,8 @@ CM_ SG_ 500 BRAKE_WARN "!!BRAKE!! warining";
 CM_ SG_ 500 COLLISION_BRK_PREP "seems to step brake before collision braking";
 CM_ SG_ 500 ACC_BRK_PREP "sometimes this flag goes high just before ACC deceleration";
 CM_ SG_ 500 COMMAND_TYPE_2 "0-NONE; 1- ACC; 2- COLLISION";
-CM_ SG_ 625 ACC_TORQ "seems like wheel torquest request(PHEV only?)";
 CM_ SG_ 625 ACC_ENG_REQ "seems like this bit goes on when ACC is asking for engine";
+CM_ SG_ 625 ACC_TORQ "seems like wheel torquest request(PHEV only?)";
 CM_ SG_ 268 BRAKE_PERHAPS "triggers only on ACC braking";
 CM_ SG_ 384 NEW_SIGNAL_1 "set in ACC gas driving. not set in electric human. not sure about gas human driving.";
 VAL_ 746 PRNDL 5 "L" 4 "D" 3 "N" 2 "R" 1 "P" ;
