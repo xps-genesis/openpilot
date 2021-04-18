@@ -68,18 +68,20 @@ BO_ 746 GEAR: 5 XXX
 
 BO_ 284 BRAKE_1: 8 XXX
  SG_ STANDSTILL : 7|1@0+ (1,0) [0|1] "" XXX
- SG_ SPEED_RELATED_1 : 37|14@0+ (1,0) [0|255] "" XXX
- SG_ BRAKE_RELATED_1_2 : 18|11@0+ (1,0) [0|255] "" XXX
- SG_ BRAKE_RELATED_1_1 : 3|12@0+ (1,0) [0|255] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
+ SG_ VEHICLE_SPEED : 37|14@0+ (0.0078125,0) [0|511.984375] "kph" XXX
+ SG_ BRAKE_VAL_TOTAL : 3|12@0+ (1,0) [0|255] "" XXX
+ SG_ BRAKE_VAL_DRIVER : 18|11@0+ (1,0) [0|255] "" XXX
 
 BO_ 320 BRAKE_2: 8 XXX
  SG_ SPEED_RELATED_2 : 47|8@0+ (1,0) [0|63] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
- SG_ BRAKE_PRESSED_2 : 2|3@0+ (1,0) [0|7] "" XXX
- SG_ BRAKE_PRESSED_ACC : 6|1@0+ (1,0) [0|3] "" XXX
+ SG_ BRAKE_ACTIVE_ACC : 6|1@0+ (1,0) [0|3] "" XXX
+ SG_ BRAKE_PEDAL : 2|2@1+ (1,0) [0|3] "" XXX
+ SG_ BRAKE_ENABLE_ACC : 7|1@0+ (1,0) [0|1] "" XXX
+ SG_ BRAKE_LIGHT : 1|2@0+ (1,0) [0|7] "" XXX
 
 BO_ 736 TRIP: 8 XXX
  SG_ COUNTER : 7|16@0+ (1,0) [0|65535] "Meters" XXX
@@ -96,24 +98,26 @@ BO_ 792 STEERING_LEVERS: 8 XXX
  SG_ TURN_SIGNALS : 1|2@0+ (1,0) [0|3] "" XXX
  SG_ HIGH_BEAM_FLASH : 3|1@0+ (1,0) [0|3] "" XXX
 
-BO_ 264 ACCEL_PEDAL_MSG: 8 XXX
+BO_ 264 ENGINE_RPM_HEV: 8 XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
- SG_ ACCEL_PEDAL : 35|1@0+ (1,0) [0|1] "" XXX
+ SG_ ENGINE_RPM : 7|16@0+ (1,0) [0|65535] "" XXX
 
 BO_ 464 SEATBELT_STATUS: 8 XXX
  SG_ SEATBELT_DRIVER_UNLATCHED : 13|1@0+ (1,0) [0|1] "" XXX
 
 BO_ 544 EPS_STATUS: 8 XXX
- SG_ LKAS_STATE : 23|4@0+ (1,0) [0|15] "" XXX
- SG_ TORQUE_DRIVER : 2|11@0+ (1,-1024) [-1024|1023] "" XXX
- SG_ TORQUE_MOTOR_RAW : 19|12@0+ (1,-2048) [-2048|2047] "" XXX
- SG_ TORQUE_MOTOR : 34|11@0+ (1,-1024) [-1024|1023] "" XXX
- SG_ AUTO_PARK_HAS_CONTROL_2 : 51|1@0+ (1,0) [0|1] "" XXX
  SG_ APA_STEER_FAULT : 50|1@0+ (1,0) [0|1] "" XXX
  SG_ DRIVER_TAKEOVER : 48|1@0+ (1,0) [0|1] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
+ SG_ TORQUE_MOTOR_RAW : 19|12@0+ (0.05,-100) [-100|104.65] "Nm" XXX
+ SG_ TORQUE_DRIVER : 2|11@0+ (0.0078125,-8) [-8|7.98] "Nm" XXX
+ SG_ TORQUE_MOTOR : 34|11@0+ (0.001953125,-2) [-2|1.998047] "" XXX
+ SG_ TORQ_STATUS : 6|4@0+ (1,0) [0|15] "" XXX
+ SG_ LKAS_ACTIVE : 23|1@0+ (1,0) [0|15] "" XXX
+ SG_ LKAS_STEER_FAULT : 22|1@0+ (1,0) [0|1] "" XXX
+ SG_ APA_ACTIVE : 51|1@0+ (1,0) [0|1] "" XXX
 
 BO_ 658 LKAS_COMMAND: 6 XXX
  SG_ COUNTER : 39|4@0+ (1,0) [0|15] "" XXX
@@ -123,10 +127,13 @@ BO_ 658 LKAS_COMMAND: 6 XXX
 
 BO_ 678 LKAS_HUD: 8 XXX
  SG_ LKAS_ICON_COLOR : 2|3@0+ (1,0) [0|3] "" XXX
- SG_ LKAS_LANE_LINES : 19|4@0+ (1,0) [0|1] "" XXX
- SG_ LKAS_ALERTS : 27|4@0+ (1,0) [0|1] "" XXX
- SG_ CAR_MODEL : 15|8@0+ (1,0) [0|255] "" XXX
- SG_ STEER_TYPE : 50|3@0+ (1,0) [0|3] "" XXX
+ SG_ LKAS_LANE_LINES : 23|8@0+ (1,0) [0|1] "" XXX
+ SG_ LKAS_ALERTS : 31|8@0+ (1,0) [0|1] "" XXX
+ SG_ STEER_TYPE : 48|3@1+ (1,0) [0|3] "" XXX
+ SG_ SETTINGS_1 : 12|3@0+ (1,0) [0|7] "" XXX
+ SG_ SETTINGS_2 : 15|3@0+ (1,0) [0|31] "" XXX
+ SG_ LKAS_CHIME_L : 40|1@0+ (1,0) [0|1] "" XXX
+ SG_ LKAS_CHIME_R : 41|1@1+ (1,0) [0|3] "" XXX
 
 BO_ 705 AUTO_PARK_BUTTON: 8 XXX
  SG_ AUTO_PARK_TOGGLE_2 : 8|1@0+ (1,0) [0|1] "" XXX
@@ -157,8 +164,9 @@ BO_ 826 AUTO_PARK_SIGNALS_3: 8 XXX
 
 BO_ 332 STEERING_2: 8 XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
- SG_ ENERGY_RELATED : 39|16@0+ (1,0) [0|65535] "" XXX
- SG_ STEER_ANGLE_2 : 7|13@0+ (0.3187251,-1307.888) [-360|360] "deg" XXX
+ SG_ YAW_RATE : 7|16@0+ (0.01,-327.68) [-327.68|-327.66] "deg" XXX
+ SG_ LONG_ACCEL : 39|8@0+ (1,0) [0|65535] "" XXX
+ SG_ LAT_ACCEL : 47|8@0+ (1,0) [0|1] "" XXX
 
 BO_ 720 BLIND_SPOT_WARNINGS: 6 XXX
  SG_ BLIND_SPOT_RIGHT : 5|1@0+ (1,0) [0|1] "" XXX
@@ -178,11 +186,15 @@ BO_ 608 PARKSENSE_SIGNAL: 8 XXX
  SG_ HUMAN_HAS_CONTROL : 17|1@0+ (1,0) [0|3] "" XXX
 
 BO_ 729 LKAS_HEARTBIT: 5 XXX
- SG_ LKAS_STATUS_OK : 31|16@0+ (1,0) [0|65535] "" XXX
+ SG_ NEW_SIGNAL_1 : 28|3@0+ (1,0) [0|15] "" XXX
+ SG_ AUTO_HIGH_BEAM : 31|1@0+ (1,0) [0|1] "" XXX
+ SG_ NEW_SIGNAL_3 : 38|3@0+ (1,0) [0|7] "" XXX
+ SG_ LKAS_BUTTON_LED : 24|3@1+ (1,0) [0|3] "" XXX
 
 BO_ 274 NEW_MSG_112: 2 XXX
 
-BO_ 290 NEW_MSG_122: 6 XXX
+BO_ 290 RADIO_ECU: 6 XXX
+ SG_ REMOTE_START_ACTIVATED : 6|1@0+ (1,0) [0|1] "" XXX
 
 BO_ 376 NEW_MSG_178: 3 XXX
 
@@ -238,44 +250,43 @@ BO_ 838 NEW_MSG_346: 2 XXX
 
 BO_ 926 NEW_MSG_39e: 3 XXX
 
-BO_ 168 ACCEL_RELATED_a8: 8 XXX
+BO_ 168 DRIVER_TORQ: 8 XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
  SG_ DRIVER_TORQ : 21|14@0+ (1.5625,-4604.688) [-4604.688|20970.3125] "" XXX
 
-BO_ 270 ACCEL_RELATED_10e: 8 XXX
+BO_ 270 ESC_ACC_ENG_COPY: 8 XXX
  SG_ ACCEL_OR_RPM : 7|16@0+ (1,0) [0|255] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
  SG_ ELECTRIC_MOTOR : 23|16@0+ (1,0) [0|65535] "" XXX
 
-BO_ 291 ENERGY_RELATED_123: 8 XXX
+BO_ 291 AXLE_TORQ: 8 XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
- SG_ ENERGY_SMOOTHER_CURVE : 35|12@0+ (1,0) [0|2047] "" XXX
  SG_ AXLE_TORQ : 20|13@0- (4,-7767) [-7767|24993] "NM" XXX
 
-BO_ 294 ENERGY_RELATED_126: 8 XXX
+BO_ 294 INERTIAL_SENSOR: 8 XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
- SG_ UNKNOWN_126_1 : 3|12@0+ (1,0) [0|4095] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
- SG_ UNKNOWN_126_2 : 35|12@0+ (1,0) [0|4095] "" XXX
- SG_ ENERGY_GAIN_LOSS_NOISY : 19|12@0+ (1,0) [0|2047] "" XXX
+ SG_ LAT_ACCEL : 3|12@0+ (1,0) [0|4095] "" XXX
+ SG_ LONG_ACCEL : 19|12@0+ (1,0) [0|2047] "" XXX
+ SG_ YAW_RATE : 35|12@0+ (1,0) [0|4095] "" XXX
 
 BO_ 300 NEW_MSG_12C: 8 XXX
 
 BO_ 308 ACCEL_GAS_134: 8 XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
- SG_ ACCEL_134 : 46|7@0+ (1,0) [0|127] "" XXX
+ SG_ PEDAL_COMP : 47|8@0+ (1,0) [0|127] "" XXX
 
 BO_ 532 ENERGY_RELATED_214: 8 XXX
  SG_ NOISY_SLOWLY_DECREASING : 16|9@0+ (1,0) [0|255] "" XXX
  SG_ ENERGY_RELATED : 0|9@0+ (1,0) [0|255] "" XXX
 
 BO_ 559 ACCEL_GAS_22F: 8 XXX
- SG_ ACCEL_22F : 3|4@0+ (1,0) [0|255] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
+ SG_ GAS_PEDAL_POS : 7|8@0+ (0.4,0) [0|100] "%" XXX
 
 BO_ 655 HYBRID_ECU: 8 XXX
  SG_ CHARGING : 1|2@0+ (1,0) [0|3] "" XXX
@@ -298,8 +309,10 @@ BO_ 878 HEV_POWER_USE_36E: 8 XXX
  SG_ BATTERY_PWR_USE : 15|8@0+ (1,-125) [-126|130] "KW" XXX
  SG_ ENGINE_PWR : 49|10@0+ (1,0) [0|1023] "KW" XXX
 
-BO_ 324 SPEED_2: 8 XXX
- SG_ SPEED_2 : 31|16@0+ (0.01,0) [0|255] "m/s" XXX
+BO_ 324 TRANS_1: 8 XXX
+ SG_ TRANS_SPEED : 31|16@0+ (0.01,0) [0|255] "m/s" XXX
+ SG_ GEAR : 15|4@0+ (1,0) [0|1] "" XXX
+ SG_ GEAR_FINAL : 11|4@0+ (1,0) [0|1] "" XXX
 
 BO_ 501 DASHBOARD: 8 XXX
  SG_ ACC_SPEED_CONFIG_KPH : 15|8@0+ (1,0) [0|3] "km/h" XXX
@@ -358,7 +371,7 @@ BO_ 625 ACC_1: 8 XXX
  SG_ ACC_ENG_REQ : 39|1@0+ (1,0) [0|1] "" XXX
  SG_ ACC_TORQ : 38|15@0+ (1,-7767) [-7767|24999] "NM" XXX
 
-BO_ 268 ACC_10c: 8 XXX
+BO_ 268 ESC_ACC_COPY: 8 XXX
  SG_ BRAKE_PERHAPS : 48|1@0+ (1,0) [0|3] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
@@ -381,6 +394,12 @@ BO_ 512 NEW_MSG_200: 8 XXX
 BO_ 654 HEV_HMI: 8 XXX
  SG_ ELEC_MODE_PERCENT : 39|8@0+ (1,-100) [0|100] "%" XXX
 
+BO_ 292 WHEEL_COUNTER: 8 XXX
+ SG_ NEW_SIGNAL_1 : 7|8@0+ (1,0) [0|1] "" XXX
+ SG_ NEW_SIGNAL_2 : 15|8@0+ (1,0) [0|1] "" XXX
+ SG_ NEW_SIGNAL_3 : 23|8@0+ (1,0) [0|1] "" XXX
+ SG_ NEW_SIGNAL_4 : 31|8@0+ (1,0) [0|1] "" XXX
+
 
 
 
@@ -392,14 +411,14 @@ CM_ SG_ 820 TURN_LIGHT_LEFT "oscillates with the light blinking";
 CM_ SG_ 820 TURN_LIGHT_RIGHT "hazard blinks both right and left lights";
 CM_ SG_ 746 PRNDL "5=L, 4=D, 3=N, 2=R, 1=P";
 CM_ SG_ 746 GEAR_CHECKSUM "different than the LKAS checksum. unknown non-simple algorithm. just build a lookup table for it.";
-CM_ SG_ 284 SPEED_RELATED_1 "Another Speed Signal, Maybe RPMs?";
-CM_ SG_ 284 BRAKE_RELATED_1_1 "Correlates with braking";
-CM_ SG_ 320 BRAKE_PRESSED_2 "Value is 5 when brake is pressed by human, 1 when ACC brake";
-CM_ SG_ 320 BRAKE_PRESSED_ACC "set when ACC brakes";
+CM_ SG_ 284 VEHICLE_SPEED "Main vehicle speed";
+CM_ SG_ 284 BRAKE_VAL_TOTAL "braking torque/pressure total";
+CM_ SG_ 284 BRAKE_VAL_DRIVER "braking torque/pressure from driver";
+CM_ SG_ 320 BRAKE_ACTIVE_ACC "set when ACC brakes";
+CM_ SG_ 320 BRAKE_PEDAL "1= PRESSED";
+CM_ SG_ 320 BRAKE_LIGHT "1 = braking";
 CM_ SG_ 792 TURN_SIGNALS "1=Left, 2=Right";
 CM_ SG_ 792 HIGH_BEAM_FLASH "use this for genericToggle";
-CM_ SG_ 264 ACCEL_PEDAL "not in ACC so seems to be actual pedal. Use for gasPressed";
-CM_ SG_ 544 LKAS_STATE "2 when autopark has control, 8 when is actuatable by lkas, 4 when there is a fault";
 CM_ SG_ 544 TORQUE_MOTOR_RAW "has larger range than TORQUE_MOTOR but ut seems biased";
 CM_ SG_ 658 COUNTER "each message increments, 0..f";
 CM_ SG_ 658 CHECKSUM "checksum calculated with https://gist.github.com/adhintz/94bf8d19b9075539f50172ab0fb24ba1";
@@ -415,22 +434,24 @@ CM_ SG_ 784 INCREASING_UNKNOWN "perhaps distance traveled";
 CM_ SG_ 826 AUTO_PARK_GEAR_1 "Reverse=0, Forward=f";
 CM_ SG_ 826 AUTO_PARK_GEAR_2 "Reverse=0, Forward=f";
 CM_ SG_ 826 AUTO_PARK_GEAR_3 "Reverse=0, Forward=f";
-CM_ SG_ 332 STEER_ANGLE_2 "slightly lags the other steer_angle signal. also more noisy.";
+CM_ SG_ 332 YAW_RATE "";
 CM_ SG_ 720 BLIND_SPOT_RIGHT "yellow triangle alert on side view mirror when a car is in your blind spot";
 CM_ SG_ 608 PARKSENSE_DISABLED "set if parksense is disabled";
-CM_ SG_ 729 LKAS_STATUS_OK "Set to 0x0820 when LKAS system is plugged in.";
+CM_ SG_ 729 LKAS_BUTTON_LED "0-OFF; 1-ON; 2-BLINK";
 CM_ SG_ 288 GAS_ENGINE_RPM_MAYBE "lags acceleration, perhaps gas engine";
 CM_ SG_ 257 ENERGY_OR_RPM "perhaps energy consumption or RPMs";
 CM_ SG_ 571 CHECKSUM "standard checksum";
 CM_ SG_ 825 BEEP_339 "sent every 0.5s. 0050 is no beep. To beep send 4355 or 4155. Used by ParkSense warning.";
 CM_ SG_ 270 ELECTRIC_MOTOR "0x7fff indicates electric motor not in use";
-CM_ SG_ 291 ENERGY_SMOOTHER_CURVE "unsure what it is, but smoother";
 CM_ SG_ 291 AXLE_TORQ "Torq delivered by engine to the wheels";
-CM_ SG_ 308 ACCEL_134 "only set when human presses accel pedal";
+CM_ SG_ 308 PEDAL_COMP "only set when human presses accel pedal";
 CM_ SG_ 532 NOISY_SLOWLY_DECREASING "perhaps battery but do not know";
+CM_ SG_ 559 GAS_PEDAL_POS "Accel Pedal Position in %";
 CM_ SG_ 816 TRACTION_OFF "set when traction off button is enabled";
 CM_ SG_ 816 TOGGLE_PARKSENSE "sending 3000071ec0ff9000 enables or disables parksense";
-CM_ SG_ 324 SPEED_2 "signal is approx half other speeds";
+CM_ SG_ 324 TRANS_SPEED "possible transmission output shift speed?";
+CM_ SG_ 324 GEAR "R=11; D=1; N=0; P=13; ";
+CM_ SG_ 324 GEAR_FINAL "R=11; D=1; N=0; P=13; ";
 CM_ SG_ 501 ACC_SPEED_CONFIG_KPH "speed configured for ACC";
 CM_ SG_ 501 ACC_SPEED_CONFIG_MPH "speed configured for ACC";
 CM_ SG_ 501 CRUISE_STATE "may just be an icon, but seems to indicate different cruise modes: ACC and Non-ACC and engaged state for both.";
