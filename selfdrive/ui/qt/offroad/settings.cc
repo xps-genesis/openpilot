@@ -81,6 +81,11 @@ TogglesPanel::TogglesPanel(QWidget *parent) : QWidget(parent) {
                                   "needs WP setup to allow high torq",
                                   "../assets/offroad/icon_road.png",
                                   this));
+  toggles.append(new ParamControl("DisableUpdates",
+                                  "Disable updates from Git",
+                                  "If enabled only manual updates possible",
+                                  "../assets/offroad/icon_warning.png",
+                                  this));
 
 #ifdef QCOM2
   toggles.append(new ParamControl("EnableWideCamera",

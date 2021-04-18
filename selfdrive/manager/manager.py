@@ -36,6 +36,7 @@ def manager_init():
     ("OpenpilotEnabledToggle", "1"),
     ("LkasFullRangeAvailable", "1"),
     ("ChryslerMangoMode", "1"),
+    ("DisableUpdates", "0"),
   ]
 
   if TICI:
