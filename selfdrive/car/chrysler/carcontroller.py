@@ -58,8 +58,12 @@ class CarController():
 
     # steer torque
     new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
-    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
+    if not Params().get_bool('ChryslerMangoMode'):
+      apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
                                                    CS.out.steeringTorqueEps, CarControllerParams)
+    else:
+      apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
+                                                     CS.out.steeringTorqueEps/4., CarControllerParams) # WP multiply factor
 
     if not Params().get_bool('ChryslerMangoMode') and not Params().get_bool('LkasFullRangeAvailable'):
       moving_fast = CS.out.vEgo > CS.CP.minSteerSpeed  # for status message
