@@ -141,23 +141,24 @@ static void draw_frame(UIState *s) {
 static void ui_draw_vision_lane_lines(UIState *s) {
   const UIScene &scene = s->scene;
   NVGpaint track_bg;
-  if (!scene.end_to_end) {
-    // paint lanelines
-    for (int i = 0; i < std::size(scene.lane_line_vertices); i++) {
-      NVGcolor color = nvgRGBAf(1.0, 1.0, 1.0, scene.lane_line_probs[i]);
-      ui_draw_line(s, scene.lane_line_vertices[i], &color, nullptr);
-    }
 
-    // paint road edges
-    for (int i = 0; i < std::size(scene.road_edge_vertices); i++) {
-      NVGcolor color = nvgRGBAf(1.0, 0.0, 0.0, std::clamp<float>(1.0 - scene.road_edge_stds[i], 0.0, 1.0));
-      ui_draw_line(s, scene.road_edge_vertices[i], &color, nullptr);
-    }
+  // paint lanelines
+  for (int i = 0; i < std::size(scene.lane_line_vertices); i++) {
+    NVGcolor color = nvgRGBAf(1.0, 1.0, 1.0, scene.lane_line_probs[i]);
+    ui_draw_line(s, scene.lane_line_vertices[i], &color, nullptr);
+  }
+
+  // paint road edge
+  for (int i = 0; i < std::size(scene.road_edge_vertices); i++) {
+    NVGcolor color = nvgRGBAf(1.0, 0.0, 1.0, std::clamp<float>(1.0 - scene.road_edge_stds[i], 0.0, 1.0));
+    ui_draw_line(s, scene.road_edge_vertices[i], &color, nullptr);
+  }
+  if (!scene.end_to_end) {
     track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h * .4,
                                           COLOR_WHITE, COLOR_WHITE_ALPHA(0));
   } else {
     track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h * .4,
-                                          COLOR_RED, COLOR_RED_ALPHA(0));
+                                          COLOR_GREEN, COLOR_GREEN_ALPHA(0));
   }
   // paint path
   ui_draw_line(s, scene.track_vertices, nullptr, &track_bg);
