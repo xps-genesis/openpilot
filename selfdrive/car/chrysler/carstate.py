@@ -68,7 +68,7 @@ class CarState(CarStateBase):
 
     self.lkas_counter = cp_cam.vl["LKAS_COMMAND"]['COUNTER']
     self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]['LKAS_BUTTON_LED']
-    self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]['APA_ACTIVE'] == 1
+    self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]['APA_STEER_ACT'] == 1
     self.veh_on = cp.vl["HYBRID_ECU"]['VEH_ON'] == 1
     self.acc_hold = bool(cp.vl["ACC_2"]['ACC_STOP'])
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
@@ -131,6 +131,7 @@ class CarState(CarStateBase):
       ("BRAKE_VAL_TOTAL", "BRAKE_1", 0),
       ("VEHICLE_SPEED_KPH", "BRAKE_1", 0),
       ("BRAKE_LIGHT", "BRAKE_2", 0),
+      ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
     ]
 
     checks = [
