@@ -29,7 +29,7 @@ class CarState(CarStateBase):
     ret.brakePressed = cp.vl["BRAKE_2"]['BRAKE_PEDAL'] == 1  # driver-only
     ret.brake = cp.vl["BRAKE_1"]['BRAKE_VAL_TOTAL']
     ret.brakeLights = bool(cp.vl["BRAKE_2"]['BRAKE_LIGHT'])
-    ret.gas = cp.vl["ACCEL_GAS_22F"]['GAS_PEDAL_POSITION']
+    ret.gas = cp.vl["ACCEL_GAS_22F"]['GAS_PEDAL_POS']
     ret.gasPressed = ret.gas > 1e-5
 
     ret.espDisabled = (cp.vl["TRACTION_BUTTON"]['TRACTION_OFF'] == 1)
