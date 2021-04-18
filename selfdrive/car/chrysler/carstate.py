@@ -54,8 +54,8 @@ class CarState(CarStateBase):
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]['CRUISE_STATE'] in [1, 2]
 
-    ret.steeringTorque = cp.vl["EPS_STATUS"]["TORQUE_DRIVER"]
-    ret.steeringTorqueEps = cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]
+    ret.steeringTorque = cp.vl["EPS_STATUS"]["TORQUE_DRIVER"] * CV.NM_TO_OPTORQ
+    ret.steeringTorqueEps = cp.vl["EPS_STATUS"]["TORQUE_MOTOR"] * CV.NM_TO_OPTORQ
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
     self.steerError = cp.vl["EPS_STATUS"]["LKAS_STEER_FAULT"] == 4
     self.apaFault = cp.vl["EPS_STATUS"]["APA_STEER_FAULT"] == 1
