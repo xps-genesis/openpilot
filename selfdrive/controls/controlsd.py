@@ -519,7 +519,7 @@ class Controls:
     controlsState.state = self.state
     controlsState.engageable = not self.events.any(ET.NO_ENTRY)
     controlsState.longControlState = self.LoC.long_control_state
-    CC.hudControl.longStopping = controlsState.longControlState == LongCtrlState.stoping
+    CC.hudControl.longStopping = controlsState.longControlState == LongCtrlState.stopping
     CC.hudControl.longStarting = controlsState.longControlState == LongCtrlState.starting
     controlsState.vPid = float(self.LoC.v_pid)
     controlsState.vCruise = float(self.v_cruise_kph)
