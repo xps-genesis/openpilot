@@ -316,7 +316,7 @@ struct CarControl {
     leftLaneVisible @7: Bool;
     rightLaneDepart @8: Bool;
     leftLaneDepart @9: Bool;
-    leadDistance @10: Bool;
+    leadDistance @10: Float32;
     longStopping @11: Bool;
     longStarting @12: Bool;
 
