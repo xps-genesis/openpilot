@@ -31,7 +31,7 @@ class CarController():
     self.acc_available = False
     self.acc_enabled = False
     self.set_speed_min = 5. * CV.MPH_TO_MS
-    self.set_speed = self.min_set_speed
+    self.set_speed = self.set_speed_min
     self.set_speed_timer = 0
     self.long_press = False
     self.cruise_state = 0
