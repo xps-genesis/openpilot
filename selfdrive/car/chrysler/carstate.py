@@ -135,6 +135,7 @@ class CarState(CarStateBase):
       ("ACC_SPEED_DEC", "WHEEL_BUTTONS", 0),
       ("ACC_FOLLOW_INC", "WHEEL_BUTTONS", 0),
       ("ACC_FOLLOW_DEC", "WHEEL_BUTTONS", 0),
+      ("ACC_BUTTON_ON", "WHEEL_BUTTONS", 0),
       ("ACC_DISTANCE_CONFIG_2", "DASHBOARD", 0),
       ("STANDSTILL", "BRAKE_1", 0),
       ("BRAKE_VAL_TOTAL", "BRAKE_1", 0),
