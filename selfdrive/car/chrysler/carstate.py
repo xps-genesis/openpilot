@@ -13,6 +13,7 @@ class CarState(CarStateBase):
     super().__init__(CP)
     can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
     self.shifter_values = can_define.dv["GEAR"]['PRNDL']
+    self.acc_on_button = False
 
   def update(self, cp, cp_cam):
 
@@ -48,9 +49,13 @@ class CarState(CarStateBase):
     ret.steeringRateDeg = cp.vl["STEERING"]['STEERING_RATE']
     ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(cp.vl['GEAR']['PRNDL'], None))
 
+    self.acc_on_button_prev = self.acc_on_button
+    self.acc_on_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_BUTTON_ON'])
+
     ret.cruiseState.enabled = bool(cp.vl["ACC_2"]['ACC_ENABLED'])  # ACC is green.
     ret.cruiseState.available = bool(cp.vl["ACC_2"]['ACC_AVAILABLE'])
-    ret.cruiseState.speed = cp.vl["DASHBOARD"]['ACC_SPEED_CONFIG_KPH'] * CV.KPH_TO_MS
+    ret.cruiseState.speed = cp.vl["DASHBOARD"]['ACC_SET_SPEED_KPH'] * CV.KPH_TO_MS
+    ret.cruiseState.standstill = bool(cp.vl['BRAKE_1']['STANDSTILL'])
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]['CRUISE_STATE'] in [1, 2]
 
@@ -74,12 +79,16 @@ class CarState(CarStateBase):
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
     self.wheel_button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
 
-    self.acc_button_pressed = bool(cp.vl["WHEEL_BUTTONS"]['ACC_CANCEL']) \
-                              or bool(cp.vl["WHEEL_BUTTONS"]['ACC_RESUME']) \
-                              or bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_INC']) \
-                              or bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_DEC']) \
-                              or bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_DEC']) \
-                              or bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_INC'])
+    self.acc_cancel_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_CANCEL'])
+    self.acc_resume_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_RESUME'])
+    self.acc_setplus_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_INC'])
+    self.acc_setminus_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_DEC'])
+    self.acc_followdec_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_DEC'])
+    self.acc_followinc_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_INC'])
+
+    self.acc_button_pressed = self.acc_cancel_button or self.acc_resume_button or self.acc_setplus_button or \
+                              self.acc_setminus_button or self.acc_followdec_button or self.acc_followinc_button
+
     return ret
 
   @staticmethod
@@ -103,7 +112,7 @@ class CarState(CarStateBase):
       ("ACC_ENABLED", "ACC_2", 0),
       ("ACC_AVAILABLE", "ACC_2", 0),
       ("HIGH_BEAM_FLASH", "STEERING_LEVERS", 0),
-      ("ACC_SPEED_CONFIG_KPH", "DASHBOARD", 0),
+      ("ACC_SET_SPEED_KPH", "DASHBOARD", 0),
       ("LEAD_DIST", "DASHBOARD", 0),
       ("CRUISE_STATE", "DASHBOARD", 0),
       ("TORQUE_DRIVER", "EPS_STATUS", 0),

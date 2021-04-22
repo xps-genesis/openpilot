@@ -8,7 +8,7 @@ from common.params import Params
 class CarInterface(CarInterfaceBase):
   @staticmethod
   def compute_gb(accel, speed):
-    return float(accel) / 3.0
+    return float(accel)
 
   @staticmethod
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), car_fw=None):
@@ -23,8 +23,23 @@ class CarInterface(CarInterfaceBase):
     ret.wheelbase = 3.089  # in meters for Pacifica Hybrid 2017
     ret.steerRatio = 16.2  # Pacifica Hybrid 2017
     ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
+    ret.openpilotLongitudinalControl = Params().get_bool('ChryslerMangoLong')
 
-    if not Params().get_bool('ChryslerMangoMode'):
+    # Long tuning Params -  make individual params for cars, baseline Pacifica Hybrid
+    ret.longitudinalTuning.kpBP = [0., .3, 10., 35.]
+    ret.longitudinalTuning.kpV = [1.8, .8, .3, .3]
+    ret.longitudinalTuning.kiBP = [0., .3, 15., 35.]
+    ret.longitudinalTuning.kiV = [0.15, .055, .05, .045]
+    ret.longitudinalTuning.deadzoneBP = [0., .5]
+    ret.longitudinalTuning.deadzoneV = [0.00, 0.00]
+    ret.gasMaxBP = [0., 1., 1.1, 15., 40.]
+    ret.gasMaxV = [2., 2., 2., 1.68, 1.3]
+    ret.brakeMaxBP = [0., 5., 5.1]
+    ret.brakeMaxV = [3.8, 3.8, 3.8]  # safety limits to stop unintended deceleration
+    ret.longitudinalTuning.kfBP = [0., 5., 10., 20., 30.]
+    ret.longitudinalTuning.kfV = [1., 1., 1., .75, .5]
+
+    if not Params().get_bool('ChryslerMangoLat'):
       ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[9., 20.], [9., 20.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1, 0.15], [0.02, 0.03]]
       ret.lateralTuning.pid.kfBP = [0.]
@@ -56,7 +71,7 @@ class CarInterface(CarInterfaceBase):
     ret.minSteerSpeed = 3.8  # m/s
     if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
       # TODO allow 2019 cars to steer down to 13 m/s if already engaged.
-      ret.minSteerSpeed = 17.5  if not Params().get_bool('ChryslerMangoMode') and not Params().get_bool('LkasFullRangeAvailable') else 0 # m/s 17 on the way up, 13 on the way down once engaged.
+      ret.minSteerSpeed = 17.5  if not Params().get_bool('ChryslerMangoLat') and not Params().get_bool('LkasFullRangeAvailable') else 0 # m/s 17 on the way up, 13 on the way down once engaged.
 
     # starting with reasonable value for civic and scaling by mass and wheelbase
     ret.rotationalInertia = scale_rot_inertia(ret.mass, ret.wheelbase)
@@ -77,6 +92,10 @@ class CarInterface(CarInterfaceBase):
 
     ret = self.CS.update(self.cp, self.cp_cam)
 
+    ret.cruiseState.available = self.CC.acc_available
+    ret.cruiseState.enabled = self.CC.acc_enabled
+    ret.cruiseState.speed = self.CC.set_speed
+
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
 
     # speeds
@@ -89,7 +108,7 @@ class CarInterface(CarInterfaceBase):
     events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low],
                                        gas_resume_speed=2.)
 
-    if ret.vEgo < self.CP.minSteerSpeed and not Params().get_bool('ChryslerMangoMode') and not Params().get_bool('LkasFullRangeAvailable'):
+    if ret.vEgo < self.CP.minSteerSpeed and not Params().get_bool('ChryslerMangoLat') and not Params().get_bool('LkasFullRangeAvailable'):
       events.add(car.CarEvent.EventName.belowSteerSpeed)
 
     ret.events = events.to_msg()
@@ -106,6 +125,8 @@ class CarInterface(CarInterfaceBase):
     if (self.CS.frame == -1):
       return []  # if we haven't seen a frame 220, then do not update.
 
-    can_sends = self.CC.update(c.enabled, self.CS, c.actuators, c.cruiseControl.cancel, c.hudControl.visualAlert)
+    can_sends = self.CC.update(c.enabled, self.CS, c.actuators, c.cruiseControl.cancel,
+                               c.hudControl.visualAlert, c.hudControl.setSpeed,
+                               c.hudControl.leadVisible, c.hudControl.leadDistance)
 
     return can_sends

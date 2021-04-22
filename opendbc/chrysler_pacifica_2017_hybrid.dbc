@@ -226,6 +226,8 @@ BO_ 571 WHEEL_BUTTONS: 3 XXX
  SG_ ACC_CANCEL : 0|1@0+ (1,0) [0|15] "" XXX
  SG_ COUNTER : 15|4@0+ (1,0) [0|15] "" XXX
  SG_ ACC_RESUME : 4|1@0+ (1,0) [0|15] "" XXX
+ SG_ ACC_BUTTON_ON : 7|1@0+ (1,0) [0|1] "" XXX
+ SG_ REG_CC_BUTTON_ON : 6|1@0+ (1,0) [0|1] "" XXX
 
 BO_ 669 NEW_MSG_29d: 3 XXX
  SG_ COUNTER : 15|4@0+ (1,0) [0|15] "" XXX
@@ -315,13 +317,20 @@ BO_ 324 TRANS_1: 8 XXX
  SG_ GEAR_FINAL : 11|4@0+ (1,0) [0|1] "" XXX
 
 BO_ 501 DASHBOARD: 8 XXX
- SG_ ACC_SPEED_CONFIG_KPH : 15|8@0+ (1,0) [0|3] "km/h" XXX
- SG_ ACC_SPEED_CONFIG_MPH : 23|8@0+ (1,0) [0|3] "mph" XXX
+ SG_ ACC_SET_SPEED_KPH : 15|8@0+ (1,0) [0|3] "km/h" XXX
+ SG_ ACC_SET_SPEED_MPH : 23|8@0+ (1,0) [0|3] "mph" XXX
  SG_ ACC_DISTANCE_CONFIG_1 : 1|2@0+ (1,0) [0|3] "" XXX
- SG_ ACC_DISTANCE_CONFIG_2 : 41|2@0+ (1,0) [0|3] "" XXX
- SG_ SPEED_DIGITAL : 63|8@0+ (1,0) [0|255] "mph" XXX
  SG_ CRUISE_STATE : 38|3@0+ (1,0) [0|7] "" XXX
  SG_ LEAD_DIST : 63|8@0+ (1,0) [0|7] "" XXX
+ SG_ CRUISE_ICON : 45|6@0+ (1,0) [0|3] "" XXX
+
+BO_ 503 OP_DASHBOARD: 8 XXX
+ SG_ ACC_SET_SPEED_KPH : 15|8@0+ (1,0) [0|3] "km/h" XXX
+ SG_ ACC_SET_SPEED_MPH : 23|8@0+ (1,0) [0|3] "mph" XXX
+ SG_ ACC_DISTANCE_CONFIG_1 : 1|2@0+ (1,0) [0|3] "" XXX
+ SG_ CRUISE_STATE : 38|3@0+ (1,0) [0|7] "" XXX
+ SG_ LEAD_DIST : 63|8@0+ (1,0) [0|7] "" XXX
+ SG_ CRUISE_ICON : 45|6@0+ (1,0) [0|3] "" XXX
 
 BO_ 639 NEW_MSG_27f: 8 XXX
  SG_ INCREASING : 47|8@0+ (1,0) [0|255] "" XXX
@@ -364,8 +373,28 @@ BO_ 500 ACC_2: 8 XXX
  SG_ COLLISION_BRK_PREP : 48|1@0+ (1,0) [0|1] "" XXX
  SG_ ACC_BRK_PREP : 49|1@0+ (1,0) [0|1] "" XXX
  SG_ COMMAND_TYPE_2 : 50|2@1+ (1,0) [0|3] "" XXX
+ SG_ COMMAND_TYPE : 38|3@0+ (1,0) [0|7] "" XXX
+
+BO_ 502 OP_ACC_2: 8 XXX
+ SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
+ SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
+ SG_ ACC_STOP : 5|1@0+ (1,0) [0|1] "" XXX
+ SG_ ACC_GO : 6|1@0+ (1,0) [0|1] "" XXX
+ SG_ ACC_DECEL_CMD : 19|12@0+ (0.004885,-16) [-16|4] "m/s2" XXX
+ SG_ ACC_AVAILABLE : 20|1@0+ (1,0) [0|1] "" XXX
+ SG_ ACC_ENABLED : 21|1@0+ (1,0) [0|1] "" XXX
+ SG_ BRAKE_WARN : 39|1@0+ (1,0) [0|1] "" XXX
+ SG_ COLLISION_BRK_PREP : 48|1@0+ (1,0) [0|1] "" XXX
+ SG_ ACC_BRK_PREP : 49|1@0+ (1,0) [0|1] "" XXX
+ SG_ COMMAND_TYPE_2 : 50|2@1+ (1,0) [0|3] "" XXX
 
 BO_ 625 ACC_1: 8 XXX
+ SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
+ SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
+ SG_ ACC_ENG_REQ : 39|1@0+ (1,0) [0|1] "" XXX
+ SG_ ACC_TORQ : 38|15@0+ (1,-7767) [-7767|24999] "NM" XXX
+
+BO_ 626 OP_ACC_1: 8 XXX
  SG_ CHECKSUM : 63|8@0+ (1,0) [0|255] "" XXX
  SG_ COUNTER : 55|4@0+ (1,0) [0|15] "" XXX
  SG_ ACC_ENG_REQ : 39|1@0+ (1,0) [0|1] "" XXX
@@ -441,6 +470,8 @@ CM_ SG_ 729 LKAS_BUTTON_LED "0-OFF; 1-ON; 2-BLINK";
 CM_ SG_ 288 GAS_ENGINE_RPM_MAYBE "lags acceleration, perhaps gas engine";
 CM_ SG_ 257 ENERGY_OR_RPM "perhaps energy consumption or RPMs";
 CM_ SG_ 571 CHECKSUM "standard checksum";
+CM_ SG_ 571 ACC_BUTTON_ON "ACC button is pressed";
+CM_ SG_ 571 REG_CC_BUTTON_ON "regular cruise control button pressed";
 CM_ SG_ 825 BEEP_339 "sent every 0.5s. 0050 is no beep. To beep send 4355 or 4155. Used by ParkSense warning.";
 CM_ SG_ 270 ELECTRIC_MOTOR "0x7fff indicates electric motor not in use";
 CM_ SG_ 291 AXLE_TORQ "Torq delivered by engine to the wheels";
@@ -452,9 +483,9 @@ CM_ SG_ 816 TOGGLE_PARKSENSE "sending 3000071ec0ff9000 enables or disables parks
 CM_ SG_ 324 TRANS_SPEED "possible transmission output shift speed?";
 CM_ SG_ 324 GEAR "R=11; D=1; N=0; P=13; ";
 CM_ SG_ 324 GEAR_FINAL "R=11; D=1; N=0; P=13; ";
-CM_ SG_ 501 ACC_SPEED_CONFIG_KPH "speed configured for ACC";
-CM_ SG_ 501 ACC_SPEED_CONFIG_MPH "speed configured for ACC";
-CM_ SG_ 501 CRUISE_STATE "may just be an icon, but seems to indicate different cruise modes: ACC and Non-ACC and engaged state for both.";
+CM_ SG_ 501 ACC_SET_SPEED_KPH "speed configured for ACC";
+CM_ SG_ 501 ACC_SET_SPEED_MPH "speed configured for ACC";
+CM_ SG_ 501 CRUISE_ICON "0,1 - off; 2.3.4,5-White + distance set; 8,9,10,11-Green + no lead + distance set; 12,13,14,15- Green + lead + distance set; 34-regularCC White;  40-regularCC Green";
 CM_ SG_ 639 INCREASING "perhaps number of seconds divided by two for this drive";
 CM_ SG_ 848 INCREASING_LSB "lower part of time counter";
 CM_ SG_ 848 INCREASING_MSB "upper part of time counter";
@@ -464,6 +495,7 @@ CM_ SG_ 500 BRAKE_WARN "!!BRAKE!! warining";
 CM_ SG_ 500 COLLISION_BRK_PREP "seems to step brake before collision braking";
 CM_ SG_ 500 ACC_BRK_PREP "sometimes this flag goes high just before ACC deceleration";
 CM_ SG_ 500 COMMAND_TYPE_2 "0-NONE; 1- ACC; 2- COLLISION";
+CM_ SG_ 500 COMMAND_TYPE "0-NONE; 1-ACC; 2-COLLISION";
 CM_ SG_ 625 ACC_ENG_REQ "seems like this bit goes on when ACC is asking for engine";
 CM_ SG_ 625 ACC_TORQ "seems like wheel torquest request(PHEV only?)";
 CM_ SG_ 268 BRAKE_PERHAPS "triggers only on ACC braking";

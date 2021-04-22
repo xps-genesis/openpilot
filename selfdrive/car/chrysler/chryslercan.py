@@ -1,6 +1,6 @@
 from cereal import car
 from selfdrive.car import make_can_msg
-
+from selfdrive.config import Conversions as CV
 
 GearShifter = car.CarState.GearShifter
 VisualAlert = car.CarControl.HUDControl.VisualAlert
@@ -68,3 +68,33 @@ def create_wheel_buttons(packer, counter, button_type):
     "COUNTER": counter
   }
   return packer.make_can_msg("WHEEL_BUTTONS", 0, values)
+
+def create_op_acc_1(packer, accel_active, trq_val):
+  values = { # 20ms
+    "ACC_ENG_REQ": accel_active,
+    "ACC_TORQ": trq_val
+  }
+  return packer.make_can_msg("OP_ACC_1", 0, values)
+
+def create_op_acc_2(packer, available, enabled, stop_req, go_req, acc_pre_brake, decel, decel_active):
+  values = { # 20ms
+    "ACC_STOP": stop_req,
+    "ACC_GO": go_req,
+    "ACC_DECEL_CMD": decel,
+    "ACC_AVAILABLE": available,
+    "ACC_ENABLED": enabled,
+    "ACC_BRK_PREP": acc_pre_brake,
+    "COMMAND_TYPE_2": 1 if enabled else 0,
+    "COMMAND_TYPE": 1 if decel_active else 0
+  }
+  return packer.make_can_msg("OP_ACC_2", 0, values)
+
+def create_op_dashboard(packer, set_speed, cruise_state, cruise_icon, lead_d):
+  values = { # 60ms
+    "ACC_SET_SPEED_KPH": set_speed * CV.MS_TO_KPH,
+    "ACC_SET_SPEED_MPH": set_speed * CV.MS_TO_MPH,
+    "CRUISE_STATE": cruise_state,
+    "CRUISE_ICON": cruise_icon,
+    "LEAD_DIST": min(lead_d, 254)
+  }
+  return packer.make_can_msg("OP_DASHBOARD", 0, values)

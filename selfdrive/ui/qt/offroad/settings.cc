@@ -29,6 +29,31 @@ TogglesPanel::TogglesPanel(QWidget *parent) : QWidget(parent) {
                                   "Use the openpilot system for adaptive cruise control and lane keep driver assistance. Your attention is required at all times to use this feature. Changing this setting takes effect when the car is powered off.",
                                   "../assets/offroad/icon_openpilot.png",
                                   this));
+
+  toggles.append(new ParamControl("EndToEndToggle",
+                                   "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
+                                   "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
+                                   "../assets/offroad/icon_road.png",
+                                   this));
+
+  toggles.append(new ParamControl("ChryslerMangoLong",
+                                   "Chrysler steer to 0 \U0001f96e",
+                                   "needs WP setup to do op long",
+                                   "../assets/offroad/icon_road.png",
+                                   this));
+
+  toggles.append(new ParamControl("ChryslerMangoLat",
+                                  "Chrysler Mango Lat \U0001f96d",
+                                  "needs WP setup to allow high torq",
+                                  "../assets/offroad/icon_road.png",
+                                  this));
+                                  
+  toggles.append(new ParamControl("LkasFullRangeAvailable",
+                                   "Chrysler steer to 0 \U0001f96e",
+                                   "needs WP setup to steer to 0 speed",
+                                   "../assets/offroad/icon_road.png",
+                                   this));
+  
   toggles.append(new ParamControl("IsLdwEnabled",
                                   "Enable Lane Departure Warnings",
                                   "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31mph (50kph).",
@@ -64,23 +89,6 @@ TogglesPanel::TogglesPanel(QWidget *parent) : QWidget(parent) {
                                                 "../assets/offroad/icon_monitoring.png",
                                                 this);
   toggles.append(record_toggle);
-  toggles.append(new ParamControl("EndToEndToggle",
-                                   "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
-                                   "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
-                                   "../assets/offroad/icon_road.png",
-                                   this));
-
-  toggles.append(new ParamControl("LkasFullRangeAvailable",
-                                   "Chrysler steer to 0 \U0001f96e",
-                                   "needs WP setup to steer to 0 speed",
-                                   "../assets/offroad/icon_road.png",
-                                   this));
-
-  toggles.append(new ParamControl("ChryslerMangoMode",
-                                  "Chrysler Mango Mode \U0001f96d",
-                                  "needs WP setup to allow high torq",
-                                  "../assets/offroad/icon_road.png",
-                                  this));
   toggles.append(new ParamControl("DisableUpdates",
                                   "Disable updates from Git",
                                   "If enabled only manual updates possible",

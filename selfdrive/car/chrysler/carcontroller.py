@@ -1,11 +1,13 @@
 from common.op_params import opParams
 from selfdrive.car import apply_toyota_steer_torque_limits
 from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, \
-                                               create_wheel_buttons, create_apa_hud
+  create_wheel_buttons, create_apa_hud, create_op_acc_1, create_op_acc_2, create_op_dashboard
 from selfdrive.car.chrysler.values import CAR, CarControllerParams
 from opendbc.can.packer import CANPacker
 from selfdrive.car.interfaces import GearShifter
 from common.params import Params
+from selfdrive.config import Conversions as CV
+from common.numpy_fast import clip
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
@@ -25,12 +27,24 @@ class CarController():
     self.stop_button_spam = 0
     self.wheel_button_counter_prev = 0
     self.lead_dist_at_stop = 0
+    #OPLong starts here
+    self.acc_available = False
+    self.acc_enabled = False
+    self.set_speed_min = 5. * CV.MPH_TO_MS
+    self.set_speed = self.min_set_speed
+    self.set_speed_timer = 0
+    self.long_press = False
+    self.cruise_state = 0
+    self.cruise_icon = 0
+    self.acc_pre_brake = False
+    self.accel_lim_prev = 0.
 
     self.packer = CANPacker(dbc_name)
 
-  def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert):
+  def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert, op_set_speed, op_lead_visible, op_lead_dist, long_stopping, long_starting):
     # this seems needed to avoid steering faults and to force the sync with the EPS counter
     frame = CS.lkas_counter
+
     if self.prev_frame == frame:
       return []
 
@@ -43,7 +57,7 @@ class CarController():
 
     if Params().get_bool('LkasFullRangeAvailable'):
       wp_type = int(1)
-    if Params().get_bool('ChryslerMangoMode'):
+    if Params().get_bool('ChryslerMangoLat'):
       wp_type = int(2)
 
     if enabled:
@@ -58,14 +72,14 @@ class CarController():
 
     # steer torque
     new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
-    if not Params().get_bool('ChryslerMangoMode'):
+    if not Params().get_bool('ChryslerMangoLat'):
       apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
                                                    CS.out.steeringTorqueEps, CarControllerParams)
     else:
       apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
                                                      CS.out.steeringTorqueEps/4., CarControllerParams) # WP multiply factor
 
-    if not Params().get_bool('ChryslerMangoMode') and not Params().get_bool('LkasFullRangeAvailable'):
+    if not Params().get_bool('ChryslerMangoLat') and not Params().get_bool('LkasFullRangeAvailable'):
       moving_fast = CS.out.vEgo > CS.CP.minSteerSpeed  # for status message
       if CS.out.vEgo > (CS.CP.minSteerSpeed - 0.5):  # for command high bit
         self.gone_fast_yet = True
@@ -116,13 +130,18 @@ class CarController():
     if wheel_button_counter_change:
       self.wheel_button_counter_prev = CS.wheel_button_counter
 
+    self.op_cancel_cmd = False
+
     if (self.ccframe % 10 < 5) and wheel_button_counter_change and self.ccframe >= self.stop_button_spam:
       button_type = None
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
         button_type = 'ACC_CANCEL'
+        self.op_cancel_cmd = True
       elif enabled and self.resume_press and CS.lead_dist > self.lead_dist_at_stop:
         button_type = 'ACC_RESUME'
-      elif not CS.out.brakePressed and not CS.out.cruiseState.enabled and CS.out.cruiseState.available and opParams().get('brakereleaseAutoResume') and CS.out.gasPressed and CS.out.gearShifter == GearShifter.drive:
+      elif not CS.out.brakePressed and not CS.out.cruiseState.enabled and \
+              CS.out.cruiseState.available and opParams().get('brakereleaseAutoResume') and \
+              CS.out.gasPressed and CS.out.gearShifter == GearShifter.drive:
         button_type = 'ACC_RESUME'
 
       if button_type is not None:
@@ -149,7 +168,153 @@ class CarController():
     new_msg = create_lkas_command(self.packer, int(apply_steer), lkas_active, frame)
     can_sends.append(new_msg)
 
+
+    #############################################################################
+    # Chrysler OP long- Recreate ACC ECU here                                   #
+    #############################################################################
+
+    # build ACC enabling logic
+    ####################################################################################################################
+    if CS.acc_on_button and not CS.acc_on_button_prev:
+       self.acc_available = not self.acc_available
+
+    if not self.acc_enabled and self.acc_available and CS.acc_setplus_button or CS.acc_setminus_button or CS.acc_resume_button:
+      self.acc_enabled = True
+      self.set_speed = max(CS.out.vEgoRaw, self.set_speed_min)
+    elif  self.acc_enabled and not self.acc_available or CS.acc_cancel_button or pcm_cancel_cmd:
+      self.acc_enabled = False
+
+    self.set_speed, self.long_press, self.set_speed_timer = setspeedlogic(self.set_speed, self.acc_enabled,
+                                                                         CS.acc_setplus_button, CS.acc_setminus_button,
+                                                                         self.set_speed_timer, self.set_speed_min, self.long_press)
+
+    self.cruise_state, self.cruise_icon = cruiseiconlogic(self.acc_enabled, self.acc_available, op_lead_visible)
+
+    # Build ACC long control signals
+    ####################################################################################################################
+    self.stop_req = long_stopping and CS.out.standstill
+    self.go_req = long_starting and CS.out.standstill
+
+    # gas and brake
+    self.accel_lim_prev = self.accel_lim
+    apply_accel = actuators.gas - actuators.brake
+
+    apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady)
+    apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
+
+    self.accel_lim = apply_accel
+    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
+
+    self.decel_val = 4.  # m/s2
+    self.trq_val = -159  # Nm
+
+    if apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD:
+      self.decel_active = True
+      self.decel_val = apply_accel
+    else:
+      self.decel_active = False
+
+    if apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD:
+      self.accel_active = True
+      self.trq_val = apply_accel * 100
+    else:
+      self.accel_active = False
+
+      # Senf ACC msgs on can
+    ####################################################################################################################
+    if self.ccframe % 2 == 0:
+      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
+      can_sends.append(new_msg)
+      new_msg = create_op_acc_2(self.packer, self.acc_available, enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
+      can_sends.append(new_msg)
+    if self.ccframe % 6 == 0:
+      new_msg = create_op_dashboard(self.packer, op_set_speed, self.cruise_state, self.cruise_icon, op_lead_dist)
+      can_sends.append(new_msg)
+
     self.ccframe += 1
     self.prev_frame = frame
 
     return can_sends
+
+def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_min, long_press):
+    shortpresstime = 20  # 200msec
+    longpresstime = 49  # 490msec
+    shortpressstep = 1 * CV.MPH_TO_MS
+    longpressstep = 5 * CV.MPH_TO_MS
+
+    if acc_enabled:
+      if setplus:
+        if timer % shortpresstime == 0 and not long_press:
+          set_speed += shortpressstep
+        elif timer % longpresstime == 0:
+            set_speed += longpressstep
+            long_press = True
+        timer += 1
+      elif setminus:
+        if timer % shortpresstime == 0 and not long_press:
+          set_speed -= shortpressstep
+        elif timer % longpresstime == 0:
+            set_speed -= longpressstep
+            long_press = True
+        timer += 1
+      else:
+        timer = 0
+        long_press = False
+
+    set_speed = max(set_speed, set_speed_min)
+
+    return set_speed, long_press, timer
+
+def cruiseiconlogic(acc_enabled, acc_available, has_lead):
+    if acc_enabled:
+      cruise_state = 4 # ACC engaged
+      if has_lead:
+        cruise_icon = 13 # ACC green icon with 2 bar distance and lead
+      else:
+        cruise_icon = 9 # ACC green icon with 2 bar distance and no lead
+    else:
+      if acc_available:
+        cruise_state = 3 # ACC on
+        cruise_icon = 3 # ACC white icon with 2 bar distance
+      else:
+        cruise_state = 0
+        cruise_icon = 0
+
+    return cruise_state, cruise_icon
+
+# Accel Hard limits
+ACCEL_HYST_GAP = 0.1  # don't change accel command for small oscillations within this value
+ACCEL_MAX = 2.  # m/s2
+ACCEL_MIN = -3.8  # m/s2
+ACCEL_SCALE = 1.
+START_BRAKE_THRESHOLD = -0.160 # m/s2
+STOP_BRAKE_THRESHOLD = 0.001 # m/s2
+START_GAS_THRESHOLD = 0.002 # m/s2
+STOP_GAS_THRESHOLD = -0.159 # m/s2
+
+def accel_hysteresis(accel, accel_steady):
+
+  # for small accel oscillations within ACCEL_HYST_GAP, don't change the accel command
+  if accel > accel_steady + ACCEL_HYST_GAP:
+    accel_steady = accel - ACCEL_HYST_GAP
+  elif accel < accel_steady - ACCEL_HYST_GAP:
+    accel_steady = accel + ACCEL_HYST_GAP
+  accel = accel_steady
+
+  return accel, accel_steady
+
+def accel_rate_limit(accel_lim, prev_accel_lim):
+ # acceleration jerk = 2.0 m/s/s/s
+ # brake jerk = 3.8 m/s/s/s
+  if accel_lim > 0:
+    if accel_lim > prev_accel_lim:
+      accel_lim = min(accel_lim, prev_accel_lim + 0.02)
+    else:
+      accel_lim = max(accel_lim, prev_accel_lim - 0.038)
+  else:
+    if accel_lim < prev_accel_lim:
+      accel_lim = max(accel_lim, prev_accel_lim - 0.038)
+    else:
+      accel_lim = min(accel_lim, prev_accel_lim + 0.01)
+
+  return accel_lim

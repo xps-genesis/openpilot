@@ -35,7 +35,8 @@ def manager_init():
     ("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')),
     ("OpenpilotEnabledToggle", "1"),
     ("LkasFullRangeAvailable", "1"),
-    ("ChryslerMangoMode", "1"),
+    ("ChryslerMangoLat", "1"),
+    ("ChryslerMangoLong", "1"),
     ("DisableUpdates", "0"),
   ]
 
