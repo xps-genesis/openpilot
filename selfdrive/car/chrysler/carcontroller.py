@@ -38,6 +38,7 @@ class CarController():
     self.cruise_icon = 0
     self.acc_pre_brake = False
     self.accel_lim_prev = 0.
+    self.accel_lim = 0.
 
     self.packer = CANPacker(dbc_name)
 
