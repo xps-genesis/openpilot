@@ -37,7 +37,7 @@ TogglesPanel::TogglesPanel(QWidget *parent) : QWidget(parent) {
                                    this));
 
   toggles.append(new ParamControl("ChryslerMangoLong",
-                                   "Chrysler steer to 0 \U0001f96e",
+                                   "Chrysler Mango Long \U0001f96e",
                                    "needs WP setup to do op long",
                                    "../assets/offroad/icon_road.png",
                                    this));
