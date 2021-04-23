@@ -41,7 +41,7 @@ Desire = log.LateralPlan.Desire
 LaneChangeState = log.LateralPlan.LaneChangeState
 LaneChangeDirection = log.LateralPlan.LaneChangeDirection
 EventName = car.CarEvent.EventName
-LongCtrlState = log.ControlsState.LongControlState
+long_ctrl_state = log.ControlsState.LongControlState
 
 class Controls:
   def __init__(self, sm=None, pm=None, can_sock=None):
@@ -456,8 +456,8 @@ class Controls:
     dat = messaging.new_message('controlsState')
     dat.valid = CS.canValid
     controlsState = dat.controlsState
-    CC.hudControl.longStopping = controlsState.LongCtrlState == LongCtrlState.stopping
-    CC.hudControl.longStarting = controlsState.LongCtrlState == LongCtrlState.starting
+    CC.hudControl.longStopping = controlsState.LongCtrlState == long_ctrl_state.stopping
+    CC.hudControl.longStarting = controlsState.LongCtrlState == long_ctrl_state.starting
 
     right_lane_visible = self.sm['lateralPlan'].rProb > 0.5
     left_lane_visible = self.sm['lateralPlan'].lProb > 0.5
