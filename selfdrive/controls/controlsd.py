@@ -456,6 +456,7 @@ class Controls:
     dat = messaging.new_message('controlsState')
     dat.valid = CS.canValid
     controlsState = dat.controlsState
+    controlsState.longControlState = self.LoC.long_control_state
     CC.hudControl.longStopping = controlsState.LongCtrlState == long_ctrl_state.stopping
     CC.hudControl.longStarting = controlsState.LongCtrlState == long_ctrl_state.starting
 
@@ -520,7 +521,6 @@ class Controls:
     controlsState.steeringAngleDesiredDeg = angle_steers_des
     controlsState.state = self.state
     controlsState.engageable = not self.events.any(ET.NO_ENTRY)
-    controlsState.longControlState = self.LoC.long_control_state
     controlsState.vPid = float(self.LoC.v_pid)
     controlsState.vCruise = float(self.v_cruise_kph)
     controlsState.upAccelCmd = float(self.LoC.pid.p)
