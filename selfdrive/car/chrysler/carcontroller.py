@@ -9,6 +9,22 @@ from common.params import Params
 from selfdrive.config import Conversions as CV
 from common.numpy_fast import clip
 
+SET_SPEED_MIN = 20. * CV.MPH_TO_MS
+LONG_PRESS_TIME = 50  # 500msec
+SHORT_PRESS_STEP = 1 * CV.MPH_TO_MS
+LONG_PRESS_STEP = 5 * CV.MPH_TO_MS
+# Accel Hard limits
+ACCEL_HYST_GAP = 0.1  # don't change accel command for small oscillations within this value
+ACCEL_MAX = 2.  # m/s2
+ACCEL_MIN = -3.8  # m/s2
+ACCEL_SCALE = 1.
+
+DEFAULT_DECEL = 4.0 # m/s2
+START_BRAKE_THRESHOLD = -0.160 # m/s2
+STOP_BRAKE_THRESHOLD = 0.001 # m/s2
+START_GAS_THRESHOLD = 0.002 # m/s2
+STOP_GAS_THRESHOLD = -0.159 # m/s2
+
 class CarController():
   def __init__(self, dbc_name, CP, VM):
     self.apply_steer_last = 0
@@ -30,10 +46,10 @@ class CarController():
     #OPLong starts here
     self.acc_available = False
     self.acc_enabled = False
-    self.set_speed_min = 5. * CV.MPH_TO_MS
-    self.set_speed = self.set_speed_min
+    self.set_speed = SET_SPEED_MIN
     self.set_speed_timer = 0
     self.short_press = True
+    self.gas_press_set_speed = False
     self.cruise_state = 0
     self.cruise_icon = 0
     self.acc_pre_brake = False
@@ -187,10 +203,13 @@ class CarController():
     elif  self.acc_enabled and not self.acc_available or CS.acc_cancel_button or pcm_cancel_cmd:
       self.acc_enabled = False
 
-    self.set_speed, self.short_press, self.set_speed_timer = setspeedlogic(self.set_speed, self.acc_enabled,
+    if CS.out.gasPressed:
+      self.gas_press_set_speed = True
+
+    self.set_speed, self.short_press, self.set_speed_timer, self.gas_press_set_speed = setspeedlogic(self.set_speed, self.acc_enabled,
                                                                          CS.acc_setplus_button, CS.acc_setminus_button,
-                                                                         self.set_speed_timer, self.set_speed_min,
-                                                                         self.short_press, CS.out.vEgoRaw, CS.out.gasPressed)
+                                                                         self.set_speed_timer, SET_SPEED_MIN,
+                                                                         self.short_press, CS.out.vEgoRaw, self.gas_press_set_speed)
 
     self.cruise_state, self.cruise_icon = cruiseiconlogic(self.acc_enabled, self.acc_available, op_lead_visible)
 
@@ -240,10 +259,8 @@ class CarController():
 
     return can_sends
 
+
 def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_min, short_press, vego, gas):
-    longpresstime = 50  # 500msec
-    shortpressstep = 1 * CV.MPH_TO_MS
-    longpressstep = 5 * CV.MPH_TO_MS
 
     if acc_enabled:
       if setplus:
@@ -251,33 +268,37 @@ def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_mi
           if gas:
             set_speed = max(vego, set_speed_min)
           else:
-            set_speed += shortpressstep
+            set_speed += SHORT_PRESS_STEP
           short_press = True
-        elif timer % longpresstime == 0:
-            set_speed += (longpressstep - set_speed % longpressstep)
+          gas = False
+        elif timer % LONG_PRESS_TIME == 0:
+            set_speed += (LONG_PRESS_STEP - set_speed % LONG_PRESS_STEP)
         timer += 1
       elif setminus:
         if not short_press:
           if gas:
             set_speed = max(vego, set_speed_min)
           else:
-            set_speed -= shortpressstep
+            set_speed -= SHORT_PRESS_STEP
           short_press = True
-        elif timer % longpresstime == 0:
-          if set_speed % longpressstep > 0:
-            set_speed += (longpressstep - set_speed % longpressstep)
-          set_speed -= longpressstep
+          gas = False
+        elif timer % LONG_PRESS_TIME == 0:
+          if set_speed % LONG_PRESS_STEP > 0:
+            set_speed += (LONG_PRESS_STEP - set_speed % LONG_PRESS_STEP)
+          set_speed -= LONG_PRESS_STEP
         timer += 1
       else:
         timer = 0
         short_press = False
     else:
       set_speed = max(vego, set_speed_min)
-      short_press = True
+      short_press = False
+      gas = False
 
     set_speed = max(set_speed, set_speed_min)
 
-    return set_speed, short_press, timer
+    return set_speed, short_press, timer, gas
+
 
 def cruiseiconlogic(acc_enabled, acc_available, has_lead):
     if acc_enabled:
@@ -295,18 +316,6 @@ def cruiseiconlogic(acc_enabled, acc_available, has_lead):
         cruise_icon = 0
 
     return cruise_state, cruise_icon
-
-# Accel Hard limits
-ACCEL_HYST_GAP = 0.1  # don't change accel command for small oscillations within this value
-ACCEL_MAX = 2.  # m/s2
-ACCEL_MIN = -3.8  # m/s2
-ACCEL_SCALE = 1.
-
-DEFAULT_DECEL = 4.0 # m/s2
-START_BRAKE_THRESHOLD = -0.160 # m/s2
-STOP_BRAKE_THRESHOLD = 0.001 # m/s2
-START_GAS_THRESHOLD = 0.002 # m/s2
-STOP_GAS_THRESHOLD = -0.159 # m/s2
 
 def accel_hysteresis(accel, accel_steady):
 
