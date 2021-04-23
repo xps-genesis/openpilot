@@ -40,6 +40,8 @@ class CarController():
     self.accel_lim_prev = 0.
     self.accel_lim = 0.
     self.accel_steady = 0.
+    self.accel_active = False
+    self.decel_active = False
 
     self.packer = CANPacker(dbc_name)
 
