@@ -457,8 +457,8 @@ class Controls:
     dat.valid = CS.canValid
     controlsState = dat.controlsState
     controlsState.longControlState = self.LoC.long_control_state
-    CC.hudControl.longStopping = controlsState.LongCtrlState == long_ctrl_state.stopping
-    CC.hudControl.longStarting = controlsState.LongCtrlState == long_ctrl_state.starting
+    CC.hudControl.longStopping = controlsState.longControlState == long_ctrl_state.stopping
+    CC.hudControl.longStarting = controlsState.longControlState == long_ctrl_state.starting
 
     right_lane_visible = self.sm['lateralPlan'].rProb > 0.5
     left_lane_visible = self.sm['lateralPlan'].lProb > 0.5
