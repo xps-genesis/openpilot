@@ -91,10 +91,11 @@ class CarInterface(CarInterfaceBase):
     self.cp_cam.update_strings(can_strings)
 
     ret = self.CS.update(self.cp, self.cp_cam)
-    
-    ret.cruiseState.available = self.CC.acc_available
-    ret.cruiseState.enabled = self.CC.acc_enabled
-    ret.cruiseState.speed = self.CC.set_speed
+
+    if 1==0: #self.CP.openpilotLongitudinalControl:
+      ret.cruiseState.available = self.CC.acc_available
+      ret.cruiseState.enabled = self.CC.acc_enabled
+      ret.cruiseState.speed = self.CC.set_speed
 
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
 
