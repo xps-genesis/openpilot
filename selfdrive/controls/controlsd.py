@@ -452,8 +452,8 @@ class Controls:
     CC.hudControl.lanesVisible = self.enabled
     CC.hudControl.leadVisible = self.sm['longitudinalPlan'].hasLead
     CC.hudControl.leadDistance = self.sm['radarState'].leadOne.dRel
-    CC.hudControl.longStopping = self.sm['controlsState'].longControlState == LongCtrlState.stopping
-    CC.hudControl.longStarting = self.sm['controlsState'].longControlState == LongCtrlState.starting
+    CC.hudControl.longStopping = self.sm['controlsState'].longControlState.stopping
+    CC.hudControl.longStarting = self.sm['controlsState'].longControlState.starting
 
     right_lane_visible = self.sm['lateralPlan'].rProb > 0.5
     left_lane_visible = self.sm['lateralPlan'].lProb > 0.5
