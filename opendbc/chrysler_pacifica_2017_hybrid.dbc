@@ -250,6 +250,8 @@ BO_ 993 NEW_MSG_3e1: 7 XXX
 
 BO_ 838 CHIME: 2 XXX
  SG_ CHIME : 7|4@0+ (1,0) [0|15] "" XXX
+ SG_ CHIME_REQ_L : 1|1@0+ (1,0) [0|1] "" XXX
+ SG_ CHIME_REQ_R : 0|1@0+ (1,0) [0|1] "" XXX
 
 BO_ 926 NEW_MSG_39e: 3 XXX
 
