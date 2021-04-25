@@ -61,7 +61,7 @@ class CarController():
     self.decel_active = False
     self.chime = 0
     self.chime_timer = 0
-    self.gas_old = False
+    self.enabled_prev = False
 
     self.packer = CANPacker(dbc_name)
 
@@ -244,8 +244,8 @@ class CarController():
     else:
       self.accel_active = False
 
-    self.chime , self.chime_timer = cluster_chime(self.chime, self.gas_old, CS.out.gasPressed, CS.out.gearShifter, self.chime_timer)
-    self.gas_old = CS.out.gasPressed
+    self.chime , self.chime_timer = cluster_chime(self.chime, enabled, self.enabled_prev, self.chime_timer)
+    self.enabled_prev = enabled
       # Senf ACC msgs on can
     ####################################################################################################################
     if self.ccframe % 2 == 0:
@@ -351,14 +351,25 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
   return accel_lim
 
 
-def cluster_chime(chime, gas_prev, gas, gear, chime_timer):
-  if gear == GearShifter.park:
-    if not gas_prev and gas:
-      chime += 1
-      chime_timer = 0
-    chime %= 0xF
-    if chime_timer < 100:
-      chime_timer += 1
+def cluster_chime(chime, enabled, enabled_prev, chime_timer, play_times):
+
+  if not enabled_prev and enabled:
+    chime = 4
+    chime_timer = 0
+    play_times = 1
+  elif enabled_prev and not enabled:
+    chime = 5
+    chime_timer = 0
+    play_times = 2
+
+  if play_times > 0 and chime_timer == 0:
+    play_times -= 1
+
+  if chime_timer < 101:
+    chime_timer += 1
+  elif chime_timer == 101 and play_times > 0:
+    chime_timer = 0
+
   return chime, chime_timer
 
 
