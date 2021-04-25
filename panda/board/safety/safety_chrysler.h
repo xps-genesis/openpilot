@@ -7,7 +7,7 @@ const int CHRYSLER_MAX_TORQUE_ERROR = 80;    // max torque cmd in excess of torq
 const int CHRYSLER_GAS_THRSLD = 30;  // 7% more than 2m/s
 const int CHRYSLER_STANDSTILL_THRSLD = 10;  // about 1m/s
 const CanMsg CHRYSLER_TX_MSGS[] = {{571, 0, 3}, {658, 0, 6}, {678, 0, 8},
-                                   {502, 0, 8}, {503, 0, 8}, {626, 0, 8}};  //OP long msgs to WP
+                                   {502, 0, 8}, {503, 0, 8}, {626, 0, 8}, {838, 0, 2}};  //OP long msgs to WP
 
 AddrCheckStruct chrysler_rx_checks[] = {
   {.msg = {{544, 0, 8, .check_checksum = true, .max_counter = 15U, .expected_timestep = 10000U}}},

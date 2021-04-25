@@ -1,7 +1,7 @@
 from common.op_params import opParams
 from selfdrive.car import apply_toyota_steer_torque_limits
 from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, \
-  create_wheel_buttons, create_apa_hud, create_op_acc_1, create_op_acc_2, create_op_dashboard
+  create_wheel_buttons, create_apa_hud, create_op_acc_1, create_op_acc_2, create_op_dashboard, create_op_chime
 from selfdrive.car.chrysler.values import CAR, CarControllerParams
 from opendbc.can.packer import CANPacker
 from selfdrive.car.interfaces import GearShifter
@@ -59,6 +59,8 @@ class CarController():
     self.accel_steady = 0.
     self.accel_active = False
     self.decel_active = False
+    self.chime, self.chime_timer = 0
+    self.gas_old = False
 
     self.packer = CANPacker(dbc_name)
 
@@ -241,16 +243,20 @@ class CarController():
     else:
       self.accel_active = False
 
+    self.chime , self.chime_timer = cluster_chime(self.chime, self.gas_old, CS.out.gasPressed, CS.out.gearShifter, self.chime_timer)
+    self.gas_old = CS.out.gasPressed
       # Senf ACC msgs on can
     ####################################################################################################################
-    if self.op_long_enable:
-      if self.ccframe % 2 == 0:
-        new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
-        can_sends.append(new_msg)
-        new_msg = create_op_acc_2(self.packer, self.acc_available, enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
-        can_sends.append(new_msg)
-      if self.ccframe % 6 == 0:
-        new_msg = create_op_dashboard(self.packer, op_set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist)
+    if self.ccframe % 2 == 0:
+      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
+      can_sends.append(new_msg)
+      new_msg = create_op_acc_2(self.packer, self.acc_available, enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
+      can_sends.append(new_msg)
+    if self.ccframe % 6 == 0:
+      new_msg = create_op_dashboard(self.packer, op_set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist, self.op_long_enable)
+      can_sends.append(new_msg)
+    if self.ccframe % 100 == 0:
+        new_msg = create_op_chime(self.packer, self.chime , self.chime_timer)
         can_sends.append(new_msg)
 
     self.ccframe += 1
@@ -342,3 +348,16 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
       accel_lim = min(accel_lim, prev_accel_lim + 0.01)
 
   return accel_lim
+
+
+def cluster_chime(chime, gas_prev, gas, gear, chime_timer):
+  if gear == GearShifter.park:
+    if not gas_prev and gas:
+      chime += 1
+      chime_timer = 0
+    chime %= 0xF
+    if chime_timer < 100:
+      chime_timer += 1
+  return chime, chime_timer
+
+
