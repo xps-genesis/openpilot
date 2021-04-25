@@ -102,7 +102,7 @@ def create_op_dashboard(packer, set_speed, cruise_state, cruise_icon, has_lead, 
 
 def create_op_chime(packer, chime, chime_timer):
   values = { # 1000ms
-    "CHIME": chime if 0 < chime_timer < 51 else 0,
+    "CHIME": chime if 0 < chime_timer < 51 else 1,
     "CHIME_REQ_L": 1 if 0 < chime_timer < 51 else 0,
     "CHIME_REQ_R": 1 if 0 < chime_timer < 51 else 0
   }
