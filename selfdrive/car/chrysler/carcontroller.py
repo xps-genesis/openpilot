@@ -257,9 +257,9 @@ class CarController():
     if self.ccframe % 6 == 0:
       new_msg = create_op_dashboard(self.packer, op_set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist, self.op_long_enable)
       can_sends.append(new_msg)
-    if self.ccframe % 100 == 0:
-        new_msg = create_op_chime(self.packer, self.chime , self.chime_timer)
-        can_sends.append(new_msg)
+
+    new_msg = create_op_chime(self.packer, self.chime, self.chime_timer)
+    can_sends.append(new_msg)
 
     self.ccframe += 1
     self.prev_frame = frame
@@ -366,9 +366,9 @@ def cluster_chime(chime, enabled, enabled_prev, chime_timer, play_times):
   if play_times > 0 and chime_timer == 0:
     play_times -= 1
 
-  if chime_timer < 101:
+  if chime_timer < 51:
     chime_timer += 1
-  elif chime_timer == 101 and play_times > 0:
+  elif chime_timer == 51 and play_times > 0:
     chime_timer = 0
 
   return chime, chime_timer
