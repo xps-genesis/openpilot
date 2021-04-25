@@ -62,6 +62,7 @@ class CarController():
     self.chime = 0
     self.chime_timer = 0
     self.enabled_prev = False
+    self.play_times = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -244,7 +245,7 @@ class CarController():
     else:
       self.accel_active = False
 
-    self.chime , self.chime_timer = cluster_chime(self.chime, enabled, self.enabled_prev, self.chime_timer)
+    self.chime , self.chime_timer = cluster_chime(self.chime, enabled, self.enabled_prev, self.chime_timer, self.play_times)
     self.enabled_prev = enabled
       # Senf ACC msgs on can
     ####################################################################################################################
