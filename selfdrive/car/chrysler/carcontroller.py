@@ -14,7 +14,7 @@ LONG_PRESS_TIME = 50  # 500msec
 SHORT_PRESS_STEP = 1 * CV.MPH_TO_MS
 LONG_PRESS_STEP = 5 * CV.MPH_TO_MS
 # Accel Hard limits
-ACCEL_HYST_GAP = 0.1  # don't change accel command for small oscillations within this value
+ACCEL_HYST_GAP = 0.01  # don't change accel command for small oscillations within this value
 ACCEL_MAX = 2.  # m/s2
 ACCEL_MIN = -3.8  # m/s2
 ACCEL_SCALE = 1.
@@ -44,6 +44,7 @@ class CarController():
     self.wheel_button_counter_prev = 0
     self.lead_dist_at_stop = 0
     #OPLong starts here
+    self.op_long_enable = CP.openpilotLongitudinalControl
     self.acc_available = False
     self.acc_enabled = False
     self.set_speed = SET_SPEED_MIN
@@ -61,7 +62,8 @@ class CarController():
 
     self.packer = CANPacker(dbc_name)
 
-  def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert, op_set_speed, op_lead_visible, op_lead_dist, long_stopping, long_starting):
+  def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert, op_lead_rvel,
+             op_set_speed, op_lead_visible, op_lead_dist, long_stopping, long_starting):
     # this seems needed to avoid steering faults and to force the sync with the EPS counter
     frame = CS.lkas_counter
 
@@ -140,7 +142,7 @@ class CarController():
       self.lead_dist_at_stop = CS.lead_dist
 
     if CS.acc_button_pressed:
-      self.stop_button_spam = self.ccframe + 50 # stop spamming for 500msec if driver pressed ant acc steering wheel button
+      self.stop_button_spam = self.ccframe + 50 # stop spamming for 500msec if driver pressed any acc steering wheel button
 
     wheel_button_counter_change = CS.wheel_button_counter != self.wheel_button_counter_prev
     if wheel_button_counter_change:
@@ -148,12 +150,12 @@ class CarController():
 
     self.op_cancel_cmd = False
 
-    if (self.ccframe % 10 < 5) and wheel_button_counter_change and self.ccframe >= self.stop_button_spam:
+    if not self.op_long_enable and (self.ccframe % 10 < 5) and wheel_button_counter_change and self.ccframe >= self.stop_button_spam:
       button_type = None
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
         button_type = 'ACC_CANCEL'
         self.op_cancel_cmd = True
-      elif enabled and self.resume_press and CS.lead_dist > self.lead_dist_at_stop:
+      elif enabled and self.resume_press and CS.lead_dist > self.lead_dist_at_stop or op_lead_rvel > 0 or CS.lead_dist >= 6.:
         button_type = 'ACC_RESUME'
       elif not CS.out.brakePressed and not CS.out.cruiseState.enabled and \
               CS.out.cruiseState.available and opParams().get('brakereleaseAutoResume') and \
@@ -241,14 +243,15 @@ class CarController():
 
       # Senf ACC msgs on can
     ####################################################################################################################
-    if self.ccframe % 2 == 0:
-      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
-      can_sends.append(new_msg)
-      new_msg = create_op_acc_2(self.packer, self.acc_available, enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
-      can_sends.append(new_msg)
-    if self.ccframe % 6 == 0:
-      new_msg = create_op_dashboard(self.packer, op_set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist)
-      can_sends.append(new_msg)
+    if self.op_long_enable:
+      if self.ccframe % 2 == 0:
+        new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
+        can_sends.append(new_msg)
+        new_msg = create_op_acc_2(self.packer, self.acc_available, enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
+        can_sends.append(new_msg)
+      if self.ccframe % 6 == 0:
+        new_msg = create_op_dashboard(self.packer, op_set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist)
+        can_sends.append(new_msg)
 
     self.ccframe += 1
     self.prev_frame = frame
@@ -298,15 +301,15 @@ def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_mi
 
 def cruiseiconlogic(acc_enabled, acc_available, has_lead):
     if acc_enabled:
-      cruise_state = 4 # ACC engaged
+      cruise_state = 4  # ACC engaged
       if has_lead:
-        cruise_icon = 13 # ACC green icon with 2 bar distance and lead
+        cruise_icon = 15  # ACC green icon with 4 bar distance and lead
       else:
-        cruise_icon = 9 # ACC green icon with 2 bar distance and no lead
+        cruise_icon = 11  # ACC green icon with 4 bar distance and no lead
     else:
       if acc_available:
         cruise_state = 3 # ACC on
-        cruise_icon = 3 # ACC white icon with 2 bar distance
+        cruise_icon = 5 # ACC white icon with 4 bar distance
       else:
         cruise_state = 0
         cruise_icon = 0

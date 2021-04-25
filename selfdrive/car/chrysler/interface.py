@@ -92,7 +92,7 @@ class CarInterface(CarInterfaceBase):
 
     ret = self.CS.update(self.cp, self.cp_cam)
 
-    if 1==0: #self.CP.openpilotLongitudinalControl:
+    if self.CP.openpilotLongitudinalControl:
       ret.cruiseState.available = self.CC.acc_available
       ret.cruiseState.enabled = self.CC.acc_enabled
       ret.cruiseState.speed = self.CC.set_speed
@@ -128,6 +128,7 @@ class CarInterface(CarInterfaceBase):
 
     can_sends = self.CC.update(c.enabled, self.CS, c.actuators, c.cruiseControl.cancel,
                                c.hudControl.visualAlert, c.hudControl.setSpeed,
+                               c.hudControl.leadRelvel,
                                c.hudControl.leadVisible, c.hudControl.leadDistance, 
                                c.hudControl.longStopping, c.hudControl.longStarting)
 

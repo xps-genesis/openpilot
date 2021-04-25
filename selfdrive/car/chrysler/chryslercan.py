@@ -95,6 +95,7 @@ def create_op_dashboard(packer, set_speed, cruise_state, cruise_icon, has_lead, 
     "ACC_SET_SPEED_MPH": set_speed * CV.MS_TO_MPH,
     "CRUISE_STATE": cruise_state,
     "CRUISE_ICON": cruise_icon,
-    "LEAD_DIST": min(lead_d, 254) if has_lead else 254
+    "LEAD_DIST": min(lead_d, 253) if has_lead else 254,
+    "OP_LONG_ENABLE": True
   }
   return packer.make_can_msg("OP_DASHBOARD", 0, values)
