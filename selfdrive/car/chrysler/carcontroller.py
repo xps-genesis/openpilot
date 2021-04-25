@@ -59,7 +59,8 @@ class CarController():
     self.accel_steady = 0.
     self.accel_active = False
     self.decel_active = False
-    self.chime, self.chime_timer = 0
+    self.chime = 0
+    self.chime_timer = 0
     self.gas_old = False
 
     self.packer = CANPacker(dbc_name)
