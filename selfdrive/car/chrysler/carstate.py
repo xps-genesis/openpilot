@@ -161,6 +161,10 @@ class CarState(CarStateBase):
       ("TRACTION_BUTTON", 1),
       ("BLIND_SPOT_WARNINGS", 2),
       ("BRAKE_1", 50),
+      ("HYBRID_ECU", 1),
+      ("AUTO_PARK_REQUEST", 50),
+      ("WHEEL_BUTTONS", 1),
+      ("ACCEL_GAS_22F", 50),
     ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
