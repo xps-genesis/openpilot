@@ -366,9 +366,9 @@ def cluster_chime(chime, enabled, enabled_prev, chime_timer, play_times):
   if play_times > 0 and chime_timer == 0:
     play_times -= 1
 
-  if chime_timer < 51:
+  if chime_timer < 21:
     chime_timer += 1
-  elif chime_timer == 51 and play_times > 0:
+  elif chime_timer == 21 and play_times > 0:
     chime_timer = 0
 
   return chime, chime_timer
