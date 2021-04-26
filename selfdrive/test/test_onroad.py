@@ -16,9 +16,9 @@ from tools.lib.logreader import LogReader
 
 # Baseline CPU usage by process
 PROCS = {
-  "selfdrive.controls.controlsd": 47.0,
+  "selfdrive.controls.controlsd": 50.0,
   "./loggerd": 45.0,
-  "selfdrive.locationd.locationd": 32.8,
+  "./locationd": 3.5,
   "selfdrive.controls.plannerd": 20.0,
   "./_ui": 15.0,
   "selfdrive.locationd.paramsd": 9.1,
@@ -44,7 +44,6 @@ if TICI:
     "./loggerd": 60.0,
     "selfdrive.controls.controlsd": 26.0,
     "./camerad": 25.0,
-    "selfdrive.locationd.locationd": 21.0,
     "selfdrive.controls.plannerd": 12.0,
     "selfdrive.locationd.paramsd": 5.0,
     "./_dmonitoringmodeld": 10.0,
@@ -72,7 +71,7 @@ def check_cpu_usage(first_proc, last_proc):
       cpu_usage = cpu_time / dt * 100.
       if cpu_usage > max(normal_cpu_usage * 1.1, normal_cpu_usage + 5.0):
         # TODO: fix high CPU when playing sounds constantly in UI
-        if proc_name == "./_ui" and cpu_usage < 40.:
+        if proc_name == "./_ui" and cpu_usage < 50.:
           continue
         result += f"Warning {proc_name} using more CPU than normal\n"
         r = False
