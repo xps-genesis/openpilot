@@ -15,7 +15,7 @@ SHORT_PRESS_STEP = 1 * CV.MPH_TO_MS
 LONG_PRESS_STEP = 5 * CV.MPH_TO_MS
 # Accel Hard limits
 ACCEL_HYST_GAP = 0.01  # don't change accel command for small oscillations within this value
-ACCEL_MAX = 2.  # m/s2
+ACCEL_MAX = 1.  # m/s2
 ACCEL_MIN = -3.8  # m/s2
 ACCEL_SCALE = 1.
 

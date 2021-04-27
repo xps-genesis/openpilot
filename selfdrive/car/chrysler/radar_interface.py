@@ -77,10 +77,10 @@ class RadarInterface(RadarInterfaceBase):
         self.pts[trackId].measured = True
 
       if 'LONG_DIST' in cpt:  # c_* message
-        self.pts[trackId].dRel = float('nan') #cpt['LONG_DIST']  # from front of car
+        self.pts[trackId].dRel = cpt['LONG_DIST']  # from front of car
         # our lat_dist is positive to the right in car's frame.
         # TODO what does yRel want?
-        self.pts[trackId].yRel = float('nan') #cpt['LAT_DIST']  # in car frame's y axis, left is positive
+        self.pts[trackId].yRel = cpt['LAT_DIST']  # in car frame's y axis, left is positive
       else:  # d_* message
         self.pts[trackId].vRel = cpt['REL_SPEED']
 
