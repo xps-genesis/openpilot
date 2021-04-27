@@ -9,7 +9,7 @@ from common.params import Params
 from selfdrive.config import Conversions as CV
 from common.numpy_fast import clip
 
-SET_SPEED_MIN = 20. * CV.MPH_TO_MS
+SET_SPEED_MIN = 5 * CV.MPH_TO_MS
 LONG_PRESS_TIME = 50  # 500msec
 SHORT_PRESS_STEP = 1 * CV.MPH_TO_MS
 LONG_PRESS_STEP = 5 * CV.MPH_TO_MS
