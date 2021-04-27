@@ -200,7 +200,8 @@ class CarController():
     if CS.acc_on_button and not CS.acc_on_button_prev:
        self.acc_available = not self.acc_available
 
-    if not self.acc_enabled and self.acc_available and CS.acc_setplus_button or CS.acc_setminus_button or CS.acc_resume_button:
+    if not self.acc_enabled and not CS.out.brakePressed and self.acc_available and \
+            (CS.acc_setplus_button or CS.acc_setminus_button or CS.acc_resume_button):
       self.acc_enabled = True
     elif  self.acc_enabled and not self.acc_available or CS.acc_cancel_button or pcm_cancel_cmd:
       self.acc_enabled = False
