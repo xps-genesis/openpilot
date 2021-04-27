@@ -84,15 +84,14 @@ def create_op_acc_2(packer, available, enabled, stop_req, go_req, acc_pre_brake,
     "ACC_AVAILABLE": available,
     "ACC_ENABLED": enabled,
     "ACC_BRK_PREP": acc_pre_brake,
-    "COMMAND_TYPE_2": 1 if enabled else 0,
     "COMMAND_TYPE": 1 if decel_active else 0
   }
   return packer.make_can_msg("OP_ACC_2", 0, values)
 
 def create_op_dashboard(packer, set_speed, cruise_state, cruise_icon, has_lead, lead_d, oplongenable):
   values = { # 60ms
-    "ACC_SET_SPEED_KPH": int(set_speed * CV.MS_TO_KPH),
-    "ACC_SET_SPEED_MPH": int(set_speed * CV.MS_TO_MPH),
+    "ACC_SET_SPEED_KPH": round(set_speed * CV.MS_TO_KPH),
+    "ACC_SET_SPEED_MPH": round(set_speed * CV.MS_TO_MPH),
     "CRUISE_STATE": cruise_state,
     "CRUISE_ICON": cruise_icon,
     "LEAD_DIST": min(lead_d, 253) if has_lead else 254,
