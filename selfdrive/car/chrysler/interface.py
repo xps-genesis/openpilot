@@ -32,8 +32,8 @@ class CarInterface(CarInterfaceBase):
     ret.longitudinalTuning.kiV = [0.15, .055, .05, .045]
     ret.longitudinalTuning.deadzoneBP = [0., .5]
     ret.longitudinalTuning.deadzoneV = [0.00, 0.00]
-    ret.gasMaxBP = [0.] #, 1., 1.1, 15., 40.]
-    ret.gasMaxV = [0.2] #, 2., 2., 1.68, 1.3]
+    ret.gasMaxBP = [0., 1., 1.1, 15., 40.]
+    ret.gasMaxV = [0.2, 2., 2., 1.68, 1.3]
     ret.brakeMaxBP = [0., 5., 5.1]
     ret.brakeMaxV = [3.8, 3.8, 3.8]  # safety limits to stop unintended deceleration
     ret.longitudinalTuning.kfBP = [0., 5., 10., 20., 30.]
@@ -127,8 +127,8 @@ class CarInterface(CarInterfaceBase):
       return []  # if we haven't seen a frame 220, then do not update.
 
     can_sends = self.CC.update(c.enabled, self.CS, c.actuators, c.cruiseControl.cancel,
-                               c.hudControl.visualAlert, c.hudControl.setSpeed,
-                               c.hudControl.leadRelvel,
+                               c.hudControl.visualAlert,
+                               c.hudControl.leadRelvel, c.hudControl.setSpeed,
                                c.hudControl.leadVisible, c.hudControl.leadDistance, 
                                c.hudControl.longStopping, c.hudControl.longStarting)
 
