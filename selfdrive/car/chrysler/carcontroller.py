@@ -218,8 +218,7 @@ class CarController():
 
     # Build ACC long control signals
     ####################################################################################################################
-    self.stop_req = long_stopping and CS.out.standstill
-    self.go_req = long_starting and CS.out.standstill
+    self.stop_req = enabled and CS.out.standstill and not CS.out.gasPressed
 
     # gas and brake
     self.accel_lim_prev = self.accel_lim
@@ -234,15 +233,19 @@ class CarController():
     self.decel_val = DEFAULT_DECEL
     self.trq_val = STOP_GAS_THRESHOLD * CV.ACCEL_TO_NM
 
-    if apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD:
+    if not CS.out.gasPressed and (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD):
       self.decel_active = True
       self.decel_val = apply_accel
     else:
       self.decel_active = False
+      
+    self.go_req = False
 
     if apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD:
       self.accel_active = True
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
+      self.stop_req = False
+      self.go_req = CS.out.standstill
     else:
       self.accel_active = False
 
