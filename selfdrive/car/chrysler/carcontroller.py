@@ -241,7 +241,7 @@ class CarController():
       
     self.go_req = False
 
-    if apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD:
+    if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
       self.accel_active = True
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
       self.stop_req = False
