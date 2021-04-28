@@ -45,7 +45,7 @@ class CarController():
     self.lead_dist_at_stop = 0
     #OPLong starts here
     self.op_long_enable = CP.openpilotLongitudinalControl
-    self.acc_available = False
+    self.acc_available = True
     self.acc_enabled = False
     self.set_speed = SET_SPEED_MIN
     self.set_speed_timer = 0
@@ -254,7 +254,7 @@ class CarController():
       # Senf ACC msgs on can
     ####################################################################################################################
     if self.ccframe % 2 == 0:
-      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
+      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val, CS.axle_torq)
       can_sends.append(new_msg)
       new_msg = create_op_acc_2(self.packer, self.acc_available, enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
       can_sends.append(new_msg)

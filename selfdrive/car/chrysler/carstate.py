@@ -89,6 +89,8 @@ class CarState(CarStateBase):
     self.acc_button_pressed = self.acc_cancel_button or self.acc_resume_button or self.acc_setplus_button or \
                               self.acc_setminus_button or self.acc_followdec_button or self.acc_followinc_button
 
+    self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
+
     return ret
 
   @staticmethod
@@ -142,6 +144,7 @@ class CarState(CarStateBase):
       ("VEHICLE_SPEED_KPH", "BRAKE_1", 0),
       ("BRAKE_LIGHT", "BRAKE_2", 0),
       ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
+      ("AXLE_TORQ", "AXLE_TORQ", 0)
     ]
 
     checks = [
@@ -165,6 +168,7 @@ class CarState(CarStateBase):
       ("AUTO_PARK_REQUEST", 50),
       ("WHEEL_BUTTONS", 1),
       ("ACCEL_GAS_22F", 50),
+      ("AXLE_TORQ", 100),
     ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)

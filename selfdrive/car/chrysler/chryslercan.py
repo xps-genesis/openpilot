@@ -69,10 +69,10 @@ def create_wheel_buttons(packer, counter, button_type):
   }
   return packer.make_can_msg("WHEEL_BUTTONS", 0, values)
 
-def create_op_acc_1(packer, accel_active, trq_val):
+def create_op_acc_1(packer, accel_active, trq_val, default_trq):
   values = { # 20ms
     "ACC_ENG_REQ": accel_active,
-    "ACC_TORQ": trq_val
+    "ACC_TORQ": trq_val if accel_active else default_trq
   }
   return packer.make_can_msg("OP_ACC_1", 0, values)
 
