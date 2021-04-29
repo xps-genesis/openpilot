@@ -271,9 +271,9 @@ class CarController():
 
 def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_min, short_press, vego, gas_set, gas):
 
-    set_speed = round(set_speed * CV.MS_TO_MPH)
-    set_speed_min = round(set_speed_min * CV.MS_TO_MPH)
-    vego = round(vego * CV.MS_TO_MPH)
+    set_speed = int(round(set_speed * CV.MS_TO_MPH))
+    set_speed_min = int(round(set_speed_min * CV.MS_TO_MPH))
+    vego = int(round(vego * CV.MS_TO_MPH))
 
     if acc_enabled:
       if setplus:
