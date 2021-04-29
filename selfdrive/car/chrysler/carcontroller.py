@@ -11,8 +11,8 @@ from common.numpy_fast import clip
 
 SET_SPEED_MIN = 5 * CV.MPH_TO_MS
 LONG_PRESS_TIME = 50  # 500msec
-SHORT_PRESS_STEP = 1 * CV.MPH_TO_MS
-LONG_PRESS_STEP = 5 * CV.MPH_TO_MS
+SHORT_PRESS_STEP = 1
+LONG_PRESS_STEP = 5
 # Accel Hard limits
 ACCEL_HYST_GAP = 0.01  # don't change accel command for small oscillations within this value
 ACCEL_MAX = 1.  # m/s2
@@ -241,7 +241,7 @@ class CarController():
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
       self.accel_active = True
-      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq)
+      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq + 100)
       self.stop_req = False
       self.go_req = CS.out.standstill
     else:
