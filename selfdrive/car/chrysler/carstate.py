@@ -6,6 +6,7 @@ from opendbc.can.can_define import CANDefine
 from selfdrive.config import Conversions as CV
 from selfdrive.car.interfaces import CarStateBase
 from selfdrive.car.chrysler.values import DBC, STEER_THRESHOLD
+from common.params import Params
 
 
 class CarState(CarStateBase):
@@ -59,8 +60,8 @@ class CarState(CarStateBase):
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]['CRUISE_STATE'] in [1, 2]
 
-    ret.steeringTorque = cp.vl["EPS_STATUS"]["TORQUE_DRIVER"] * 4
-    ret.steeringTorqueEps = cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]
+    ret.steeringTorque = cp.vl["EPS_STATUS"]["TORQUE_DRIVER"]/4
+    ret.steeringTorqueEps = cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]/4 if Params().get_bool('ChryslerMangoLat') else cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
     self.steerError = cp.vl["EPS_STATUS"]["LKAS_STEER_FAULT"] == 4
     self.apaFault = cp.vl["EPS_STATUS"]["APA_STEER_FAULT"] == 1
@@ -90,6 +91,8 @@ class CarState(CarStateBase):
                               self.acc_setminus_button or self.acc_followdec_button or self.acc_followinc_button
 
     self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
+    self.acc_override = bool(cp.vl["ACCEL_RELATED_120"]['ACC_OVERRIDE'])
+
 
     return ret
 
@@ -144,7 +147,8 @@ class CarState(CarStateBase):
       ("VEHICLE_SPEED_KPH", "BRAKE_1", 0),
       ("BRAKE_LIGHT", "BRAKE_2", 0),
       ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
-      ("AXLE_TORQ", "AXLE_TORQ", 0)
+      ("AXLE_TORQ", "AXLE_TORQ", 0),
+      ("ACC_OVERRIDE", "ACCEL_RELATED_120", 0)
     ]
 
     checks = [
@@ -169,6 +173,7 @@ class CarState(CarStateBase):
       ("WHEEL_BUTTONS", 1),
       ("ACCEL_GAS_22F", 50),
       ("AXLE_TORQ", 100),
+      ("ACCEL_RELATED_120", 50),
     ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
