@@ -310,7 +310,7 @@ def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_mi
     if not gas:
       gas_set = False
 
-    set_speed = max(set_speed, set_speed_min) * CV.MS_TO_MPH
+    set_speed = max(set_speed, set_speed_min) * CV.MPH_TO_MS
 
     return set_speed, short_press, timer, gas_set
 
