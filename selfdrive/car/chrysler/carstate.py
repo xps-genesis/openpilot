@@ -92,7 +92,7 @@ class CarState(CarStateBase):
 
     self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
     self.acc_override = bool(cp.vl["ACCEL_RELATED_120"]['ACC_OVERRIDE'])
-    self.accbrakeFaulted = (cp.vl["BRAKE_2"]['ACC_BRAKE_FAIL']) > 0
+    self.accbrakeFaulted = ((cp.vl["BRAKE_2"]['ACC_BRAKE_FAIL']) > 0) or ((cp.vl["ACC_ERROR"]['ACC_ERROR']) > 0)
     self.accengFaulted = (cp.vl["ACCEL_RELATED_120"]['ACC_ENG_OK']) == 0
 
 
@@ -153,6 +153,7 @@ class CarState(CarStateBase):
       ("ACC_OVERRIDE", "ACCEL_RELATED_120", 0),
       ("ACC_BRAKE_FAIL", "BRAKE_2", 0),
       ("ACC_ENG_OK", "ACCEL_RELATED_120", 0),
+      ("ACC_ERROR", "ACC_ERROR", 0),
     ]
 
     checks = [
@@ -178,6 +179,7 @@ class CarState(CarStateBase):
       ("ACCEL_GAS_22F", 50),
       ("AXLE_TORQ", 100),
       ("ACCEL_RELATED_120", 50),
+      ("ACC_ERROR", 1),
     ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)

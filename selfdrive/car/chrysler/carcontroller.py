@@ -63,6 +63,7 @@ class CarController():
     self.chime_timer = 0
     self.enabled_prev = False
     self.play_times = 0
+    self.resume_set_speed = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -205,10 +206,11 @@ class CarController():
       self.acc_enabled = True
     elif  self.acc_enabled and not self.acc_available or CS.acc_cancel_button or pcm_cancel_cmd:
       self.acc_enabled = False
+      self.resume_set_speed = self.set_speed
 
     self.set_speed, self.short_press, self.set_speed_timer, self.gas_press_set_speed = setspeedlogic(self.set_speed, self.acc_enabled,
-                                                                         CS.acc_setplus_button, CS.acc_setminus_button,
-                                                                         self.set_speed_timer, SET_SPEED_MIN,
+                                                                         CS.acc_setplus_button, CS.acc_setminus_button,  CS.acc_resume_button,
+                                                                         self.set_speed_timer, SET_SPEED_MIN, self.resume_set_speed,
                                                                          self.short_press, CS.out.vEgoRaw, self.gas_press_set_speed, CS.out.gasPressed)
 
     self.cruise_state, self.cruise_icon = cruiseiconlogic(self.acc_enabled, self.acc_available, op_lead_visible)
@@ -230,7 +232,7 @@ class CarController():
     self.decel_val = DEFAULT_DECEL
     self.trq_val = STOP_GAS_THRESHOLD * CV.ACCEL_TO_NM
 
-    if not CS.out.gasPressed and CS.acc_override and\
+    if not CS.out.gasPressed and not CS.acc_override and\
             (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD):
       self.decel_active = True
       self.decel_val = apply_accel
@@ -241,7 +243,7 @@ class CarController():
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
       self.accel_active = True
-      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq + 100)
+      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq - 50)
       self.stop_req = False
       self.go_req = CS.out.standstill
     else:
@@ -269,7 +271,7 @@ class CarController():
     return can_sends
 
 
-def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_min, short_press, vego, gas_set, gas):
+def setspeedlogic(set_speed, acc_enabled, setplus, setminus, resbut, timer, set_speed_min, ressetspeed, short_press, vego, gas_set, gas):
 
     set_speed = int(round((set_speed * CV.MS_TO_MPH), 0))
     set_speed_min = int(round((set_speed_min * CV.MS_TO_MPH),0))
@@ -300,12 +302,15 @@ def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_mi
             set_speed += (LONG_PRESS_STEP - set_speed % LONG_PRESS_STEP)
           set_speed -= LONG_PRESS_STEP
         timer += 1
+      elif resbut and not short_press:
+        set_speed = max(ressetspeed, set_speed_min)
+        short_press = True
       else:
         timer = 0
         short_press = False
     else:
       set_speed = max(vego, set_speed_min)
-      short_press = False
+      short_press = True
 
     if not gas:
       gas_set = False
