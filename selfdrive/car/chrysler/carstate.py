@@ -149,7 +149,8 @@ class CarState(CarStateBase):
       ("BRAKE_LIGHT", "BRAKE_2", 0),
       ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
       ("AXLE_TORQ", "AXLE_TORQ", 0),
-      ("ACC_OVERRIDE", "ACCEL_RELATED_120", 0)
+      ("ACC_OVERRIDE", "ACCEL_RELATED_120", 0),
+      ("ACC_BRAKE_FAIL", "BRAKE_2", 0),
     ]
 
     checks = [
