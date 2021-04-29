@@ -112,7 +112,7 @@ class CarInterface(CarInterfaceBase):
     if ret.vEgo < self.CP.minSteerSpeed and not Params().get_bool('ChryslerMangoLat') and not Params().get_bool('LkasFullRangeAvailable'):
       events.add(car.CarEvent.EventName.belowSteerSpeed)
 
-    if self.CS.accbrakeFaulted:
+    if self.CC.acc_enabled and (self.CS.accbrakeFaulted or self.CS.accengFaulted):
       events.add(car.CarEvent.EventName.accFaulted)
 
     ret.events = events.to_msg()

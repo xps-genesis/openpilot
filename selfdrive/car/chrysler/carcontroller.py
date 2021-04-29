@@ -206,13 +206,10 @@ class CarController():
     elif  self.acc_enabled and not self.acc_available or CS.acc_cancel_button or pcm_cancel_cmd:
       self.acc_enabled = False
 
-    if CS.out.gasPressed:
-      self.gas_press_set_speed = True
-
     self.set_speed, self.short_press, self.set_speed_timer, self.gas_press_set_speed = setspeedlogic(self.set_speed, self.acc_enabled,
                                                                          CS.acc_setplus_button, CS.acc_setminus_button,
                                                                          self.set_speed_timer, SET_SPEED_MIN,
-                                                                         self.short_press, CS.out.vEgoRaw, self.gas_press_set_speed)
+                                                                         self.short_press, CS.out.vEgoRaw, self.gas_press_set_speed, CS.out.gasPressed)
 
     self.cruise_state, self.cruise_icon = cruiseiconlogic(self.acc_enabled, self.acc_available, op_lead_visible)
 
@@ -231,7 +228,7 @@ class CarController():
     apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     self.decel_val = DEFAULT_DECEL
-    self.trq_val = CS.axle_torq if CS.out.gasPressed else -159
+    self.trq_val = STOP_GAS_THRESHOLD * CV.ACCEL_TO_NM
 
     if not CS.out.gasPressed and CS.acc_override and\
             (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD):
@@ -244,7 +241,7 @@ class CarController():
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
       self.accel_active = True
-      self.trq_val = apply_accel * CV.ACCEL_TO_NM
+      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq)
       self.stop_req = False
       self.go_req = CS.out.standstill
     else:
@@ -260,7 +257,7 @@ class CarController():
       new_msg = create_op_acc_2(self.packer, self.acc_available, self.acc_enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
       can_sends.append(new_msg)
     if self.ccframe % 6 == 0:
-      new_msg = create_op_dashboard(self.packer, op_set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist, self.op_long_enable)
+      new_msg = create_op_dashboard(self.packer, self.set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist, self.op_long_enable)
       can_sends.append(new_msg)
 
     new_msg = create_op_chime(self.packer, self.chime, self.chime_timer)
@@ -272,28 +269,32 @@ class CarController():
     return can_sends
 
 
-def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_min, short_press, vego, gas):
+def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_min, short_press, vego, gas_set, gas):
+
+    set_speed = round(set_speed * CV.MS_TO_MPH)
+    set_speed_min = round(set_speed_min * CV.MS_TO_MPH)
+    vego = round(vego * CV.MS_TO_MPH)
 
     if acc_enabled:
       if setplus:
         if not short_press:
-          if gas:
+          if gas and not gas_set:
             set_speed = max(vego, set_speed_min)
+            gas_set = True
           else:
             set_speed += SHORT_PRESS_STEP
           short_press = True
-          gas = False
         elif timer % LONG_PRESS_TIME == 0:
             set_speed += (LONG_PRESS_STEP - set_speed % LONG_PRESS_STEP)
         timer += 1
       elif setminus:
         if not short_press:
-          if gas:
+          if gas and not gas_set:
             set_speed = max(vego, set_speed_min)
+            gas_set = True
           else:
             set_speed -= SHORT_PRESS_STEP
           short_press = True
-          gas = False
         elif timer % LONG_PRESS_TIME == 0:
           if set_speed % LONG_PRESS_STEP > 0:
             set_speed += (LONG_PRESS_STEP - set_speed % LONG_PRESS_STEP)
@@ -305,11 +306,13 @@ def setspeedlogic(set_speed, acc_enabled, setplus, setminus, timer, set_speed_mi
     else:
       set_speed = max(vego, set_speed_min)
       short_press = False
-      gas = False
 
-    set_speed = max(set_speed, set_speed_min)
+    if not gas:
+      gas_set = False
 
-    return set_speed, short_press, timer, gas
+    set_speed = max(set_speed, set_speed_min) * CV.MS_TO_MPH
+
+    return set_speed, short_press, timer, gas_set
 
 
 def cruiseiconlogic(acc_enabled, acc_available, has_lead):
