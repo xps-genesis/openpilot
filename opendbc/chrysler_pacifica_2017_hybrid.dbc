@@ -82,6 +82,7 @@ BO_ 320 BRAKE_2: 8 XXX
  SG_ BRAKE_PEDAL : 2|2@1+ (1,0) [0|3] "" XXX
  SG_ BRAKE_ENABLE_ACC : 7|1@0+ (1,0) [0|1] "" XXX
  SG_ BRAKE_LIGHT : 1|2@0+ (1,0) [0|7] "" XXX
+ SG_ ACC_BRAKE_FAIL : 39|2@0+ (1,0) [0|3] "" XXX
 
 BO_ 736 TRIP: 8 XXX
  SG_ COUNTER : 7|16@0+ (1,0) [0|65535] "Meters" XXX

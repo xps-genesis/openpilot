@@ -257,7 +257,7 @@ class CarController():
     if self.ccframe % 2 == 0:
       new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
       can_sends.append(new_msg)
-      new_msg = create_op_acc_2(self.packer, self.acc_available, enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
+      new_msg = create_op_acc_2(self.packer, self.acc_available, self.acc_enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
       can_sends.append(new_msg)
     if self.ccframe % 6 == 0:
       new_msg = create_op_dashboard(self.packer, op_set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist, self.op_long_enable)

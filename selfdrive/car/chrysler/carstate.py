@@ -92,6 +92,7 @@ class CarState(CarStateBase):
 
     self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
     self.acc_override = bool(cp.vl["ACCEL_RELATED_120"]['ACC_OVERRIDE'])
+    self.accbrakeFaulted = (cp.vl["BRAKE_2"]['ACC_BRAKE_FAIL']) > 0
 
 
     return ret
