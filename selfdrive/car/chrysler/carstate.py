@@ -179,7 +179,7 @@ class CarState(CarStateBase):
       ("ACCEL_GAS_22F", 50),
       ("AXLE_TORQ", 100),
       ("ACCEL_RELATED_120", 50),
-      ("ACC_ERROR", 1),
+      ("ACC_ERROR", 0),
     ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
