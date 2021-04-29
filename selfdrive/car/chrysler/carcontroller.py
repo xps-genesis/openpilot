@@ -231,7 +231,7 @@ class CarController():
     apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     self.decel_val = DEFAULT_DECEL
-    self.trq_val = STOP_GAS_THRESHOLD * CV.ACCEL_TO_NM
+    self.trq_val = CS.axle_torq
 
     if not CS.out.gasPressed and (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD):
       self.decel_active = True
@@ -254,7 +254,7 @@ class CarController():
       # Senf ACC msgs on can
     ####################################################################################################################
     if self.ccframe % 2 == 0:
-      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val, CS.axle_torq)
+      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
       can_sends.append(new_msg)
       new_msg = create_op_acc_2(self.packer, self.acc_available, enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
       can_sends.append(new_msg)
