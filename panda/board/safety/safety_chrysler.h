@@ -73,7 +73,7 @@ static int chrysler_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     // Measured eps torque
     if (addr == 544) {
       int torque_meas_new = ((GET_BYTE(to_push, 4) & 0x7U) << 8) + GET_BYTE(to_push, 5) - 1024U;
-      torque = torque/4;
+      torque_meas_new = torque_meas_new/4;
 
       // update array of samples
       update_sample(&torque_meas, torque_meas_new);
