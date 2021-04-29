@@ -372,7 +372,7 @@ def cluster_chime(chime, enabled, enabled_prev, chime_timer, play_times):
     chime_timer = 0
     play_times = 1
   elif enabled_prev and not enabled:
-    chime = 5
+    chime = 1
     chime_timer = 0
     play_times = 2
 

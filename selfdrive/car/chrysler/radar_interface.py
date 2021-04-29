@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import numpy as np
 from numpy import tan
 
 from opendbc.can.parser import CANParser
@@ -24,7 +25,8 @@ def _create_radar_can_parser(car_fingerprint):
   # default values should be after the factor/offset are applied.
   signals = list(zip(['LONG_DIST'] * msg_n +
                 ['LAT_ANGLE'] * msg_n +
-                ['REL_SPEED'] * msg_n,
+                ['REL_SPEED'] * msg_n +
+                ['MEASURED'] * msg_n,
                 RADAR_MSGS_C * 2 +  # LONG_DIST, LAT_DIST
                 RADAR_MSGS_D,    # REL_SPEED
                 [0] * msg_n +  # LONG_DIST
@@ -76,13 +78,14 @@ class RadarInterface(RadarInterfaceBase):
         self.pts[trackId].trackId = trackId
         self.pts[trackId].aRel = float('nan')
         self.pts[trackId].yvRel = float('nan')
-        self.pts[trackId].measured = True
 
       if 'LONG_DIST' in cpt:  # c_* message
         self.pts[trackId].dRel = cpt['LONG_DIST']  # from front of car
-        self.pts[trackId].yRel = cpt['LAT_ANGLE'] # in car frame's y axis, left is positive
+        self.pts[trackId].yRel = cpt['LAT_ANGLE']  # in car frame's y axis, left is positive
+        self.pts[trackId].yRel = np.tan(self.pts[trackId].yRel) * self.pts[trackId].dRel
       else:  # d_* message
         self.pts[trackId].vRel = cpt['REL_SPEED']
+        self.pts[trackId].measured = cpt['MEASURED']
 
     # We want a list, not a dictionary. Filter out LONG_DIST==0 because that means it's not valid.
     ret.points = [x for x in self.pts.values() if x.dRel != 0]
