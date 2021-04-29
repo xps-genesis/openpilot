@@ -38,6 +38,11 @@ class CarInterface(CarInterfaceBase):
     ret.brakeMaxV = [3.8, 3.8, 3.8]  # safety limits to stop unintended deceleration
     ret.longitudinalTuning.kfBP = [0., 5., 10., 20., 30.]
     ret.longitudinalTuning.kfV = [1., 1., 1., .75, .5]
+    ret.startAccel = .5
+    ret.minSpeedCan = 0.3
+    ret.stoppingBrakeRate = 0.2 # brake_travel/s while trying to stop
+    ret.startingBrakeRate = 2.0 # brake_travel/s while releasing on restart
+    ret.stoppingControl = True
 
     if not Params().get_bool('ChryslerMangoLat'):
       ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[9., 20.], [9., 20.]]
