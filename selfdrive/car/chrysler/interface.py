@@ -99,6 +99,11 @@ class CarInterface(CarInterfaceBase):
 
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
 
+    if self.CP.openpilotLongitudinalControl:
+      ret.cruiseState.available = self.CC.acc_available
+      ret.cruiseState.enabled = self.CC.acc_enabled
+      ret.cruiseState.speed = self.CC.set_speed
+
     # speeds
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
