@@ -16,7 +16,7 @@ SHORT_PRESS_STEP = 1
 LONG_PRESS_STEP = 5
 # Accel Hard limits
 ACCEL_HYST_GAP = 0.01  # don't change accel command for small oscillations within this value
-ACCEL_MAX = 1.  # m/s2
+ACCEL_MAX = 2.  # m/s2
 ACCEL_MIN = -3.8  # m/s2
 ACCEL_SCALE = 1.
 
@@ -208,7 +208,6 @@ class CarController():
       self.acc_enabled = True
     elif  self.acc_enabled and not self.acc_available or CS.acc_cancel_button or pcm_cancel_cmd:
       self.acc_enabled = False
-      self.resume_set_speed = self.set_speed
 
     self.set_speed, self.short_press, self.set_speed_timer, self.gas_press_set_speed = setspeedlogic(self.set_speed, self.acc_enabled, self.acc_enabled_prev,
                                                                          CS.acc_setplus_button, CS.acc_setminus_button,  CS.acc_resume_button,
@@ -241,11 +240,11 @@ class CarController():
     else:
       self.decel_active = False
       
-    self.go_req = False
+    self.go_req = long_starting
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
       self.accel_active = True
-      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq - 50)
+      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq - 159)
       self.stop_req = False
       self.go_req = CS.out.standstill
     else:
@@ -277,7 +276,6 @@ class CarController():
 def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, resbut, timer, ressetspeed, short_press, vego, gas_set, gas):
 
     set_speed = int(round((set_speed * CV.MS_TO_MPH), 0))
-    set_speed_min = int(round((SET_SPEED_MIN * CV.MS_TO_MPH), 0))
     vego = int(round((vego * CV.MS_TO_MPH), 0))
 
     if not acc_enabled and acc_enabled_prev:

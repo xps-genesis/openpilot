@@ -27,13 +27,13 @@ class CarInterface(CarInterfaceBase):
 
     # Long tuning Params -  make individual params for cars, baseline Pacifica Hybrid
     ret.longitudinalTuning.kpBP = [0., .3, 10., 35.]
-    ret.longitudinalTuning.kpV = [1.8, .8, .3, .3]
+    ret.longitudinalTuning.kpV = [1., .8, .3, .3]
     ret.longitudinalTuning.kiBP = [0., .3, 15., 35.]
     ret.longitudinalTuning.kiV = [0.15, .055, .05, .045]
     ret.longitudinalTuning.deadzoneBP = [0., .5]
     ret.longitudinalTuning.deadzoneV = [0.00, 0.00]
     ret.gasMaxBP = [0., 1., 1.1, 15., 40.]
-    ret.gasMaxV = [0.4, 1., 1., 1., 1.]
+    ret.gasMaxV = [1., 1.2, 1.4, 1., 1.]
     ret.brakeMaxBP = [0., 5., 5.1]
     ret.brakeMaxV = [3.8, 3.8, 3.8]  # safety limits to stop unintended deceleration
     ret.longitudinalTuning.kfBP = [0., 5., 10., 20., 30.]

@@ -10,6 +10,7 @@ RADAR_MSGS_C = list(range(0x2c2, 0x2d4+2, 2))  # c_ messages 706,...,724
 RADAR_MSGS_D = list(range(0x2a2, 0x2b4+2, 2))  # d_ messages
 LAST_MSG = max(RADAR_MSGS_C + RADAR_MSGS_D)
 NUMBER_MSGS = len(RADAR_MSGS_C) + len(RADAR_MSGS_D)
+vego = carstate.vEgo
 
 def _create_radar_can_parser(car_fingerprint):
   msg_n = len(RADAR_MSGS_C)
@@ -25,12 +26,14 @@ def _create_radar_can_parser(car_fingerprint):
   signals = list(zip(['LONG_DIST'] * msg_n +
                 ['LAT_ANGLE'] * msg_n +
                 ['REL_SPEED'] * msg_n +
-                ['PROBABILITY'] * msg_n,
+                ['PROBABILITY'] * msg_n +
+                ['MEASURED'] * msg_n,
                 RADAR_MSGS_C * 2 +  # LONG_DIST, LAT_DIST
-                RADAR_MSGS_D * 2,    # REL_SPEED, MEASURED
+                RADAR_MSGS_D * 3,   # REL_SPEED, PROBABILITY, MEASURED
                 [0] * msg_n +  # LONG_DIST
                 [-0.5] * msg_n +    # LAT_DIST
                 [-128] * msg_n +
+                [0] * msg_n +
                 [0] * msg_n))  # REL_SPEED set to 0, factor/offset to this
   # TODO what are the checks actually used for?
   # honda only checks the last message,
@@ -85,10 +88,11 @@ class RadarInterface(RadarInterfaceBase):
         self.pts[trackId].yRel = math.tan(self.pts[trackId].yRel) * self.pts[trackId].dRel
       else:  # d_* message
         self.pts[trackId].vRel = cpt['REL_SPEED']
-        self.pts[trackId].measured = cpt['PROBABILITY'] > (0.05*255)  # > 75% , how to decide?
+        self.pts[trackId].measured = (cpt['MEASURED'] and self.pts[trackId].dRel > 10) or \
+                                     (cpt['PROBABILITY'] > (0.9 *255) and 0 < self.pts[trackId].dRel <= 10)
 
     # We want a list, not a dictionary. Filter out LONG_DIST==0 because that means it's not valid.
-    ret.points = [x for x in self.pts.values() if 0 < x.dRel <= 250]
+    ret.points = [x for x in self.pts.values() if x.dRel <= 250 and x.measured]
 
     self.updated_messages.clear()
     return ret
