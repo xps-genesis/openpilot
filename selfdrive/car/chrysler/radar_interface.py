@@ -30,7 +30,7 @@ def _create_radar_can_parser(car_fingerprint):
                 RADAR_MSGS_D * 2,    # REL_SPEED, MEASURED
                 [0] * msg_n +  # LONG_DIST
                 [-0.5] * msg_n +    # LAT_DIST
-                [-128] * msg_n) +
+                [-128] * msg_n +
                 [0] * msg_n)  # REL_SPEED set to 0, factor/offset to this
   # TODO what are the checks actually used for?
   # honda only checks the last message,
