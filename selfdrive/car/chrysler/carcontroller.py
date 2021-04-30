@@ -67,6 +67,7 @@ class CarController():
     self.gap_timer = 0
     self.enabled_prev = False
     self.resume_set_speed = 0
+    self.acc_counter = 0
 
     self.packer = CANPacker(dbc_name)
 
