@@ -51,12 +51,12 @@ def create_lkas_hud(packer, gear, lkas_active, hud_count, steer_type):
   return packer.make_can_msg("LKAS_HUD", 0, values)  # 0x2a6
 
 
-def create_lkas_command(packer, apply_steer, lkas_active, frame):
+def create_lkas_command(packer, apply_steer, lkas_active, counter):
   # LKAS_COMMAND 0x292 (658) Lane-keeping signal to turn the wheel.
   values = {
     "LKAS_STEERING_TORQUE": apply_steer,
     "LKAS_HIGH_TORQUE": lkas_active,
-    "COUNTER": frame % 0x10,
+    "COUNTER": counter,
   }
   return packer.make_can_msg("LKAS_COMMAND", 0, values)
 
@@ -69,10 +69,11 @@ def create_wheel_buttons(packer, counter, button_type):
   }
   return packer.make_can_msg("WHEEL_BUTTONS", 0, values)
 
-def create_op_acc_1(packer, accel_active, trq_val):
+def create_op_acc_1(packer, accel_active, trq_val, acc_counter):
   values = { # 20ms
     "ACC_ENG_REQ": accel_active,
-    "ACC_TORQ": trq_val
+    "ACC_TORQ": trq_val,
+    "COUNTER": acc_counter
   }
   return packer.make_can_msg("OP_ACC_1", 0, values)
 

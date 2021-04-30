@@ -33,7 +33,6 @@ class CarController():
   def __init__(self, dbc_name, CP, VM):
     self.apply_steer_last = 0
     self.ccframe = 0
-    self.prev_frame = -1
     self.hud_count = 0
     self.car_fingerprint = CP.carFingerprint
     self.gone_fast_yet = False
@@ -74,10 +73,6 @@ class CarController():
   def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert, op_lead_rvel,
              op_set_speed, op_lead_visible, op_lead_dist, long_stopping, long_starting):
     # this seems needed to avoid steering faults and to force the sync with the EPS counter
-    frame = CS.lkas_counter
-
-    if self.prev_frame == frame:
-      return []
 
     # *** compute control surfaces ***
     if self.on_timer < 200 and CS.veh_on:
@@ -192,7 +187,7 @@ class CarController():
     if self.ccframe % 25 == 0:
       self.hud_count += 1
 
-    new_msg = create_lkas_command(self.packer, int(apply_steer), lkas_active, frame)
+    new_msg = create_lkas_command(self.packer, int(apply_steer), lkas_active, CS.lkas_counter)
     can_sends.append(new_msg)
 
 
@@ -260,7 +255,9 @@ class CarController():
       # Senf ACC msgs on can
     ####################################################################################################################
     if self.ccframe % 2 == 0:
-      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val)
+      self.acc_counter %= 0xF
+      self.acc_counter += 1
+      new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val, self.acc_counter)
       can_sends.append(new_msg)
       new_msg = create_op_acc_2(self.packer, self.acc_available, self.acc_enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
       can_sends.append(new_msg)
@@ -272,7 +269,6 @@ class CarController():
     can_sends.append(new_msg)
 
     self.ccframe += 1
-    self.prev_frame = frame
 
     return can_sends
 
