@@ -84,14 +84,14 @@ class RadarInterface(RadarInterfaceBase):
       if 'LONG_DIST' in cpt:  # c_* message
         self.pts[trackId].dRel = cpt['LONG_DIST']  # from front of car
         self.pts[trackId].yRel = cpt['LAT_ANGLE']  # in car frame's y axis, left is positive
-        self.pts[trackId].yRel = math.tan(self.pts[trackId].yRel) * self.pts[trackId].dRel
+        self.pts[trackId].yRel = -math.tan(self.pts[trackId].yRel) * self.pts[trackId].dRel
       else:  # d_* message
         self.pts[trackId].vRel = cpt['REL_SPEED']
-        self.pts[trackId].measured = (cpt['MEASURED'] and self.pts[trackId].dRel > 15) or \
-                                     (cpt['PROBABILITY'] > (0.98 *255) and 5 < self.pts[trackId].dRel <= 15)
+        self.pts[trackId].measured = cpt['MEASURED'] and \
+                                     (cpt['PROBABILITY'] > (0.98 *255))
 
     # We want a list, not a dictionary. Filter out LONG_DIST==0 because that means it's not valid.
-    ret.points = [x for x in self.pts.values() if x.dRel <= 250 and x.measured]
+    ret.points = [x for x in self.pts.values() if 0 < x.dRel <= 250 and x.measured]
 
     self.updated_messages.clear()
     return ret
