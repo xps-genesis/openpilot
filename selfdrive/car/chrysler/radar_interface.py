@@ -25,7 +25,7 @@ def _create_radar_can_parser(car_fingerprint):
   signals = list(zip(['LONG_DIST'] * msg_n +
                 ['LAT_ANGLE'] * msg_n +
                 ['REL_SPEED'] * msg_n +
-                ['MEASURED'] * msg_n,
+                ['PROBABILITY'] * msg_n,
                 RADAR_MSGS_C * 2 +  # LONG_DIST, LAT_DIST
                 RADAR_MSGS_D * 2,    # REL_SPEED, MEASURED
                 [0] * msg_n +  # LONG_DIST
@@ -85,10 +85,10 @@ class RadarInterface(RadarInterfaceBase):
         self.pts[trackId].yRel = math.tan(self.pts[trackId].yRel) * self.pts[trackId].dRel
       else:  # d_* message
         self.pts[trackId].vRel = cpt['REL_SPEED']
-        self.pts[trackId].measured = cpt['MEASURED'] == 1
+        self.pts[trackId].measured = cpt['PROBABILITY'] > (0.75*255)  # > 75% , how to decide?
 
     # We want a list, not a dictionary. Filter out LONG_DIST==0 because that means it's not valid.
-    ret.points = [x for x in self.pts.values() if 3 < x.dRel <= 250]
+    ret.points = [x for x in self.pts.values() if 0 < x.dRel <= 250 and x.measured]
 
     self.updated_messages.clear()
     return ret
