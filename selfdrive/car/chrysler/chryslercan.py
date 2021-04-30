@@ -99,10 +99,10 @@ def create_op_dashboard(packer, set_speed, cruise_state, cruise_icon, has_lead, 
   }
   return packer.make_can_msg("OP_DASHBOARD", 0, values)
 
-def create_op_chime(packer, chime, chime_timer):
+def create_op_chime(packer, chime, chime_timer, gap_timer, chimegap_time):
   values = { # 1000ms
-    "CHIME": chime if 0 < chime_timer < 21 else 14,
-    "CHIME_REQ_L": 1 if 0 < chime_timer < 21 else 0,
-    "CHIME_REQ_R": 1 if 0 < chime_timer < 21 else 0
+    "CHIME": chime if (chime_timer > 0 and (gap_timer == 0 or gap_timer == chimegap_time)) else 14,
+    "CHIME_REQ_L": 1 if (chime_timer > 0 and (gap_timer == 0 or gap_timer == chimegap_time)) else 0,
+    "CHIME_REQ_R": 1 if (chime_timer > 0 and (gap_timer == 0 or gap_timer == chimegap_time)) else 0
   }
   return packer.make_can_msg("CHIME", 0, values)

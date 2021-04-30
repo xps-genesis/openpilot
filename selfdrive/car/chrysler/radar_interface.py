@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-import numpy as np
-from numpy import tan
+import math
 
 from opendbc.can.parser import CANParser
 from cereal import car
@@ -81,8 +80,8 @@ class RadarInterface(RadarInterfaceBase):
 
       if 'LONG_DIST' in cpt:  # c_* message
         self.pts[trackId].dRel = cpt['LONG_DIST']  # from front of car
-        self.pts[trackId].yRel = float('nan') #cpt['LAT_ANGLE']  # in car frame's y axis, left is positive
-       # self.pts[trackId].yRel = np.tan(self.pts[trackId].yRel) * self.pts[trackId].dRel
+        self.pts[trackId].yRel = cpt['LAT_ANGLE']  # in car frame's y axis, left is positive
+        self.pts[trackId].yRel = math.tan(self.pts[trackId].yRel) * self.pts[trackId].dRel
       else:  # d_* message
         self.pts[trackId].vRel = cpt['REL_SPEED']
 
