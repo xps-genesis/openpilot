@@ -87,8 +87,8 @@ class RadarInterface(RadarInterfaceBase):
         self.pts[trackId].yRel = math.tan(self.pts[trackId].yRel) * self.pts[trackId].dRel
       else:  # d_* message
         self.pts[trackId].vRel = cpt['REL_SPEED']
-        self.pts[trackId].measured = (cpt['MEASURED'] and self.pts[trackId].dRel > 10) or \
-                                     (cpt['PROBABILITY'] > (0.9 *255) and 0 < self.pts[trackId].dRel <= 10)
+        self.pts[trackId].measured = (cpt['MEASURED'] and self.pts[trackId].dRel > 15) or \
+                                     (cpt['PROBABILITY'] > (0.98 *255) and 5 < self.pts[trackId].dRel <= 15)
 
     # We want a list, not a dictionary. Filter out LONG_DIST==0 because that means it's not valid.
     ret.points = [x for x in self.pts.values() if x.dRel <= 250 and x.measured]
