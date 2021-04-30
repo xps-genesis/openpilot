@@ -27,7 +27,7 @@ START_GAS_THRESHOLD = 0.002 # m/s2
 STOP_GAS_THRESHOLD = -0.159 # m/s2
 
 CHIME_TIME = 21
-CHIME_GAP_TIME = 51
+CHIME_GAP_TIME = 20
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
@@ -209,6 +209,7 @@ class CarController():
     elif  self.acc_enabled and not self.acc_available or CS.acc_cancel_button or pcm_cancel_cmd:
       self.acc_enabled = False
 
+
     self.set_speed, self.short_press, self.set_speed_timer, self.gas_press_set_speed = setspeedlogic(self.set_speed, self.acc_enabled, self.acc_enabled_prev,
                                                                          CS.acc_setplus_button, CS.acc_setminus_button,  CS.acc_resume_button,
                                                                          self.set_speed_timer, self.resume_set_speed,
@@ -244,7 +245,7 @@ class CarController():
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
       self.accel_active = True
-      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq - 159)
+      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq - 50)
       self.stop_req = False
       self.go_req = CS.out.standstill
     else:
