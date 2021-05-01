@@ -136,16 +136,16 @@ class CarController():
 
     self.op_cancel_cmd = False
 
-    if not self.op_long_enable and (self.ccframe % 10 < 5) and wheel_button_counter_change and self.ccframe >= self.stop_button_spam:
+    if (self.ccframe % 10 < 5) and wheel_button_counter_change and self.ccframe >= self.stop_button_spam:
       button_type = None
-      if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled:
+      if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled and not self.op_long_enable:
         button_type = 'ACC_CANCEL'
         self.op_cancel_cmd = True
       elif enabled and self.resume_press and (CS.lead_dist > self.lead_dist_at_stop or op_lead_rvel > 0 or 15 > CS.lead_dist >= 6.):
         button_type = 'ACC_RESUME'
       elif not CS.out.brakePressed and not CS.out.cruiseState.enabled and \
               CS.out.cruiseState.available and opParams().get('brakereleaseAutoResume') and \
-              CS.out.gasPressed and CS.out.gearShifter == GearShifter.drive:
+              CS.out.gasPressed and CS.out.gearShifter == GearShifter.drive and not self.op_long_enable:
         button_type = 'ACC_RESUME'
 
       if button_type is not None:
