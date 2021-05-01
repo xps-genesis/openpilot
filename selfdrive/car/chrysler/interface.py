@@ -41,7 +41,7 @@ class CarInterface(CarInterfaceBase):
     ret.startAccel = .5
     ret.minSpeedCan = 0.3
     ret.stoppingBrakeRate = 0.2 # brake_travel/s while trying to stop
-    ret.startingBrakeRate = 2.0 # brake_travel/s while releasing on restart
+    ret.startingBrakeRate = 4.0 # brake_travel/s while releasing on restart
     ret.stoppingControl = True
 
     if not Params().get_bool('ChryslerMangoLat'):
