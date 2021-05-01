@@ -8,26 +8,9 @@ from selfdrive.car.interfaces import GearShifter
 from common.params import Params
 from selfdrive.config import Conversions as CV
 from common.numpy_fast import clip
-
-SET_SPEED_MIN = 5 * CV.MPH_TO_MS
-SET_SPEED_MAX = 120 * CV.MPH_TO_MS
-LONG_PRESS_TIME = 50  # 500msec
-SHORT_PRESS_STEP = 1
-LONG_PRESS_STEP = 5
-# Accel Hard limits
-ACCEL_HYST_GAP = 0.01  # don't change accel command for small oscillations within this value
-ACCEL_MAX = 2.  # m/s2
-ACCEL_MIN = -3.8  # m/s2
-ACCEL_SCALE = 1.
-
-DEFAULT_DECEL = 4.0 # m/s2
-START_BRAKE_THRESHOLD = -0.160 # m/s2
-STOP_BRAKE_THRESHOLD = 0.001 # m/s2
-START_GAS_THRESHOLD = 0.002 # m/s2
-STOP_GAS_THRESHOLD = -0.159 # m/s2
-
-CHIME_TIME = 21
-CHIME_GAP_TIME = 20
+from selfdrive.car.chrysler.chryslerlonghelper import cluster_chime, accel_hysteresis, accel_rate_limit, \
+  cruiseiconlogic, setspeedlogic, SET_SPEED_MIN, DEFAULT_DECEL, STOP_GAS_THRESHOLD, START_BRAKE_THRESHOLD, \
+  STOP_BRAKE_THRESHOLD, START_GAS_THRESHOLD, CHIME_GAP_TIME, ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
@@ -53,7 +36,7 @@ class CarController():
     self.set_speed = SET_SPEED_MIN
     self.set_speed_timer = 0
     self.short_press = True
-    self.gas_press_set_speed = False
+    self.gas_speed_sync = False
     self.cruise_state = 0
     self.cruise_icon = 0
     self.acc_pre_brake = False
@@ -71,9 +54,7 @@ class CarController():
 
     self.packer = CANPacker(dbc_name)
 
-  def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert, op_lead_rvel,
-             op_set_speed, op_lead_visible, op_lead_dist, long_stopping, long_starting):
-    # this seems needed to avoid steering faults and to force the sync with the EPS counter
+  def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert, op_lead_rvel, op_lead_visible, op_lead_dist, long_starting):
 
     # *** compute control surfaces ***
     if self.on_timer < 200 and CS.veh_on:
@@ -210,10 +191,11 @@ class CarController():
       self.acc_enabled = False
 
 
-    self.set_speed, self.short_press, self.set_speed_timer, self.gas_press_set_speed = setspeedlogic(self.set_speed, self.acc_enabled, self.acc_enabled_prev,
-                                                                         CS.acc_setplus_button, CS.acc_setminus_button,  CS.acc_resume_button,
-                                                                         self.set_speed_timer, self.resume_set_speed,
-                                                                         self.short_press, CS.out.vEgoRaw, self.gas_press_set_speed, CS.out.gasPressed)
+    self.set_speed, self.short_press, self.set_speed_timer, \
+    self.gas_speed_sync, self.resume_set_speed = setspeedlogic(self.set_speed, self.acc_enabled, self.acc_enabled_prev,
+                                                               CS.acc_setplus_button, CS.acc_setminus_button, CS.acc_resume_button,
+                                                               self.set_speed_timer, self.resume_set_speed, self.short_press,
+                                                               CS.out.vEgoRaw, self.gas_speed_sync, CS.out.gasPressed)
 
     self.cruise_state, self.cruise_icon = cruiseiconlogic(self.acc_enabled, self.acc_available, op_lead_visible)
 
@@ -260,10 +242,12 @@ class CarController():
       self.acc_counter += 1
       new_msg = create_op_acc_1(self.packer, self.accel_active, self.trq_val, self.acc_counter)
       can_sends.append(new_msg)
-      new_msg = create_op_acc_2(self.packer, self.acc_available, self.acc_enabled, self.stop_req, self.go_req, self.acc_pre_brake, self.decel_val, self.decel_active)
+      new_msg = create_op_acc_2(self.packer, self.acc_available, self.acc_enabled, self.stop_req, self.go_req,
+                                self.acc_pre_brake, self.decel_val, self.decel_active)
       can_sends.append(new_msg)
     if self.ccframe % 6 == 0:
-      new_msg = create_op_dashboard(self.packer, self.set_speed, self.cruise_state, self.cruise_icon, op_lead_visible, op_lead_dist, self.op_long_enable)
+      new_msg = create_op_dashboard(self.packer, self.set_speed, self.cruise_state, self.cruise_icon, op_lead_visible,
+                                    op_lead_dist, self.op_long_enable)
       can_sends.append(new_msg)
 
     new_msg = create_op_chime(self.packer, self.chime, self.chime_timer, self.gap_timer, CHIME_GAP_TIME)
@@ -274,124 +258,5 @@ class CarController():
     return can_sends
 
 
-def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, resbut, timer, ressetspeed, short_press, vego, gas_set, gas):
-
-    set_speed = int(round((set_speed * CV.MS_TO_MPH), 0))
-    vego = int(round((vego * CV.MS_TO_MPH), 0))
-
-    if not acc_enabled and acc_enabled_prev:
-      ressetspeed = set_speed
-
-    if acc_enabled_prev and acc_enabled:
-      if setplus:
-        if not short_press:
-          if gas and not gas_set:
-            set_speed = vego
-            gas_set = True
-          else:
-            set_speed += SHORT_PRESS_STEP
-          short_press = True
-        elif timer % LONG_PRESS_TIME == 0:
-            set_speed += (LONG_PRESS_STEP - set_speed % LONG_PRESS_STEP)
-        timer += 1
-      elif setminus:
-        if not short_press:
-          if gas and not gas_set:
-            set_speed = vego
-            gas_set = True
-          else:
-            set_speed -= SHORT_PRESS_STEP
-          short_press = True
-        elif timer % LONG_PRESS_TIME == 0:
-          if set_speed % LONG_PRESS_STEP > 0:
-            set_speed += (LONG_PRESS_STEP - set_speed % LONG_PRESS_STEP)
-          set_speed -= LONG_PRESS_STEP
-        timer += 1
-      else:
-        timer = 0
-        short_press = False
-    elif acc_enabled and not short_press:
-      if resbut:
-        set_speed = ressetspeed
-      else:
-        set_speed = vego
-      short_press = True
-      timer += 1
-    else:
-      short_press = False
-      timer = 0
-    if not gas:
-      gas_set = False
-
-    set_speed = set_speed * CV.MPH_TO_MS
-    set_speed = clip(set_speed, SET_SPEED_MIN, SET_SPEED_MAX)
-
-    return set_speed, short_press, timer, gas_set
-
-
-def cruiseiconlogic(acc_enabled, acc_available, has_lead):
-    if acc_enabled:
-      cruise_state = 4  # ACC engaged
-      if has_lead:
-        cruise_icon = 15  # ACC green icon with 4 bar distance and lead
-      else:
-        cruise_icon = 11  # ACC green icon with 4 bar distance and no lead
-    else:
-      if acc_available:
-        cruise_state = 3 # ACC on
-        cruise_icon = 5 # ACC white icon with 4 bar distance
-      else:
-        cruise_state = 0
-        cruise_icon = 0
-
-    return cruise_state, cruise_icon
-
-def accel_hysteresis(accel, accel_steady):
-
-  # for small accel oscillations within ACCEL_HYST_GAP, don't change the accel command
-  if accel > accel_steady + ACCEL_HYST_GAP:
-    accel_steady = accel - ACCEL_HYST_GAP
-  elif accel < accel_steady - ACCEL_HYST_GAP:
-    accel_steady = accel + ACCEL_HYST_GAP
-  accel = accel_steady
-
-  return accel, accel_steady
-
-def accel_rate_limit(accel_lim, prev_accel_lim):
- # acceleration jerk = 2.0 m/s/s/s
- # brake jerk = 3.8 m/s/s/s
-  if accel_lim > 0:
-    if accel_lim > prev_accel_lim:
-      accel_lim = min(accel_lim, prev_accel_lim + 0.02)
-    else:
-      accel_lim = max(accel_lim, prev_accel_lim - 0.038)
-  else:
-    if accel_lim < prev_accel_lim:
-      accel_lim = max(accel_lim, prev_accel_lim - 0.038)
-    else:
-      accel_lim = min(accel_lim, prev_accel_lim + 0.01)
-
-  return accel_lim
-
-
-def cluster_chime(chime_val, enabled, enabled_prev, chime_timer, gap_timer):
-
-  if not enabled_prev and enabled:
-    chime_val = 4
-    chime_timer = CHIME_TIME
-    gap_timer = 0
-  elif enabled_prev and not enabled:
-    chime_val = 7
-    chime_timer = CHIME_TIME
-    gap_timer = CHIME_GAP_TIME
-
-  if chime_timer > 0:
-    chime_timer -= 1
-  elif gap_timer > 0:
-    gap_timer -= 1
-    if gap_timer == 0:
-      chime_timer = CHIME_TIME
-
-  return chime_val, chime_timer, gap_timer
 
 
