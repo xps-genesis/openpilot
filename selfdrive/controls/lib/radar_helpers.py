@@ -11,7 +11,7 @@ _LEAD_ACCEL_TAU = 1.5
 SPEED, ACCEL = 0, 1   # Kalman filter states enum
 
 # stationary qualification parameters
-v_ego_stationary = 4.   # no stationary object flag below this speed
+v_ego_stationary = 0.   # no stationary object flag below this speed
 
 
 class Track():
