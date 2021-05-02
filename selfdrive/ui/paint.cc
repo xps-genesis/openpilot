@@ -240,7 +240,6 @@ static void ui_draw_vision_face(UIState *s) {
 }
 
 static void ui_draw_driver_view(UIState *s) {
-  s->sidebar_collapsed = true;
   const bool is_rhd = s->scene.is_rhd;
   const int width = 4 * s->viz_rect.h / 3;
   const Rect rect = {s->viz_rect.centerX() - width / 2, s->viz_rect.y, width, s->viz_rect.h};  // x, y, w, h
