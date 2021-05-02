@@ -82,7 +82,7 @@ static void draw_lead(UIState *s, int idx) {
   float fillAlpha = 0;
   float speedBuff = 10.;
   float leadBuff = 40.;
-  float d_rel = lead.getDRel() + 3.;
+  float d_rel = lead.getDRel() + 9.;
   float v_rel = lead.getVRel();
   if (d_rel < leadBuff) {
     fillAlpha = 255*(1.0-(d_rel/leadBuff));
