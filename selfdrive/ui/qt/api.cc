@@ -20,7 +20,7 @@ const std::string private_key_path = "/persist/comma/id_rsa";
 const std::string private_key_path = util::getenv_default("HOME", "/.comma/persist/comma/id_rsa", "/persist/comma/id_rsa");
 #endif
 
-QByteArray CommaApi::rsa_sign(QByteArray data) {
+QByteArray CommaApi::rsa_sign(const QByteArray &data) {
   auto file = QFile(private_key_path.c_str());
   if (!file.open(QIODevice::ReadOnly)) {
     qDebug() << "No RSA private key found, please run manager.py or registration.py";
@@ -44,7 +44,7 @@ QByteArray CommaApi::rsa_sign(QByteArray data) {
   return sig;
 }
 
-QString CommaApi::create_jwt(QVector<QPair<QString, QJsonValue>> payloads, int expiry) {
+QString CommaApi::create_jwt(const QVector<QPair<QString, QJsonValue>> &payloads, int expiry) {
   QString dongle_id = QString::fromStdString(Params().get("DongleId"));
 
   QJsonObject header;
@@ -57,7 +57,7 @@ QString CommaApi::create_jwt(QVector<QPair<QString, QJsonValue>> payloads, int e
   payload.insert("nbf", t);
   payload.insert("iat", t);
   payload.insert("exp", t + expiry);
-  for (auto load : payloads) {
+  for (auto &load : payloads) {
     payload.insert(load.first, load.second);
   }
 
@@ -72,14 +72,14 @@ QString CommaApi::create_jwt(QVector<QPair<QString, QJsonValue>> payloads, int e
 }
 
 
-HttpRequest::HttpRequest(QObject *parent, QString requestURL, const QString &cache_key) : cache_key(cache_key), QObject(parent) {
+HttpRequest::HttpRequest(QObject *parent, const QString &requestURL, const QString &cache_key, bool create_jwt_) : cache_key(cache_key), create_jwt(create_jwt_), QObject(parent) {
   networkAccessManager = new QNetworkAccessManager(this);
   reply = NULL;
 
   networkTimer = new QTimer(this);
   networkTimer->setSingleShot(true);
   networkTimer->setInterval(20000);
-  connect(networkTimer, SIGNAL(timeout()), this, SLOT(requestTimeout()));
+  connect(networkTimer, &QTimer::timeout, this, &HttpRequest::requestTimeout);
 
   sendRequest(requestURL);
 
@@ -90,8 +90,16 @@ HttpRequest::HttpRequest(QObject *parent, QString requestURL, const QString &cac
   }
 }
 
-void HttpRequest::sendRequest(QString requestURL){
-  QString token = CommaApi::create_jwt();
+void HttpRequest::sendRequest(const QString &requestURL){
+  QString token;
+  if(create_jwt) {
+    token = CommaApi::create_jwt();
+  } else {
+    QString token_json = QString::fromStdString(util::read_file(util::getenv_default("HOME", "/.comma/auth.json", "/.comma/auth.json")));
+    QJsonDocument json_d = QJsonDocument::fromJson(token_json.toUtf8());
+    token = json_d["access_token"].toString();
+  }
+
   QNetworkRequest request;
   request.setUrl(QUrl(requestURL));
   request.setRawHeader(QByteArray("Authorization"), ("JWT " + token).toUtf8());
@@ -106,7 +114,7 @@ void HttpRequest::sendRequest(QString requestURL){
   reply = networkAccessManager->get(request);
 
   networkTimer->start();
-  connect(reply, SIGNAL(finished()), this, SLOT(requestFinished()));
+  connect(reply, &QNetworkReply::finished, this, &HttpRequest::requestFinished);
 }
 
 void HttpRequest::requestTimeout(){
@@ -129,6 +137,7 @@ void HttpRequest::requestFinished(){
       if (!cache_key.isEmpty()) {
         Params().remove(cache_key.toStdString());
       }
+      qDebug() << reply->errorString();
       emit failedResponse(reply->errorString());
     }
   } else {

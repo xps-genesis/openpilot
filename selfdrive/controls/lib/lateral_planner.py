@@ -1,7 +1,7 @@
 import os
 import math
 import numpy as np
-from common.realtime import sec_since_boot, DT_MDL, DT_CTRL
+from common.realtime import sec_since_boot, DT_MDL
 from common.numpy_fast import interp, clip
 from selfdrive.swaglog import cloudlog
 from selfdrive.controls.lib.lateral_mpc import libmpc_py
@@ -105,11 +105,6 @@ class LateralPlanner():
     one_blinker = sm['carState'].leftBlinker != sm['carState'].rightBlinker
     below_lane_change_speed = v_ego < LANE_CHANGE_SPEED_MIN
 
-    if sm['carState'].leftBlinker:
-      self.lane_change_direction = LaneChangeDirection.left
-    elif sm['carState'].rightBlinker:
-      self.lane_change_direction = LaneChangeDirection.right
-
     if (not active) or (self.lane_change_timer > LANE_CHANGE_TIME_MAX):
       self.lane_change_state = LaneChangeState.off
       self.lane_change_direction = LaneChangeDirection.none
@@ -136,6 +131,11 @@ class LateralPlanner():
       # State transitions
       # off
       if self.lane_change_state == LaneChangeState.off and one_blinker and not self.prev_one_blinker and not below_lane_change_speed:
+        if sm['carState'].leftBlinker:
+          self.lane_change_direction = LaneChangeDirection.left
+        elif sm['carState'].rightBlinker:
+          self.lane_change_direction = LaneChangeDirection.right
+
         self.lane_change_state = LaneChangeState.preLaneChange
         self.lane_change_ll_prob = 1.0
 
@@ -148,16 +148,16 @@ class LateralPlanner():
 
       # starting
       elif self.lane_change_state == LaneChangeState.laneChangeStarting:
-        # fade out over 5s
-        self.lane_change_ll_prob = max(self.lane_change_ll_prob - 2*DT_CTRL, 0.0)
+        # fade out over .5s
+        self.lane_change_ll_prob = max(self.lane_change_ll_prob - 2*DT_MDL, 0.0)
         # 98% certainty
         if lane_change_prob < 0.02 and self.lane_change_ll_prob < 0.01:
           self.lane_change_state = LaneChangeState.laneChangeFinishing
 
       # finishing
       elif self.lane_change_state == LaneChangeState.laneChangeFinishing:
-        # fade in laneline over 0.5s
-        self.lane_change_ll_prob = min(self.lane_change_ll_prob + 2*DT_MDL, 1.0)
+        # fade in laneline over 1s
+        self.lane_change_ll_prob = min(self.lane_change_ll_prob + DT_MDL, 1.0)
         if one_blinker and self.lane_change_ll_prob > 0.99:
           self.lane_change_state = LaneChangeState.preLaneChange
         elif self.lane_change_ll_prob > 0.99:

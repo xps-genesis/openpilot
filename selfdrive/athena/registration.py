@@ -10,11 +10,11 @@ from common.params import Params
 from common.spinner import Spinner
 from common.file_helpers import mkdirs_exists_ok
 from common.basedir import PERSIST
-from selfdrive.hardware import HARDWARE
+from selfdrive.hardware import HARDWARE, PC
 from selfdrive.swaglog import cloudlog
 
 
-def register(show_spinner=False):
+def register(show_spinner=False) -> str:
   params = Params()
   params.put("SubscriberInfo", HARDWARE.get_subscriber_info())
 
@@ -41,8 +41,9 @@ def register(show_spinner=False):
       spinner.update("registering device")
 
     # Create registration token, in the future, this key will make JWTs directly
-    private_key = open(PERSIST+"/comma/id_rsa").read()
-    public_key = open(PERSIST+"/comma/id_rsa.pub").read()
+    with open(PERSIST+"/comma/id_rsa.pub") as f1, open(PERSIST+"/comma/id_rsa") as f2:
+      public_key = f1.read()
+      private_key = f2.read()
 
     # Block until we get the imei
     imei1, imei2 = None, None
@@ -65,13 +66,14 @@ def register(show_spinner=False):
         resp = api_get("v2/pilotauth/", method='POST', timeout=15,
                        imei=imei1, imei2=imei2, serial=serial, public_key=public_key, register_token=register_token)
 
-        if resp.status_code == 402:
-          cloudlog.info("Uknown serial number while trying to register device")
+        if resp.status_code in (402, 403):
+          cloudlog.info(f"Unable to register device, got {resp.status_code}")
           dongle_id = None
+          if PC:
+            dongle_id = "UnofficialDevice"
         else:
           dongleauth = json.loads(resp.text)
           dongle_id = dongleauth["dongle_id"]
-          params.put("DongleId", dongle_id)
         break
       except Exception:
         cloudlog.exception("failed to authenticate")
@@ -81,6 +83,8 @@ def register(show_spinner=False):
     if show_spinner:
       spinner.close()
 
+  if dongle_id:
+    params.put("DongleId", dongle_id)
   return dongle_id
 
 
