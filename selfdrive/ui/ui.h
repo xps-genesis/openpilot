@@ -104,7 +104,7 @@ typedef struct UIScene {
   cereal::ControlsState::Reader controls_state;
   cereal::DriverState::Reader driver_state;
   cereal::DriverMonitoringState::Reader dmonitoring_state;
-
+  cereal::LongitudinalPlan::Reader long_plan;
   // gps
   int satelliteCount;
   bool gpsOK;
