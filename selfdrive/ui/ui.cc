@@ -142,9 +142,9 @@ static void update_state(UIState *s) {
     }
     update_leads(s, sm["radarState"].getRadarState(), line);
   }
-  if (scene.started && sm.updated("LongitudinalPlan")) {
-    scene.long_plan = sm["LongitudinalPlan"].getLongitudinalPlan();
-  }
+  //if (scene.started && sm.updated("LongitudinalPlan")) {
+  //  scene.long_plan = sm["LongitudinalPlan"].getLongitudinalPlan();
+  //}
   if (sm.updated("liveCalibration")) {
     scene.world_objects_visible = true;
     auto rpy_list = sm["liveCalibration"].getLiveCalibration().getRpyCalib();
