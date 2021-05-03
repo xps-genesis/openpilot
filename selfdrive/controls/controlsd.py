@@ -96,7 +96,7 @@ class Controls:
     if self.read_only:
       self.CP.safetyModel = car.CarParams.SafetyModel.noOutput
 
-    # Write CarParams for radard and boardd safety mode
+    # Write CarParams for radard
     cp_bytes = self.CP.to_bytes()
     params.put("CarParams", cp_bytes)
     put_nonblocking("CarParamsCache", cp_bytes)

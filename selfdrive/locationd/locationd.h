@@ -13,9 +13,12 @@
 #include "common/timing.h"
 #include "common/transformations/coordinates.hpp"
 #include "common/transformations/orientation.hpp"
-#include "selfdrive/sensord/sensors/constants.hpp"
+#include "selfdrive/sensord/sensors/constants.h"
 
 #include "models/live_kf.h"
+
+#define VISION_DECIMATION 2
+#define SENSOR_DECIMATION 10
 
 #define POSENET_STD_HIST_HALF 20
 
@@ -58,4 +61,9 @@ private:
   int64_t unix_timestamp_millis = 0;
   double last_gps_fix = 0;
   bool device_fell = false;
+
+  int gyro_counter = 0;
+  int acc_counter = 0;
+  int speed_counter = 0;
+  int cam_counter = 0;
 };
