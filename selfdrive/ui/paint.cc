@@ -196,14 +196,13 @@ static void ui_draw_world(UIState *s) {
 
 static void ui_draw_vision_maxspeed(UIState *s) {
   const int SET_SPEED_NA = 255;
-  const bool change_color;
+  bool change_color = false;
   float maxspeed = s->scene.controls_state.getVCruise();
   float op_speed = s->scene.long_plan.getVTargetFuture();
   if (maxspeed >= op_speed) {
     maxspeed = op_speed;
     change_color = true;
   }
-  else{ change_color = false}
   const bool is_cruise_set = maxspeed != 0 && maxspeed != SET_SPEED_NA;
   if (is_cruise_set && !s->scene.is_metric) { maxspeed *= 0.6225; }
 
