@@ -3,6 +3,7 @@ import math
 import numpy as np
 from common.params import Params
 from common.numpy_fast import interp
+from common.op_params import opParams
 
 import cereal.messaging as messaging
 from common.realtime import sec_since_boot
@@ -83,6 +84,8 @@ class Planner():
     self.params = Params()
     self.first_loop = True
 
+    self.op_params = opParams()
+
   def choose_solution(self, v_cruise_setpoint, enabled):
     if enabled:
       solutions = {'cruise': self.v_cruise}
@@ -107,7 +110,7 @@ class Planner():
 
     self.v_acc_future = min([self.mpc1.v_mpc_future, self.mpc2.v_mpc_future, v_cruise_setpoint])
 
-  def update(self, sm, CP):
+  def update(self, sm, CP, lateral_planner):
     """Gets called when new radarState is available"""
     cur_time = sec_since_boot()
     v_ego = sm['carState'].vEgo
@@ -187,6 +190,13 @@ class Planner():
     self.v_acc_next = v_acc_sol
     self.a_acc_next = a_acc_sol
 
+    if self.op_params.get('slow_in_turns'):
+      curvs = list(lateral_planner.mpc_solution.curvature)
+      if len(curvs):
+        # find the largest curvature in the solution and use that.
+        curv = max(abs(min(curvs)), abs(max(curvs)))
+        self.v_acc_future = float(min(self.v_acc_future, self.limit_speed_in_curv(sm, curv)))
+
     self.first_loop = False
 
   def publish(self, sm, pm):
@@ -215,3 +225,24 @@ class Planner():
     longitudinalPlan.processingDelay = (plan_send.logMonoTime / 1e9) - sm.rcv_time['radarState']
 
     pm.send('longitudinalPlan', plan_send)
+
+  def limit_speed_in_curv(self, sm, curv):
+    v_ego = sm['carState'].vEgo
+    a_y_max = 2.975 - v_ego * 0.0375  # ~1.85 @ 75mph, ~2.6 @ 25mph
+
+    # rotate the line
+    angle = self.op_params.get('slow_in_turns_rotate')
+    if angle != 0:
+      _, a_y_max = self.rotate((0, 2.975), (v_ego, a_y_max), angle * 0.0174533)
+
+    v_curvature = np.sqrt(a_y_max / np.clip(curv, 1e-4, None))
+    model_speed = np.min(v_curvature)
+    return model_speed * self.op_params.get('slow_in_turns_ratio')
+
+  def rotate(self, origin, point, angle):
+    ox, oy = origin
+    px, py = point
+
+    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
+    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
+    return qx, qy
