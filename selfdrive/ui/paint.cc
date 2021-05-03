@@ -232,7 +232,7 @@ static void ui_draw_vision_speed(UIState *s) {
   const bool brake_light = s->scene.car_state.getBrakeLights();
   const std::string speed_str = std::to_string((int)std::nearbyint(speed));
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
-  if brake_light {
+  if (brake_light) {
     ui_draw_text(s, s->viz_rect.centerX(), 240, speed_str.c_str(), 96 * 2.5, COLOR_RED, "sans-bold");
     ui_draw_text(s, s->viz_rect.centerX(), 320, s->scene.is_metric ? "km/h" : "mph", 36 * 2.5, COLOR_RED_ALPHA(200), "sans-regular");
   }
