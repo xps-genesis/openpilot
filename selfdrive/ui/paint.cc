@@ -199,7 +199,7 @@ static void ui_draw_vision_maxspeed(UIState *s) {
   bool change_color = false;
   float maxspeed = s->scene.controls_state.getVCruise();
   float op_speed = s->scene.long_plan.getVTargetFuture();
-  if (maxspeed >= op_speed) {
+  if (maxspeed >= op_speed > 3.) {
     maxspeed = op_speed;
     change_color = true;
   }
@@ -234,12 +234,11 @@ static void ui_draw_vision_speed(UIState *s) {
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
   if (brake_light) {
     ui_draw_text(s, s->viz_rect.centerX(), 240, speed_str.c_str(), 96 * 2.5, COLOR_RED, "sans-bold");
-    ui_draw_text(s, s->viz_rect.centerX(), 320, s->scene.is_metric ? "km/h" : "mph", 36 * 2.5, COLOR_RED_ALPHA(200), "sans-regular");
   }
   else{
     ui_draw_text(s, s->viz_rect.centerX(), 240, speed_str.c_str(), 96 * 2.5, COLOR_WHITE, "sans-bold");
-    ui_draw_text(s, s->viz_rect.centerX(), 320, s->scene.is_metric ? "km/h" : "mph", 36 * 2.5, COLOR_WHITE_ALPHA(200), "sans-regular");
   }
+  ui_draw_text(s, s->viz_rect.centerX(), 320, s->scene.is_metric ? "km/h" : "mph", 36 * 2.5, COLOR_WHITE_ALPHA(200), "sans-regular");
 }
 
 static void ui_draw_vision_event(UIState *s) {

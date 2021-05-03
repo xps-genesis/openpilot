@@ -64,8 +64,7 @@ class opParams:
     self.fork_params = {
                         'slow_in_turns': Param(True, bool, 'Slow while in turns'),
                         'slow_in_turns_ratio': Param(1, VT.number, 'Adjust how much slowing occurs. (1.25 = 25% faster in turns than the default)'),
-                        'slow_in_turns_rotate': Param(0, VT.number, 'This adjusts how much amount the vehicle slows as the curve increases'),
-                        'nonlinearsas': Param(False, bool, 'Toggle to enable non linear desired steering angle based tune'),
+                        'slow_in_turns_rotate': Param(1, VT.number, 'This adjusts how much amount the vehicle slows as the curve increases'),
                         'nonudgeLCA': Param(True, bool, 'Toggle to enable no nudge lane change'),
                         'nonudgeLCAspeed': Param(35, int, 'speed-mph above which no nudge lca is allowed'),
                         'brakereleaseAutoResume': Param(False, bool, 'Toggle to enable auto resume ACC on brake release')
