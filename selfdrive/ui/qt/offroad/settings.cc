@@ -68,6 +68,11 @@ TogglesPanel::TogglesPanel(QWidget *parent) : QWidget(parent) {
                                   "Display speed in km/h instead of mp/h.",
                                   "../assets/offroad/icon_metric.png",
                                   this));
+  toggles.append(new ParamControl("CommunityFeaturesToggle",
+                                  "Enable Community Features",
+                                  "Use features from the open source community that are not maintained or supported by comma.ai and have not been confirmed to meet the standard safety model. These features include community supported cars and community supported hardware. Be extra cautious when using these features",
+                                  "../assets/offroad/icon_shell.png",
+                                  this));
 
 #ifndef QCOM2
   toggles.append(new ParamControl("IsUploadRawEnabled",
