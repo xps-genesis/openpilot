@@ -1,7 +1,7 @@
 from common.op_params import opParams
 from selfdrive.car import apply_toyota_steer_torque_limits
 from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, \
-  create_wheel_buttons, create_apa_hud, create_op_acc_1, create_op_acc_2, create_op_dashboard, create_op_chime
+  create_wheel_buttons, create_mango_hud, create_op_acc_1, create_op_acc_2, create_op_dashboard, create_op_chime
 from selfdrive.car.chrysler.values import CAR, CarControllerParams
 from opendbc.can.packer import CANPacker
 from selfdrive.car.interfaces import GearShifter
@@ -29,6 +29,9 @@ class CarController():
     self.stop_button_spam = 0
     self.wheel_button_counter_prev = 0
     self.lead_dist_at_stop = 0
+    self.mango_lat_active = Params().get_bool('ChryslerMangoLat')
+    self.full_range_steer = Params().get_bool('LkasFullRangeAvailable')
+    self.mango_mode_active = self.mango_lat_active or self.full_range_steer
     #OPLong starts here
     self.op_long_enable = CP.openpilotLongitudinalControl
     self.acc_available = True
@@ -57,15 +60,15 @@ class CarController():
   def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert, op_lead_rvel, op_lead_visible, op_lead_dist, long_starting):
 
     # *** compute control surfaces ***
-    if self.on_timer < 200 and CS.veh_on:
+    if self.on_timer < 50 and CS.veh_on:
       self.on_timer += 1
 
     wp_type = int(0)
     self.hightorqUnavailable = False
 
-    if Params().get_bool('LkasFullRangeAvailable'):
+    if self.full_range_steer:
       wp_type = int(1)
-    if Params().get_bool('ChryslerMangoLat'):
+    if self.mango_lat_active:
       wp_type = int(2)
 
     if enabled:
@@ -83,7 +86,7 @@ class CarController():
     apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
                                                    CS.out.steeringTorqueEps, CarControllerParams)
 
-    if not Params().get_bool('ChryslerMangoLat') and not Params().get_bool('LkasFullRangeAvailable'):
+    if not self.mango_mode_active:
       moving_fast = CS.out.vEgo > CS.CP.minSteerSpeed  # for status message
       if CS.out.vEgo > (CS.CP.minSteerSpeed - 0.5):  # for command high bit
         self.gone_fast_yet = True
@@ -98,7 +101,7 @@ class CarController():
     self.steer_rate_limited = new_steer != apply_steer
     self.apply_steer_last = apply_steer
 
-    if CS.out.standstill:
+    if CS.out.vEgo < 2.2:
       self.steer_type = wp_type
 
     if wp_type != 2:
@@ -106,7 +109,7 @@ class CarController():
       if self.steerErrorMod:
         self.steer_type = int(0)
     elif CS.apaFault or CS.out.gearShifter not in (GearShifter.drive, GearShifter.low) or \
-            abs(CS.out.steeringAngleDeg) > 330. or self.on_timer < 200 or CS.apa_steer_status:
+            self.on_timer < 50 or CS.apa_steer_status:
       self.steer_type = int(0)
     
     if self.steer_type == int(0) and CS.out.gearShifter in (GearShifter.drive, GearShifter.low) and not CS.apaFault:
@@ -143,10 +146,6 @@ class CarController():
         self.op_cancel_cmd = True
       elif enabled and self.resume_press and (CS.lead_dist > self.lead_dist_at_stop or op_lead_rvel > 0 or 15 > CS.lead_dist >= 6.):
         button_type = 'ACC_RESUME'
-      elif not CS.out.brakePressed and not CS.out.cruiseState.enabled and \
-              CS.out.cruiseState.available and opParams().get('brakereleaseAutoResume') and \
-              CS.out.gasPressed and CS.out.gearShifter == GearShifter.drive and not self.op_long_enable:
-        button_type = 'ACC_RESUME'
 
       if button_type is not None:
         new_msg = create_wheel_buttons(self.packer, CS.wheel_button_counter + 1, button_type)
@@ -155,7 +154,7 @@ class CarController():
     # LKAS_HEARTBIT is forwarded by Panda so no need to send it here.
     # frame is 100Hz (0.01s period)
     if (self.ccframe % 2 == 0) and wp_type == 2:  # 0.02s period
-      new_msg = create_apa_hud(
+      new_msg = create_mango_hud(
           self.packer, self.apaActive, CS.apaFault, lkas_active,
           self.steer_type)
       can_sends.append(new_msg)
@@ -235,7 +234,7 @@ class CarController():
 
     self.chime, self.chime_timer, self.gap_timer = cluster_chime(self.chime, enabled, self.enabled_prev, self.chime_timer, self.gap_timer)
     self.enabled_prev = enabled
-      # Senf ACC msgs on can
+      # Send ACC msgs on can
     ####################################################################################################################
     if self.ccframe % 2 == 0:
       self.acc_counter %= 0xF

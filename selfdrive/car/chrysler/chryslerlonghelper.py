@@ -13,7 +13,7 @@ ACCEL_MIN = -3.8  # m/s2
 ACCEL_SCALE = 1.
 
 DEFAULT_DECEL = 4.0 # m/s2
-START_BRAKE_THRESHOLD = -0.160 # m/s2
+START_BRAKE_THRESHOLD = -0.005 # m/s2
 STOP_BRAKE_THRESHOLD = 0.001 # m/s2
 START_GAS_THRESHOLD = 0.002 # m/s2
 STOP_GAS_THRESHOLD = -0.159 # m/s2
@@ -33,7 +33,10 @@ def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, r
       if setplus:
         if not short_press:
           if gas and not gas_set:
-            set_speed = vego
+            if set_speed < vego:
+              set_speed = vego
+            else:
+              set_speed += SHORT_PRESS_STEP
             gas_set = True
           else:
             set_speed += SHORT_PRESS_STEP

@@ -481,7 +481,7 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
 
   EventName.hightorqsteerUnavailable: {
     ET.PERMANENT: Alert(
-      "Mango Mode Not Enabled",
+      "Mango Lat Not Enabled",
       "Bring the vehicle to stop in fwd gear to re-enable",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOWEST, VisualAlert.none, AudibleAlert.none, 0., 0., .2),

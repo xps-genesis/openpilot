@@ -5,7 +5,7 @@ from selfdrive.config import Conversions as CV
 GearShifter = car.CarState.GearShifter
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
-def create_apa_hud(packer, apa_active, apa_fault, enabled, steer_type):
+def create_mango_hud(packer, apa_active, apa_fault, enabled, steer_type):
   # LKAS_HUD 0x2a6 (678) Controls what lane-keeping icon is displayed.
 
   color = 1  # default values are for park or neutral in 2017 are 0 0, but trying 1 1 for 2019

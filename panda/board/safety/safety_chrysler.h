@@ -63,6 +63,8 @@ static uint8_t chrysler_get_counter(CAN_FIFOMailBox_TypeDef *to_push) {
 
 static int chrysler_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 
+  bool unsafe_chrysler_mango = unsafe_mode & UNSAFE_CHRYSLER_MANGO;
+
   bool valid = addr_safety_check(to_push, chrysler_rx_checks, CHRYSLER_RX_CHECK_LEN,
                                  chrysler_get_checksum, chrysler_compute_checksum,
                                  chrysler_get_counter);
@@ -72,8 +74,10 @@ static int chrysler_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 
     // Measured eps torque
     if (addr == 544) {
-      int torque_meas_new = (((GET_BYTE(to_push, 4) & 0x7U) << 8) + GET_BYTE(to_push, 5))/4 - 1024U;
-
+      int torque_meas_new = ((GET_BYTE(to_push, 4) & 0x7U) << 8) + GET_BYTE(to_push, 5) - 1024U;
+      if (unsafe_chrysler_mango) {
+        torque_meas_new = torque_meas_new/4;
+      }
       // update array of samples
       update_sample(&torque_meas, torque_meas_new);
     }
@@ -183,7 +187,7 @@ static int chrysler_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
       tx = 0;
     }
   }
-  tx = 1;
+
   return tx;
 }
 
