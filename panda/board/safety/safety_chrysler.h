@@ -187,7 +187,6 @@ static int chrysler_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
       tx = 0;
     }
   }
-  tx = 1;
 
   return tx;
 }
