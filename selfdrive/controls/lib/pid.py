@@ -172,6 +172,11 @@ class PIDLongController():
     self.p = error * self.k_p
     self.f = feedforward * self.k_f
 
+    if self.last_error > 0.5 >= error:
+      self.i = 0.
+    if self.last_error > 0. >= error:
+        self.f = 0.
+
     if override:
       self.i -= self.i_unwind_rate * float(np.sign(self.i))
     else:
