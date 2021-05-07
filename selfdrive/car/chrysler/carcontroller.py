@@ -23,7 +23,6 @@ class CarController():
     self.timer = 0
     self.steerErrorMod = False
     self.steer_type = int(0)
-    self.on_timer = 0
     self.hightorqUnavailable = False
     self.acc_stop_timer = 0
     self.stop_button_spam = 0
@@ -60,8 +59,6 @@ class CarController():
   def update(self, enabled, CS, actuators, pcm_cancel_cmd, hud_alert, op_lead_rvel, op_lead_visible, op_lead_dist, long_starting):
 
     # *** compute control surfaces ***
-    if self.on_timer < 50 and CS.veh_on:
-      self.on_timer += 1
 
     wp_type = int(0)
     self.hightorqUnavailable = False
@@ -109,7 +106,7 @@ class CarController():
       if self.steerErrorMod:
         self.steer_type = int(0)
     elif CS.apaFault or CS.out.gearShifter not in (GearShifter.drive, GearShifter.low) or \
-            self.on_timer < 50 or CS.apa_steer_status:
+            not CS.veh_on or CS.apa_steer_status:
       self.steer_type = int(0)
     
     if self.steer_type == int(0) and CS.out.gearShifter in (GearShifter.drive, GearShifter.low) and not CS.apaFault:

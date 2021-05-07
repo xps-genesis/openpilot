@@ -15,6 +15,7 @@ class CarState(CarStateBase):
     can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
     self.shifter_values = can_define.dv["GEAR"]['PRNDL']
     self.acc_on_button = False
+    self.veh_on_timer = 0
 
   def update(self, cp, cp_cam):
 
@@ -74,7 +75,18 @@ class CarState(CarStateBase):
     self.lkas_counter = cp_cam.vl["LKAS_COMMAND"]['COUNTER']
     self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]['LKAS_BUTTON_LED']
     self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]['APA_STEER_ACT'] == 1
-    self.veh_on = cp.vl["HYBRID_ECU"]['VEH_ON'] == 1
+    if self.CP.enablehybridEcu:
+       if cp.vl["HYBRID_ECU"]['VEH_ON'] == 1:
+         self.veh_on_timer += 1
+       else:
+         self.veh_on_timer = 0
+       self.veh_on = self.veh_on_timer >= 50
+       self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
+    else:
+      self.veh_on_timer += 1
+      self.veh_on = self.veh_on_timer >= 200
+      self.axle_torq = 0
+
     self.acc_hold = bool(cp.vl["ACC_2"]['ACC_STOP'])
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
     self.wheel_button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
@@ -89,7 +101,6 @@ class CarState(CarStateBase):
     self.acc_button_pressed = self.acc_cancel_button or self.acc_resume_button or self.acc_setplus_button or \
                               self.acc_setminus_button or self.acc_followdec_button or self.acc_followinc_button
 
-    self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
     self.acc_override = bool(cp.vl["ACCEL_RELATED_120"]['ACC_OVERRIDE'])
     self.accbrakeFaulted = ((cp.vl["BRAKE_2"]['ACC_BRAKE_FAIL']) > 0) or ((cp.vl["ACC_ERROR"]['ACC_ERROR']) > 0)
     self.accengFaulted = (cp.vl["ACCEL_RELATED_120"]['ACC_ENG_OK']) == 0
