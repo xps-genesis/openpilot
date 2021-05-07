@@ -367,7 +367,7 @@ struct CarParams {
   enableDsu @5 :Bool; # driving support unit
   enableApgs @6 :Bool; # advanced parking guidance system
   enableBsm @56 :Bool; # blind spot monitoring
-  enablehydridEcu @57 :Bool; #hydrid ecu
+  enablehybridEcu @57 :Bool; #hydrid ecu
 
   minEnableSpeed @7 :Float32;
   minSteerSpeed @8 :Float32;
