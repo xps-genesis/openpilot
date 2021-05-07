@@ -1,6 +1,7 @@
 import os
 import math
 
+from numpy import interp
 import cereal.messaging as messaging
 from selfdrive.swaglog import cloudlog
 from common.realtime import sec_since_boot
@@ -10,6 +11,8 @@ from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 
 LOG_MPC = os.environ.get('LOG_MPC', False)
 
+BpvlTr = [0.  , 5., 20. , 30., 35.]
+TrvlY = [ 0.85, 1.8,  1.7, 1.45, 1.]
 
 class LongitudinalMpc():
   def __init__(self, mpc_id):
@@ -94,7 +97,8 @@ class LongitudinalMpc():
 
     # Calculate mpc
     t = sec_since_boot()
-    self.n_its = self.libmpc.run_mpc(self.cur_state, self.mpc_solution, self.a_lead_tau, a_lead)
+    TR = interp(v_ego, BpvlTr, TrvlY)
+    self.n_its = self.libmpc.run_mpc(self.cur_state, self.mpc_solution, self.a_lead_tau, a_lead, TR)
     self.duration = int((sec_since_boot() - t) * 1e9)
 
     # Get solution. MPC timestep is 0.2 s, so interpolation to 0.05 s is needed

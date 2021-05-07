@@ -1,6 +1,6 @@
 from cereal import log
 from common.numpy_fast import clip, interp
-from selfdrive.controls.lib.pid import PIController
+from selfdrive.controls.lib.pid import PIDLongController
 
 LongCtrlState = log.ControlsState.LongControlState
 
@@ -57,7 +57,7 @@ class LongControl():
     kdBP = [0., 16., 35.]
     kdV = [0.08, 0.215, 0.51]
 
-    self.pid = PIController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
+    self.pid = PIDLongController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                             (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
                             (CP.longitudinalTuning.kfBP, CP.longitudinalTuning.kfV),
                             (kdBP, kdV),
@@ -101,12 +101,7 @@ class LongControl():
       prevent_overshoot = not CP.stoppingControl and CS.vEgo < 1.5 and v_target_future < 0.7
       deadzone = interp(v_ego_pid, CP.longitudinalTuning.deadzoneBP, CP.longitudinalTuning.deadzoneV)
 
-      if 1. > (self.v_pid - v_ego_pid) >= 0.:
-        mod_a_target = 0.
-      else:
-        mod_a_target = a_target
-
-      output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=mod_a_target, freeze_integrator=prevent_overshoot)
+      output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)

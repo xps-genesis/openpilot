@@ -130,7 +130,6 @@ class CarState(CarStateBase):
       ("SEATBELT_DRIVER_UNLATCHED", "SEATBELT_STATUS", 0),
       ("APA_ACTIVE", "EPS_STATUS", 0),
       ("APA_STEER_FAULT", "EPS_STATUS", 0),
-      ("VEH_ON", "HYBRID_ECU", 0),
       ("ACC_STOP", "ACC_2", 0),
       ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
       ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
@@ -148,7 +147,6 @@ class CarState(CarStateBase):
       ("VEHICLE_SPEED_KPH", "BRAKE_1", 0),
       ("BRAKE_LIGHT", "BRAKE_2", 0),
       ("APA_STEER_ACT", "AUTO_PARK_REQUEST", 0),
-      ("AXLE_TORQ", "AXLE_TORQ", 0),
       ("ACC_OVERRIDE", "ACCEL_RELATED_120", 0),
       ("ACC_BRAKE_FAIL", "BRAKE_2", 0),
       ("ACC_ENG_OK", "ACCEL_RELATED_120", 0),
@@ -172,14 +170,22 @@ class CarState(CarStateBase):
       ("TRACTION_BUTTON", 1),
       ("BLIND_SPOT_WARNINGS", 2),
       ("BRAKE_1", 50),
-      ("HYBRID_ECU", 1),
       ("AUTO_PARK_REQUEST", 50),
       ("WHEEL_BUTTONS", 1),
       ("ACCEL_GAS_22F", 50),
-      ("AXLE_TORQ", 100),
       ("ACCEL_RELATED_120", 50),
       ("ACC_ERROR", 0),
     ]
+
+    if CP.enablehybridEcu:
+      signals += [
+        ("VEH_ON", "HYBRID_ECU", 0),
+        ("AXLE_TORQ", "AXLE_TORQ", 0),
+      ]
+      checks += [
+        ("HYBRID_ECU", 1),
+        ("AXLE_TORQ", 100),
+      ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
 

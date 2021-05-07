@@ -146,6 +146,8 @@ class CarController():
         self.op_cancel_cmd = True
       elif enabled and self.resume_press and (CS.lead_dist > self.lead_dist_at_stop or op_lead_rvel > 0 or 15 > CS.lead_dist >= 6.):
         button_type = 'ACC_RESUME'
+      elif long_starting:
+        button_type = 'ACC_RESUME'
 
       if button_type is not None:
         new_msg = create_wheel_buttons(self.packer, CS.wheel_button_counter + 1, button_type)

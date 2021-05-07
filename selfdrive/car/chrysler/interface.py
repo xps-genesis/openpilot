@@ -86,6 +86,8 @@ class CarInterface(CarInterfaceBase):
     ret.tireStiffnessFront, ret.tireStiffnessRear = scale_tire_stiffness(ret.mass, ret.wheelbase, ret.centerToFront)
 
     ret.enableCamera = True
+    ret.enableBsm = 720 in fingerprint[0]
+    ret.enablehybridEcu = 655 in fingerprint[0]
 
     return ret
 
