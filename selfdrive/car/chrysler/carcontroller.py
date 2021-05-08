@@ -28,6 +28,7 @@ class CarController():
     self.stop_button_spam = 0
     self.wheel_button_counter_prev = 0
     self.lead_dist_at_stop = 0
+    self.hybridEcu = CP.enablehybridEcu
     self.mango_lat_active = Params().get_bool('ChryslerMangoLat')
     self.full_range_steer = Params().get_bool('LkasFullRangeAvailable')
     self.mango_mode_active = self.mango_lat_active or self.full_range_steer
@@ -224,10 +225,16 @@ class CarController():
     self.go_req = long_starting
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
-      self.accel_active = True
-      self.trq_val = max(apply_accel * CV.ACCEL_TO_NM, CS.axle_torq - 50)
-      self.stop_req = False
-      self.go_req = CS.out.standstill
+      self.trq_val = apply_accel * CV.ACCEL_TO_NM
+      if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
+        self.accel_active = True
+        self.stop_req = False
+        self.go_req = CS.out.standstill
+      else:
+        self.trq_val = CS.axle_torq_min
+        self.accel_active = False
+      if not self.hybridEcu:
+        self.trq_val /= 15.5  # GEAR_RATO guess for non hybrid?
     else:
       self.accel_active = False
 

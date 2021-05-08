@@ -82,11 +82,13 @@ class CarState(CarStateBase):
        else:
          self.veh_on_timer = 0
        self.veh_on = self.veh_on_timer >= 50
-       self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
+       self.axle_torq_max = cp.vl["AXLE_TORQ"]['AXLE_TORQ_MAX']
+       self.axle_torq_min = cp.vl["AXLE_TORQ"]['AXLE_TORQ_MIN']
     else:
       self.veh_on_timer += 1
       self.veh_on = self.veh_on_timer >= 200
-      self.axle_torq = 0
+      self.axle_torq_min = 20.
+      self.axle_torq_max = 300.
 
     self.acc_hold = bool(cp.vl["ACC_2"]['ACC_STOP'])
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
@@ -105,7 +107,6 @@ class CarState(CarStateBase):
     self.acc_override = bool(cp.vl["ACCEL_RELATED_120"]['ACC_OVERRIDE'])
     self.accbrakeFaulted = ((cp.vl["BRAKE_2"]['ACC_BRAKE_FAIL']) > 0) or ((cp.vl["ACC_ERROR"]['ACC_ERROR']) > 0)
     self.accengFaulted = (cp.vl["ACCEL_RELATED_120"]['ACC_ENG_OK']) == 0
-
 
     return ret
 
@@ -193,6 +194,8 @@ class CarState(CarStateBase):
       signals += [
         ("VEH_ON", "HYBRID_ECU", 0),
         ("AXLE_TORQ", "AXLE_TORQ", 0),
+        ("AXLE_TORQ_MIN", "AXLE_TORQ", 0),
+        ("AXLE_TORQ_MAX", "AXLE_TORQ", 0),
       ]
       checks += [
         ("HYBRID_ECU", 1),
