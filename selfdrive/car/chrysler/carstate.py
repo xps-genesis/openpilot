@@ -89,8 +89,8 @@ class CarState(CarStateBase):
       self.veh_on = self.veh_on_timer >= 200
       self.axle_torq_min = 20.
       self.axle_torq_max = 300.
-    print('self.axle_torq_max')
-    print('self.axle_torq_min')
+    print('self.axle_torq_max', self.axle_torq_min)
+    print('self.axle_torq_min', self.axle_torq_max)
     self.acc_hold = bool(cp.vl["ACC_2"]['ACC_STOP'])
     self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
     self.wheel_button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
