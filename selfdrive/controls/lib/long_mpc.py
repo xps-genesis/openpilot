@@ -11,8 +11,8 @@ from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 
 LOG_MPC = os.environ.get('LOG_MPC', False)
 
-BpvlTr = [0.  , 5., 20. , 30., 35.]
-TrvlY = [ 0.85, 1.8,  1.2, 1.05, 1.]
+BpvlTr = [0. , 5., 20. , 30., 35.]
+TrvlY = [ 0.85, 1.8,  1.4, 1.05, 1.]
 
 class LongitudinalMpc():
   def __init__(self, mpc_id):

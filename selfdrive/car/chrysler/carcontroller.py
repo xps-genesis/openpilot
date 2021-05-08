@@ -255,6 +255,3 @@ class CarController():
 
     return can_sends
 
-
-
-

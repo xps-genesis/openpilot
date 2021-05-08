@@ -68,9 +68,10 @@ class CarState(CarStateBase):
     self.apasteerOn = cp.vl["EPS_STATUS"]["APA_ACTIVE"] == 1
 
     ret.genericToggle = bool(cp.vl["STEERING_LEVERS"]['HIGH_BEAM_FLASH'])
-
-    ret.leftBlindspot = 7 > cp.vl["BLIND_SPOT_WARNINGS"]['BLIND_SPOT_LEFT'] > 0
-    ret.rightBlindspot = 7 > cp.vl["BLIND_SPOT_WARNINGS"]['BLIND_SPOT_RIGHT'] > 0
+    
+    if self.CP.enableBsm:
+      ret.leftBlindspot = cp.vl["BLIND_SPOT_WARNINGS"]['BLIND_SPOT_LEFT'] == 1
+      ret.rightBlindspot = cp.vl["BLIND_SPOT_WARNINGS"]['BLIND_SPOT_RIGHT'] == 1
 
     self.lkas_counter = cp_cam.vl["LKAS_COMMAND"]['COUNTER']
     self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]['LKAS_BUTTON_LED']
@@ -197,6 +198,13 @@ class CarState(CarStateBase):
         ("HYBRID_ECU", 1),
         ("AXLE_TORQ", 100),
       ]
+
+    if CP.enableBsm:
+      signals += [
+        ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
+        ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
+      ]
+      checks += [("BLIND_SPOT_WARNINGS", 2)]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
 

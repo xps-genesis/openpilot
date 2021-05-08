@@ -74,13 +74,13 @@ TogglesPanel::TogglesPanel(QWidget *parent) : QWidget(parent) {
                                   "../assets/offroad/icon_shell.png",
                                   this));
 
-#ifndef QCOM2
-  toggles.append(new ParamControl("IsUploadRawEnabled",
-                                 "Upload Raw Logs",
-                                 "Upload full logs and full resolution video by default while on WiFi. If not enabled, individual logs can be marked for upload at my.comma.ai/useradmin.",
-                                 "../assets/offroad/icon_network.png",
-                                 this));
-#endif
+  if (!Hardware::TICI()) {
+    toggles.append(new ParamControl("IsUploadRawEnabled",
+                                    "Upload Raw Logs",
+                                    "Upload full logs and full resolution video by default while on WiFi. If not enabled, individual logs can be marked for upload at my.comma.ai/useradmin.",
+                                    "../assets/offroad/icon_network.png",
+                                    this));
+  }
 
   ParamControl *record_toggle = new ParamControl("RecordFront",
                                                  "Record and Upload Driver Camera",
@@ -94,19 +94,18 @@ TogglesPanel::TogglesPanel(QWidget *parent) : QWidget(parent) {
                                   "../assets/offroad/icon_warning.png",
                                   this));
 
-#ifdef QCOM2
-  toggles.append(new ParamControl("EnableWideCamera",
-                                  "Enable use of Wide Angle Camera",
-                                  "Use wide angle camera for driving and ui. Only takes effect after reboot.",
-                                  "../assets/offroad/icon_openpilot.png",
-                                  this));
-  toggles.append(new ParamControl("EnableLteOnroad",
-                                  "Enable LTE while onroad",
-                                  "",
-                                  "../assets/offroad/icon_network.png",
-                                  this));
-
-#endif
+  if (Hardware::TICI()) {
+    toggles.append(new ParamControl("EnableWideCamera",
+                                    "Enable use of Wide Angle Camera",
+                                    "Use wide angle camera for driving and ui. Only takes effect after reboot.",
+                                    "../assets/offroad/icon_openpilot.png",
+                                    this));
+    toggles.append(new ParamControl("EnableLteOnroad",
+                                    "Enable LTE while onroad",
+                                    "",
+                                    "../assets/offroad/icon_network.png",
+                                    this));
+  }
 
   bool record_lock = Params().getBool("RecordFrontLock");
   record_toggle->setEnabled(!record_lock);
@@ -288,7 +287,13 @@ QWidget * network_panel(QWidget * parent) {
   return w;
 }
 
-SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
+void SettingsWindow::showEvent(QShowEvent *event) {
+  if (layout()) {
+    panel_widget->setCurrentIndex(0);
+    nav_btns->buttons()[0]->setChecked(true);
+    return;
+  }
+
   // setup two main layouts
   QVBoxLayout *sidebar_layout = new QVBoxLayout();
   sidebar_layout->setMargin(0);
@@ -391,9 +396,3 @@ void SettingsWindow::hideEvent(QHideEvent *event){
     }
   }
 }
-
-void SettingsWindow::showEvent(QShowEvent *event){
-  panel_widget->setCurrentIndex(0);
-  nav_btns->buttons()[0]->setChecked(true);
-}
-
