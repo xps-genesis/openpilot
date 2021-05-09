@@ -87,7 +87,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.enableCamera = True
     ret.enableBsm = 720 in fingerprint[0]
-    ret.enablehybridEcu = True # 655 in fingerprint[0]
+    ret.enablehybridEcu = 655 in fingerprint[0]
 
     return ret
 
