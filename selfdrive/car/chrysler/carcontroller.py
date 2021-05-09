@@ -213,7 +213,7 @@ class CarController():
     apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     self.decel_val = DEFAULT_DECEL
-    self.trq_val = STOP_GAS_THRESHOLD * CV.ACCEL_TO_NM
+    self.trq_val = max(CS.axle_torq, CS.axle_torq_min)
 
     if not CS.out.gasPressed and not CS.acc_override and\
             (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD):

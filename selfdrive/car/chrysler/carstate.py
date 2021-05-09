@@ -16,6 +16,7 @@ class CarState(CarStateBase):
     self.shifter_values = can_define.dv["GEAR"]['PRNDL']
     self.acc_on_button = False
     self.veh_on_timer = 0
+    self.axle_torq = 0
 
   def update(self, cp, cp_cam):
 
@@ -82,6 +83,7 @@ class CarState(CarStateBase):
        else:
          self.veh_on_timer = 0
        self.veh_on = self.veh_on_timer >= 50
+       self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
        self.axle_torq_max = cp.vl["AXLE_TORQ"]['AXLE_TORQ_MAX']
        self.axle_torq_min = cp.vl["AXLE_TORQ"]['AXLE_TORQ_MIN']
     else:
