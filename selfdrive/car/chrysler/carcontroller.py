@@ -99,7 +99,7 @@ class CarController():
     self.steer_rate_limited = new_steer != apply_steer
     self.apply_steer_last = apply_steer
 
-    if CS.out.vEgo < 2.2:
+    if CS.out.vEgo < 20.2:
       self.steer_type = wp_type
 
     if wp_type != 2:
