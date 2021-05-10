@@ -22,8 +22,6 @@ class CarState(CarStateBase):
 
     ret = car.CarState.new_message()
 
-    self.frame = int(cp.vl["EPS_STATUS"]['COUNTER'])
-
     ret.doorOpen = any([cp.vl["DOORS"]['DOOR_OPEN_FL'],
                         cp.vl["DOORS"]['DOOR_OPEN_FR'],
                         cp.vl["DOORS"]['DOOR_OPEN_RL'],
@@ -106,7 +104,7 @@ class CarState(CarStateBase):
     self.acc_button_pressed = self.acc_cancel_button or self.acc_resume_button or self.acc_setplus_button or \
                               self.acc_setminus_button or self.acc_followdec_button or self.acc_followinc_button
 
-    self.acc_override = bool(cp.vl["ACCEL_RELATED_120"]['ACC_OVERRIDE'])
+    ret.accgasOverride = bool(cp.vl["ACCEL_RELATED_120"]['ACC_OVERRIDE'])
     self.accbrakeFaulted = ((cp.vl["BRAKE_2"]['ACC_BRAKE_FAIL']) > 0) or ((cp.vl["ACC_ERROR"]['ACC_ERROR']) > 0)
     self.accengFaulted = (cp.vl["ACCEL_RELATED_120"]['ACC_ENG_OK']) == 0
 
@@ -198,10 +196,12 @@ class CarState(CarStateBase):
         ("AXLE_TORQ", "AXLE_TORQ", 0),
         ("AXLE_TORQ_MIN", "AXLE_TORQ", 0),
         ("AXLE_TORQ_MAX", "AXLE_TORQ", 0),
+        ("ELEC_MODE_PERCENT", "HEV_HMI", 0),
       ]
       checks += [
         ("HYBRID_ECU", 1),
         ("AXLE_TORQ", 100),
+        ("HEV_HMI", 10),
       ]
 
     if CP.enableBsm:

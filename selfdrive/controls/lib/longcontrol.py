@@ -86,7 +86,7 @@ class LongControl():
 
     v_ego_pid = max(CS.vEgo, CP.minSpeedCan)  # Without this we get jumps, CAN bus reports 0 when speed < 0.3
 
-    if self.long_control_state == LongCtrlState.off or CS.gasPressed:
+    if self.long_control_state == LongCtrlState.off or CS.accgasOverride:
       self.reset(v_ego_pid)
       output_gb = 0.
 
