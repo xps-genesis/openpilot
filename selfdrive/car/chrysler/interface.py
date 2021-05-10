@@ -128,9 +128,6 @@ class CarInterface(CarInterfaceBase):
   # to be called @ 100hz
   def apply(self, c):
 
-    if (self.CS.frame == -1):
-      return []  # if we haven't seen a frame 220, then do not update.
-
     can_sends = self.CC.update(c.enabled, self.CS, c.actuators, c.cruiseControl.cancel,
                                c.hudControl.visualAlert,
                                c.hudControl.leadRelvel,
