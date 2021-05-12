@@ -108,15 +108,14 @@ def accel_hysteresis(accel, accel_steady):
 
   return accel, accel_steady
 
-def accel_rate_limit(accel_lim, prev_accel_lim, freeze_gas):
+def accel_rate_limit(accel_lim, prev_accel_lim):
  # acceleration jerk = 2.0 m/s/s/s
  # brake jerk = 3.8 m/s/s/s
 
   drBp = [0., -0.15, -0.50, -1.0, -1.5, -5.0]
-  dra = [ -0.005, -0.012,  -0.01, -0.015, -0.03, -0.04]
+  dra = [ -0.005, -0.007,  -0.01, -0.015, -0.02, -0.04]
 
   decel_rate = interp(accel_lim, drBp, dra)
-  accel_rate = 0.002 if freeze_gas else 0.02
 
   if accel_lim > 0:
     if accel_lim > prev_accel_lim:

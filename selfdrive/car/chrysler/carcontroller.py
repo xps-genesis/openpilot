@@ -208,7 +208,7 @@ class CarController():
     apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
 
     self.accel_lim = apply_accel
-    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, CS.hybrid_power_meter > 25)
+    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
@@ -223,7 +223,12 @@ class CarController():
     self.go_req = long_starting
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
-      self.trq_val = apply_accel * CV.ACCEL_TO_NM
+
+      if CS.hybrid_power_meter > 25 and self.trq_val > CS.axle_torq:
+        self.trq_val = CS.axle_torq
+      else:
+        self.trq_val = apply_accel * CV.ACCEL_TO_NM
+
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
         self.accel_active = True
         self.stop_req = False
