@@ -208,10 +208,10 @@ class CarController():
     apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
 
     self.accel_lim = apply_accel
-    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
+    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, CS.hybrid_power_meter > 25)
 
     self.decel_val = DEFAULT_DECEL
-    self.trq_val = max(CS.axle_torq, CS.axle_torq_min)
+    self.trq_val = CS.axle_torq_min
 
     if not CS.out.accgasOverride and\
             (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel <= STOP_BRAKE_THRESHOLD):

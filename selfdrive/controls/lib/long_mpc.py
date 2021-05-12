@@ -12,7 +12,7 @@ from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 LOG_MPC = os.environ.get('LOG_MPC', False)
 
 BpvlTr = [0. , 5., 20. , 30., 35.]
-TrvlY = [ 0.85, 1.8,  1.4, 1.05, 1.]
+TrvlY = [ 0.85, 1.8,  1.8, 1.05, 1.]
 
 class LongitudinalMpc():
   def __init__(self, mpc_id):
@@ -88,9 +88,6 @@ class LongitudinalMpc():
       self.prev_lead_x = x_lead
       self.cur_state[0].x_l = x_lead
       self.cur_state[0].v_l = v_lead
-
-      if ((v_lead**2 - v_ego**2)/(2 * x_lead)) < -3.:
-        TR = 2.5
     else:
       self.prev_lead_status = False
       # Fake a fast lead car, so mpc keeps running
