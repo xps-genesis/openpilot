@@ -24,7 +24,7 @@ MAX_CURVATURE_RATES = [0.00174533, 0.0008726646]
 MAX_CURVATURE_RATE_SPEEDS = [0, 35]
 
 sadBP = [0., 5., 10., 22., 25., 40.]
-sadV = [.0, .05, .1, .35, .55, .65]
+sadV = [.0, .05, .1, .22, .35, .45]
 
 DESIRES = {
   LaneChangeDirection.none: {
