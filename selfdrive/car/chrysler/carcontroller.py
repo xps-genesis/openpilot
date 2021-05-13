@@ -225,7 +225,7 @@ class CarController():
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel >= STOP_GAS_THRESHOLD):
 
       if CS.hybrid_power_meter > 25 and self.trq_val > CS.axle_torq:
-        self.trq_val = CS.axle_torq
+        self.trq_val = CS.axle_torq - 100
       else:
         self.trq_val = apply_accel * CV.ACCEL_TO_NM
 
