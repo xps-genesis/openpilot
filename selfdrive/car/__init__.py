@@ -77,7 +77,7 @@ def apply_toyota_steer_torque_limits(apply_torque, apply_torque_last, motor_torq
       LIMITS.STEER_DELTA_UP = 2.
     elif abs(apply_torque) < 50:
       LIMITS.STEER_DELTA_UP = 1.8
-    elif abs(apply_torque) < 60:
+    elif abs(apply_torque) < 100:
       LIMITS.STEER_DELTA_UP = 1.6
     elif abs(apply_torque) < 350:
       LIMITS.STEER_DELTA_UP = 1.4

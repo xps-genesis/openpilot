@@ -86,9 +86,9 @@ Supported Cars
 | Hyundai   | Palisade 2020-21              | All               | Stock            | 0mph               | 0mph              |
 | Hyundai   | Sonata 2020-21                | All               | Stock            | 0mph               | 0mph              |
 | Lexus     | CT Hybrid 2017-18             | LSS               | Stock<sup>3</sup>| 0mph               | 0mph              |
-| Lexus     | ES 2019-20                    | All               | openpilot        | 0mph               | 0mph              |
+| Lexus     | ES 2019-21                    | All               | openpilot        | 0mph               | 0mph              |
 | Lexus     | ES Hybrid 2017-18             | LSS               | Stock<sup>3</sup>| 0mph               | 0mph              |
-| Lexus     | ES Hybrid 2019                | All               | openpilot        | 0mph               | 0mph              |
+| Lexus     | ES Hybrid 2019-21             | All               | openpilot        | 0mph               | 0mph              |
 | Lexus     | IS 2017-2019                  | All               | Stock            | 22mph              | 0mph              |
 | Lexus     | NX 2018                       | All               | Stock<sup>3</sup>| 0mph               | 0mph              |
 | Lexus     | NX 2020                       | All               | openpilot        | 0mph               | 0mph              |
@@ -177,8 +177,9 @@ Community Maintained Cars and Features
 | Škoda     | Superb 2015-18                | Driver Assistance | Stock            | 0mph               | 0mph         |
 | Subaru    | Ascent 2019                   | EyeSight          | Stock            | 0mph               | 0mph         |
 | Subaru    | Crosstrek 2018-19             | EyeSight          | Stock            | 0mph               | 0mph         |
-| Subaru    | Forester 2019-20              | EyeSight          | Stock            | 0mph               | 0mph         |
+| Subaru    | Forester 2019-21              | EyeSight          | Stock            | 0mph               | 0mph         |
 | Subaru    | Impreza 2017-19               | EyeSight          | Stock            | 0mph               | 0mph         |
+| Volkswagen| Atlas 2018-19                 | Driver Assistance | Stock            | 0mph               | 0mph         |
 | Volkswagen| e-Golf 2014, 2019-20          | Driver Assistance | Stock            | 0mph               | 0mph         |
 | Volkswagen| Golf 2015-19                  | Driver Assistance | Stock            | 0mph               | 0mph         |
 | Volkswagen| Golf GTE 2016                 | Driver Assistance | Stock            | 0mph               | 0mph         |

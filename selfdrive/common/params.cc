@@ -1,22 +1,25 @@
-#include "common/params.h"
+#include "selfdrive/common/params.h"
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif  // _GNU_SOURCE
 
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <dirent.h>
+#include <string.h>
 #include <sys/file.h>
 #include <sys/stat.h>
-#include <mutex>
+#include <unistd.h>
+
 #include <csignal>
-#include <string.h>
+#include <mutex>
 #include <unordered_map>
-#include "common/util.h"
-#include "common/swaglog.h"
+
+#include "selfdrive/common/swaglog.h"
+#include "selfdrive/common/util.h"
 #include "selfdrive/hardware/hw.h"
+
 // keep trying if x gets interrupted by a signal
 #define HANDLE_EINTR(x)                                       \
   ({                                                          \
@@ -208,6 +211,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"Offroad_NeosUpdate", CLEAR_ON_MANAGER_START},
     {"Offroad_UpdateFailed", CLEAR_ON_MANAGER_START},
     {"Offroad_HardwareUnsupported", CLEAR_ON_MANAGER_START},
+    {"Offroad_UnofficialHardware", CLEAR_ON_MANAGER_START},
     {"ForcePowerDown", CLEAR_ON_MANAGER_START},
     {"LkasFullRangeAvailable", PERSISTENT},
     {"ChryslerMangoLat", PERSISTENT},
@@ -314,18 +318,7 @@ int Params::readAll(std::map<std::string, std::string> *params) {
   std::lock_guard<FileLock> lk(file_lock);
 
   std::string key_path = params_path + "/d";
-  DIR *d = opendir(key_path.c_str());
-  if (!d) return -1;
-
-  struct dirent *de = NULL;
-  while ((de = readdir(d))) {
-    if (isalnum(de->d_name[0])) {
-      (*params)[de->d_name] = util::read_file(key_path + "/" + de->d_name);
-    }
-  }
-
-  closedir(d);
-  return 0;
+  return util::read_files_in_dir(key_path, params);
 }
 
 void Params::clearAll(ParamKeyType key_type) {
