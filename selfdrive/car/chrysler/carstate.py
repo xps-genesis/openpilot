@@ -1,5 +1,3 @@
-from copy import copy
-
 from cereal import car
 from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine

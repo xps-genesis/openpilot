@@ -129,6 +129,30 @@ class Tici(HardwareBase):
 
     return str(self.get_modem().Get(MM_MODEM, 'EquipmentIdentifier', dbus_interface=DBUS_PROPS, timeout=TIMEOUT))
 
+  def get_network_info(self):
+    modem = self.get_modem()
+    try:
+      info = modem.Command("AT+QNWINFO", int(TIMEOUT * 1000), dbus_interface=MM_MODEM, timeout=TIMEOUT)
+    except Exception:
+      return None
+
+    if info and info.startswith('+QNWINFO: '):
+      info = info.replace('+QNWINFO: ', '').replace('"', '').split(',')
+
+      if len(info) != 4:
+        return None
+
+      technology, operator, band, channel = info 
+
+      return({
+        'technology': technology,
+        'operator': operator,
+        'band': band,
+        'channel': int(channel)
+      })
+    else:
+      return None
+
   def parse_strength(self, percentage):
       if percentage < 25:
         return NetworkStrength.poor

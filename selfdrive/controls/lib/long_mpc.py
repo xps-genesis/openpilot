@@ -88,6 +88,9 @@ class LongitudinalMpc():
       self.prev_lead_x = x_lead
       self.cur_state[0].x_l = x_lead
       self.cur_state[0].v_l = v_lead
+      
+      if v_lead < 3. and v_ego > 9.:
+        TR = 2.5
     else:
       self.prev_lead_status = False
       # Fake a fast lead car, so mpc keeps running

@@ -140,7 +140,7 @@ class CarController():
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled and not self.op_long_enable:
         button_type = 'ACC_CANCEL'
         self.op_cancel_cmd = True
-      elif enabled and self.resume_press and (CS.lead_dist > self.lead_dist_at_stop or op_lead_rvel > 0 or 15 > CS.lead_dist >= 6.):
+      elif enabled and (self.resume_press or self.op_long_enable) and ((CS.lead_dist > self.lead_dist_at_stop) or op_lead_rvel > 0 or 15 > CS.lead_dist >= 6.):
         button_type = 'ACC_RESUME'
       elif long_starting:
         button_type = 'ACC_RESUME'

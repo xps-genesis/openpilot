@@ -2,14 +2,12 @@
 
 from selfdrive.car import dbc_dict
 from cereal import car
-from common.params import Params
 Ecu = car.CarParams.Ecu
-from selfdrive.config import Conversions as CV
 
 class CarControllerParams:
-  STEER_MAX = 261  # 262 faults
-  STEER_DELTA_UP = 2.  # 3 is stock. 100 is fine. 200 is too much it seems
-  STEER_DELTA_DOWN = 3  # no faults on the way down it seems
+  STEER_MAX = 261         # 262 faults
+  STEER_DELTA_UP = 2      # 3 is stock. 100 is fine. 200 is too much it seems
+  STEER_DELTA_DOWN = 3    # no faults on the way down it seems
   STEER_ERROR_MAX = 80
 
 
