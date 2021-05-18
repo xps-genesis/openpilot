@@ -207,7 +207,7 @@ static void ui_draw_vision_maxspeed(UIState *s) {
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
   ui_draw_text(s, rect.centerX(), 148, "MAX", 26 * 2.5, COLOR_WHITE_ALPHA(is_cruise_set ? 200 : 100), "sans-regular");
   if (is_cruise_set) {
-    if (change_color) {
+    if (0) {
      const std::string maxspeed_str = std::to_string((int)std::nearbyint(maxspeed));
      ui_draw_text(s, rect.centerX(), 242, maxspeed_str.c_str(), 48 * 2.5, COLOR_RED, "sans-bold");
     }
