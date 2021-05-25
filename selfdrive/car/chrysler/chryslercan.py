@@ -85,7 +85,7 @@ def create_op_acc_2(packer, available, enabled, stop_req, go_req, acc_pre_brake,
     "ACC_AVAILABLE": available,
     "ACC_ENABLED": enabled,
     "ACC_BRK_PREP": acc_pre_brake,
-    "COMMAND_TYPE": 1 if decel_active else 0,
+    "COMMAND_TYPE": 1 if (decel_active or stop_req or go_req) else 0,
     "COUNTER": acc_counter
   }
   return packer.make_can_msg("OP_ACC_2", 0, values)
