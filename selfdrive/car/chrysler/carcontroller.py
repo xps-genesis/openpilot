@@ -190,6 +190,7 @@ class CarController():
 
     if not self.acc_enabled and not CS.out.brakePressed and self.acc_available and \
             (CS.acc_setplus_button or set_button or res_button):
+      
       self.acc_enabled = True
       if not self.allow_resume_button:
         self.allow_resume_button = True

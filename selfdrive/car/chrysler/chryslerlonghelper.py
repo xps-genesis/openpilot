@@ -8,15 +8,15 @@ LONG_PRESS_TIME = 50  # 500msec
 SHORT_PRESS_STEP = 1
 LONG_PRESS_STEP = 5
 # Accel Hard limits
-ACCEL_HYST_GAP = 0.01  # don't change accel command for small oscillations within this value
+ACCEL_HYST_GAP = 0.0  # don't change accel command for small oscillations within this value
 ACCEL_MAX = 2.  # m/s2
 ACCEL_MIN = -3.8  # m/s2
 ACCEL_SCALE = 1.
 
 DEFAULT_DECEL = 4.0 # m/s2
 START_BRAKE_THRESHOLD = -0.25 # m/s2
-STOP_BRAKE_THRESHOLD = 0.02 # m/s2
-START_GAS_THRESHOLD = 0.0 # m/s2
+STOP_BRAKE_THRESHOLD = 0.0 # m/s2
+START_GAS_THRESHOLD = 0.001 # m/s2
 STOP_GAS_THRESHOLD = -0.249 # m/s2
 
 CHIME_TIME = 8
