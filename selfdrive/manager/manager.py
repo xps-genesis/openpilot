@@ -43,7 +43,6 @@ def manager_init():
 
   if TICI:
     default_params.append(("EnableLteOnroad", "1"))
-    default_params.append(("IsUploadRawEnabled", "1"))
 
   if params.get_bool("RecordFrontLock"):
     params.put_bool("RecordFront", True)
