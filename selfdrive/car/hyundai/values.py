@@ -256,12 +256,15 @@ FW_VERSIONS = {
     (Ecu.eps, 0x7d4, None): [b'\xf1\x00BD  MDPS C 1.00 1.04 56310/M6000 4BDDC104', ],
     (Ecu.engine, 0x7e0, None): [b'\xf1\x81616B1051\x00\x00\x00\x00\x00\x00\x00\x00', ],
   },
-  CAR.ELANTRA_2020: {
-    (Ecu.engine, 0x7e0, None): [b'\xf1\x81616B1051\x00\x00\x00\x00\x00\x00\x00\x00', ],
-  },
   CAR.KIA_SELTOS: {
     (Ecu.eps, 0x7d4, None): [b'\xf1\000SP2 MDPS C 1.00 1.04 56300Q5200          ',],
   },
+  CAR.ELANTRA_2020: {
+    (Ecu.engine, 0x7e0, None): [b'\xf1\x81616B1051\x00\x00\x00\x00\x00\x00\x00\x00', ],
+    (Ecu.eps, 0x7d4, None): [
+       b'\xf1\x87\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf1\x00CN7 MDPS C 1.00 1.06 \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 4CNDC106\xf1\xa01.06',
+       b'\xf1\x8756310AA050\x00\xf1\x00CN7 MDPS C 1.00 1.06 56310AA050\x00 4CNDC106\xf1\xa01.06',
+    ],
 }
 
 CHECKSUM = {

@@ -1,6 +1,7 @@
 import os
 import math
 
+from numpy import interp
 import cereal.messaging as messaging
 from selfdrive.swaglog import cloudlog
 from common.realtime import sec_since_boot
@@ -10,6 +11,8 @@ from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 
 LOG_MPC = os.environ.get('LOG_MPC', False)
 
+BpvlTr = [0. , 5., 20. , 30., 35.]
+TrvlY = [ 0.85, 1.8,  1.8, 1.05, 1.]
 
 class LongitudinalMpc():
   def __init__(self, mpc_id):
@@ -64,6 +67,7 @@ class LongitudinalMpc():
 
     # Setup current mpc state
     self.cur_state[0].x_ego = 0.0
+    TR = interp(v_ego, BpvlTr, TrvlY)
 
     if lead is not None and lead.status:
       x_lead = lead.dRel
@@ -84,6 +88,9 @@ class LongitudinalMpc():
       self.prev_lead_x = x_lead
       self.cur_state[0].x_l = x_lead
       self.cur_state[0].v_l = v_lead
+      
+      if v_lead < 3. and v_ego > 9.:
+        TR = 2.
     else:
       self.prev_lead_status = False
       # Fake a fast lead car, so mpc keeps running
@@ -94,7 +101,7 @@ class LongitudinalMpc():
 
     # Calculate mpc
     t = sec_since_boot()
-    self.n_its = self.libmpc.run_mpc(self.cur_state, self.mpc_solution, self.a_lead_tau, a_lead)
+    self.n_its = self.libmpc.run_mpc(self.cur_state, self.mpc_solution, self.a_lead_tau, a_lead, TR)
     self.duration = int((sec_since_boot() - t) * 1e9)
 
     # Get solution. MPC timestep is 0.2 s, so interpolation to 0.05 s is needed

@@ -1,6 +1,6 @@
 from cereal import log
 from common.numpy_fast import clip, interp
-from selfdrive.controls.lib.pid import PIDController
+from selfdrive.controls.lib.pid import PIDLongController
 
 LongCtrlState = log.ControlsState.LongControlState
 
@@ -15,7 +15,7 @@ RATE = 100.0
 
 
 def long_control_state_trans(active, long_control_state, v_ego, v_target, v_pid,
-                             output_gb, brake_pressed, cruise_standstill, min_speed_can):
+                             output_gb, brake_pressed, cruise_standstill, min_speed_can, drel):
   """Update longitudinal control state machine"""
   stopping_target_speed = min_speed_can + STOPPING_TARGET_SPEED_OFFSET
   stopping_condition = (v_ego < 2.0 and cruise_standstill) or \
@@ -23,7 +23,7 @@ def long_control_state_trans(active, long_control_state, v_ego, v_target, v_pid,
                         ((v_pid < stopping_target_speed and v_target < stopping_target_speed) or
                          brake_pressed))
 
-  starting_condition = v_target > STARTING_TARGET_SPEED and not cruise_standstill
+  starting_condition = v_target > STARTING_TARGET_SPEED and not cruise_standstill and drel > 4
 
   if not active:
     long_control_state = LongCtrlState.off
@@ -55,15 +55,15 @@ class LongControl():
     self.long_control_state = LongCtrlState.off  # initialized to off
 
     kdBP = [0., 16., 35.]
-    kdV = [0.08, 0.215, 0.51]
+    kdV = [0.08, 0.015, 0.051]
 
-    self.pid = PIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
-                             (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
-                             (CP.longitudinalTuning.kfBP, CP.longitudinalTuning.kfV),
-                             (kdBP, kdV),
-                             rate=RATE,
-                             sat_limit=0.8,
-                             convert=compute_gb)
+    self.pid = PIDLongController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
+                            (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
+                            (CP.longitudinalTuning.kfBP, CP.longitudinalTuning.kfV),
+                            (kdBP, kdV),
+                            rate=RATE,
+                            sat_limit=0.8,
+                            convert=compute_gb)
     self.v_pid = 0.0
     self.last_output_gb = 0.0
 
@@ -72,7 +72,7 @@ class LongControl():
     self.pid.reset()
     self.v_pid = v_pid
 
-  def update(self, active, CS, v_target, v_target_future, a_target, CP):
+  def update(self, active, CS, v_target, v_target_future, a_target, CP, drel):
     """Update longitudinal control. This updates the state machine and runs a PID loop"""
     # Actuation limits
     gas_max = interp(CS.vEgo, CP.gasMaxBP, CP.gasMaxV)
@@ -82,7 +82,7 @@ class LongControl():
     output_gb = self.last_output_gb
     self.long_control_state = long_control_state_trans(active, self.long_control_state, CS.vEgo,
                                                        v_target_future, self.v_pid, output_gb,
-                                                       CS.brakePressed, CS.cruiseState.standstill, CP.minSpeedCan)
+                                                       CS.brakePressed, CS.cruiseState.standstill, CP.minSpeedCan, drel)
 
     v_ego_pid = max(CS.vEgo, CP.minSpeedCan)  # Without this we get jumps, CAN bus reports 0 when speed < 0.3
 
@@ -117,7 +117,7 @@ class LongControl():
 
     # Intention is to move again, release brake fast before handing control to PID
     elif self.long_control_state == LongCtrlState.starting:
-      if output_gb < -0.2:
+      if output_gb < 0.4:
         output_gb += CP.startingBrakeRate / RATE
       self.reset(CS.vEgo)
 
