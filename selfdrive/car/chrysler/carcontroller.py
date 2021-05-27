@@ -58,6 +58,7 @@ class CarController():
     self.allow_resume_button = False
     self.acc_counter = 0
     self.gas_timer = 0
+    self.go_req = 0
 
     self.packer = CANPacker(dbc_name)
 
@@ -144,7 +145,7 @@ class CarController():
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled and not self.op_long_enable:
         button_type = 'ACC_CANCEL'
         self.op_cancel_cmd = True
-      elif enabled and (self.resume_press or self.op_long_enable) and ((CS.lead_dist > self.lead_dist_at_stop) or (op_lead_rvel > 0) or (15 > CS.lead_dist >= 6.)):
+      elif enabled and self.resume_press and not self.op_long_enable and ((CS.lead_dist > self.lead_dist_at_stop) or (op_lead_rvel > 0) or (15 > CS.lead_dist >= 6.)):
         button_type = 'ACC_RESUME'
       elif long_starting:
         button_type = 'ACC_RESUME'
@@ -217,6 +218,16 @@ class CarController():
     accmaxBp = [20, 25, 40]
     accmaxhyb = [ACCEL_MAX, 1., .5]
 
+    self.decel_val = DEFAULT_DECEL
+    self.trq_val = CS.axle_torq_min
+    if not self.go_req:
+      self.go_req = long_starting
+    else:
+      self.go_req = CS.out.standstill
+    self.stop_req = enabled and CS.out.standstill and not CS.out.gasPressed and not self.go_req
+    if self.go_req or self.stop_req:
+      accmaxhyb = [.75, .75, .75]
+
     apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady)
     accel_max_tbl = interp(CS.hybrid_power_meter, accmaxBp, accmaxhyb)
 
@@ -224,11 +235,6 @@ class CarController():
 
     self.accel_lim = apply_accel
     apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
-
-    self.decel_val = DEFAULT_DECEL
-    self.trq_val = CS.axle_torq_min
-    self.go_req = long_starting
-    self.stop_req = enabled and CS.out.standstill and not CS.out.gasPressed and not self.go_req
 
     if not CS.out.accgasOverride and\
             (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel < STOP_BRAKE_THRESHOLD):
