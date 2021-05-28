@@ -130,7 +130,7 @@ class CarInterface(CarInterfaceBase):
 
     can_sends = self.CC.update(c.enabled, self.CS, c.actuators, c.cruiseControl.cancel,
                                c.hudControl.visualAlert,
-                               c.hudControl.leadRelvel,
+                               c.hudControl.leadvRel,
                                c.hudControl.leadVisible, c.hudControl.leadDistance, 
                                c.hudControl.longStarting)
 
