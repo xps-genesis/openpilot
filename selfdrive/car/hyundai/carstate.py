@@ -305,7 +305,7 @@ class CarState(CarStateBase):
       ("SCC12", 0),
       ("CGW2", 0),
       ("EMS16", 0),
-      ("LVR1", 0),
+      ("LVR12", 0),
       ("ESP11", 0),
     ]
 
