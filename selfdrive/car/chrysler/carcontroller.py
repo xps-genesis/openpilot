@@ -251,7 +251,7 @@ class CarController():
         self.pos_aego_latch = False
     else:
       self.decel_active = False
-      self.pre_decel_val = CS.aEgo
+      self.pre_decel_val = CS.out.aEgo
       self.pos_aego_latch = False
 
     if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or (self.accel_active and apply_accel > STOP_GAS_THRESHOLD)):
