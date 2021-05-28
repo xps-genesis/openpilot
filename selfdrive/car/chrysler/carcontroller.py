@@ -239,7 +239,9 @@ class CarController():
     apply_accel, decel_rate = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     if not CS.out.accgasOverride and\
-            (apply_accel <= START_BRAKE_THRESHOLD or (self.decel_active and apply_accel < STOP_BRAKE_THRESHOLD)):
+            ((apply_accel <= START_BRAKE_THRESHOLD)
+             or (self.decel_active and (apply_accel < STOP_BRAKE_THRESHOLD or apply_accel < CS.out.aEgo))
+             or self.stop_req):
       self.decel_active = True
       if self.pre_decel_val > 0. or self.pos_aego_latch and self.pre_decel_val > apply_accel:  # going down slope causes jerky braking, start from aego and ramp down
         self.pre_decel_val = max(self.pre_decel_val - decel_rate, apply_accel)
@@ -254,7 +256,9 @@ class CarController():
       self.pre_decel_val = CS.out.aEgo
       self.pos_aego_latch = False
 
-    if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or (self.accel_active and apply_accel > STOP_GAS_THRESHOLD)):
+    if not self.decel_active and not CS.out.brakePressed and\
+            ((apply_accel >= START_GAS_THRESHOLD)
+             or (self.accel_active and apply_accel > STOP_GAS_THRESHOLD)):
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
 
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
