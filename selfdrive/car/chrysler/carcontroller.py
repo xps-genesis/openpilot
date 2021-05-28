@@ -59,6 +59,8 @@ class CarController():
     self.acc_counter = 0
     self.gas_timer = 0
     self.go_req = 0
+    self.pre_decel_val = 0.
+    self.pos_aego_latch = False
 
     self.packer = CANPacker(dbc_name)
 
@@ -213,7 +215,7 @@ class CarController():
     ####################################################################################################################
     # gas and brake
     self.accel_lim_prev = self.accel_lim
-    apply_accel = actuators.gas - actuators.brake
+    apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
     accmaxBp = [20, 25, 40]
     accmaxhyb = [ACCEL_MAX, 1., .5]
@@ -234,16 +236,25 @@ class CarController():
     apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, accel_max_tbl)
 
     self.accel_lim = apply_accel
-    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
+    apply_accel, decel_rate = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     if not CS.out.accgasOverride and\
-            (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel < STOP_BRAKE_THRESHOLD):
+            (apply_accel <= START_BRAKE_THRESHOLD or (self.decel_active and apply_accel < STOP_BRAKE_THRESHOLD)):
       self.decel_active = True
-      self.decel_val = apply_accel
+      if self.pre_decel_val > 0. or self.pos_aego_latch and self.pre_decel_val > apply_accel:  # going down slope causes jerky braking, start from aego and ramp down
+        self.pre_decel_val = max(self.pre_decel_val - max(.01, decel_rate), apply_accel)
+        self.decel_val = self.pre_decel_val
+        self.pos_aego_latch = True
+      else:
+        self.decel_val = apply_accel
+        self.pre_decel_val = 0.
+        self.pos_aego_latch = False
     else:
       self.decel_active = False
+      self.pre_decel_val = CS.aEgo
+      self.pos_aego_latch = False
 
-    if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel > STOP_GAS_THRESHOLD):
+    if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or (self.accel_active and apply_accel > STOP_GAS_THRESHOLD)):
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
 
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
