@@ -545,6 +545,13 @@ class CarState(CarStateBase):
         ("Supplemental_Counter", "FCA11", 0),
         ("PAINT1_Status", "FCA11", 1),
       ]
+      checks += [
+        ("SCC11", 0),
+        ("SCC12", 0),
+        ("SCC13", 0),
+        ("SCC14", 0),
+        ("FCA11", 0),
+      ]
       if CP.sccBus == 2:
         checks += [
           ("SCC11", 0),
