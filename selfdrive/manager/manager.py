@@ -38,6 +38,7 @@ def manager_init():
     ("LkasFullRangeAvailable", "1"),
     ("ChryslerMangoLat", "1"),
     ("ChryslerMangoLong", "1"),
+    ("ChryslerMadGas", "1"),
     ("DisableUpdates", "0"),
   ]
 

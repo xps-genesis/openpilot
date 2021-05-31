@@ -219,6 +219,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"LkasFullRangeAvailable", PERSISTENT},
     {"ChryslerMangoLat", PERSISTENT},
     {"ChryslerMangoLong", PERSISTENT},
+    {"ChryslerMadGas", PERSISTENT},
 };
 
 } // namespace

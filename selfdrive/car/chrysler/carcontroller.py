@@ -142,7 +142,7 @@ class CarController():
 
     self.op_cancel_cmd = False
 
-    if (self.ccframe % 10 < 5) and wheel_button_counter_change and self.ccframe >= self.stop_button_spam:
+    if wheel_button_counter_change and self.ccframe >= self.stop_button_spam:
       button_type = None
       if not enabled and pcm_cancel_cmd and CS.out.cruiseState.enabled and not self.op_long_enable:
         button_type = 'ACC_CANCEL'
@@ -218,7 +218,10 @@ class CarController():
     apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
     accmaxBp = [20, 25, 40]
-    accmaxhyb = [ACCEL_MAX, 1., .5]
+    if Params().get_bool('ChryslerMadGas'):
+      accmaxhyb = [ACCEL_MAX, ACCEL_MAX, ACCEL_MAX]
+    else:
+      accmaxhyb = [ACCEL_MAX, 1., .5]
 
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
@@ -243,8 +246,8 @@ class CarController():
              or (self.decel_active and (apply_accel < STOP_BRAKE_THRESHOLD or apply_accel < CS.out.aEgo))
              or self.stop_req):
       self.decel_active = True
-      if self.pre_decel_val > 0. or self.pos_aego_latch and self.pre_decel_val > apply_accel:  # going down slope causes jerky braking, start from aego and ramp down
-        self.pre_decel_val = max(self.pre_decel_val - decel_rate, apply_accel)
+      if self.pre_decel_val > 0. or self.pos_aego_latch and self.pre_decel_val > 0:  # going down slope causes jerky braking, start from aego and ramp down
+        self.pre_decel_val = max(self.pre_decel_val - .001, 0)
         self.decel_val = self.pre_decel_val
         self.pos_aego_latch = True
       else:

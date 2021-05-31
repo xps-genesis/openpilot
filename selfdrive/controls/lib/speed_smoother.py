@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import interp
 
 
 def get_delta_out_limits(aEgo, aMax, aMin, jMax, jMin):
@@ -16,11 +17,19 @@ def speed_smoother(vEgo, aEgo, vT, aMax, aMin, jMax, jMin, ts):
 
   dV = vT - vEgo
 
+  jmaxBp = [0., 5., 30., 40.]
+  jmaxV = [3., 1.5, 1., .5]
+  jminBp = [0., 5., 30., 40.]
+  jminV = [3., 1.5, 1., .5]
+
+  jmaxtbl = interp(vEgo, jmaxBp, jmaxV)
+  jmintbl = interp(vEgo, jminBp, jminV)
+
   # recover quickly if dV is positive and aEgo is negative or viceversa
   if dV > 0. and aEgo < 0.:
-    jMax *= .5
+    jMax *= jmaxtbl
   elif dV < 0. and aEgo > 0.:
-    jMin *= .5
+    jMin *= jmintbl
 
   tDelta = get_delta_out_limits(aEgo, aMax, aMin, jMax, jMin)
 

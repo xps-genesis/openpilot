@@ -123,14 +123,14 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
 
   if accel_lim > 0:
     if accel_lim > prev_accel_lim:
-      accel_lim = min(accel_lim, prev_accel_lim + 0.01)
+      accel_lim = min(accel_lim, prev_accel_lim + 0.0075)
     else:
       accel_lim = max(accel_lim, prev_accel_lim - 0.038)
   else:
     if accel_lim < prev_accel_lim:
       accel_lim = max(accel_lim, prev_accel_lim - decel_rate)
     else:
-      accel_lim = min(accel_lim, prev_accel_lim + 0.01)
+      accel_lim = min(accel_lim, prev_accel_lim + 0.0075)
 
   return accel_lim, decel_rate
 
