@@ -213,6 +213,8 @@ class CarController():
     ####################################################################################################################
     # gas and brake
     self.accel_lim_prev = self.accel_lim
+    if self.decel_active:
+      actuators.gas = 0
     apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
     accmaxBp = [20, 25, 40]
@@ -240,7 +242,7 @@ class CarController():
     apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
     if enabled and not CS.out.accgasOverride and\
-            (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel < STOP_BRAKE_THRESHOLD and CS.out.brake > 0.):
+            (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel < STOP_BRAKE_THRESHOLD and CS.out.brake > 10.):
       self.decel_active = True
       self.decel_val = apply_accel
     else:
