@@ -21,12 +21,13 @@ AWARENESS_DECEL = -0.2     # car smoothly decel at .2m/s^2 when user is distract
 # lookup tables VS speed to determine min and max accels in cruise
 # make sure these accelerations are smaller than mpc limits
 _A_CRUISE_MIN_V = [-1.0, -.8, -.67, -.5, -.30]
+_A_CRUISE_MIN_V_FOLLOWING = [-.075, -.05, -.05, -.05, -.05]
 _A_CRUISE_MIN_BP = [  0.,  5.,  10., 20.,  40.]
 
 # need fast accel at very low speed for stop and go
 # make sure these accelerations are smaller than mpc limits
-_A_CRUISE_MAX_V = [1.6, 1.2, 1.0, 0.65, .4]
-_A_CRUISE_MAX_V_FOLLOWING = [1.4, 1.2, 1.0, 1.0, 0.65, .4]
+_A_CRUISE_MAX_V = [1.0, 1.0, 1.0, 0.65, .4]
+_A_CRUISE_MAX_V_FOLLOWING = [1.0, 1.0, 1.0, 1.0, 0.65, .4]
 _A_CRUISE_MAX_BP = [0., .8,  6.4, 22.5, 40.]
 
 # Lookup table for turns
@@ -35,12 +36,13 @@ _A_TOTAL_MAX_BP = [20., 40.]
 
 
 def calc_cruise_accel_limits(v_ego, following):
-  a_cruise_min = interp(v_ego, _A_CRUISE_MIN_BP, _A_CRUISE_MIN_V)
 
   if following:
     a_cruise_max = interp(v_ego, _A_CRUISE_MAX_BP, _A_CRUISE_MAX_V_FOLLOWING)
+    a_cruise_min = interp(v_ego, _A_CRUISE_MIN_BP, _A_CRUISE_MIN_V_FOLLOWING)
   else:
     a_cruise_max = interp(v_ego, _A_CRUISE_MAX_BP, _A_CRUISE_MAX_V)
+    a_cruise_min = interp(v_ego, _A_CRUISE_MIN_BP, _A_CRUISE_MIN_V)
   return np.vstack([a_cruise_min, a_cruise_max])
 
 
