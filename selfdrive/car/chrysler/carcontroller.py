@@ -216,8 +216,8 @@ class CarController():
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
 
-    if self.decel_active:
-      actuators.gas = self.trq_val/CV.ACCEL_TO_NM
+    #if self.decel_active:
+    #  actuators.gas = self.trq_val/CV.ACCEL_TO_NM
     apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
     accmaxBp = [20, 25, 40]
