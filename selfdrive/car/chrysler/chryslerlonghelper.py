@@ -132,7 +132,7 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
     else:
       accel_lim = min(accel_lim, prev_accel_lim + 0.0075)
 
-  return accel_lim, decel_rate
+  return accel_lim
 
 
 def cluster_chime(chime_val, enabled, enabled_prev, chime_timer, gap_timer):
