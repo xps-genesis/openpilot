@@ -223,10 +223,10 @@ class CarController():
 
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
-    if not self.go_req:
+    if not self.go_req and enabled:
       self.go_req = long_starting
     else:
-      self.go_req = CS.out.standstill
+      self.go_req = CS.out.standstill and enabled
     self.stop_req = enabled and CS.out.standstill and not CS.out.gasPressed and not self.go_req
     if self.go_req or self.stop_req:
       accmaxhyb = [.75, .75, .75]
@@ -239,20 +239,20 @@ class CarController():
     self.accel_lim = apply_accel
     apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
-    if not CS.out.accgasOverride and\
-            (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel < STOP_BRAKE_THRESHOLD):
+    if enabled and not CS.out.accgasOverride and\
+            (apply_accel <= START_BRAKE_THRESHOLD or self.decel_active and apply_accel < STOP_BRAKE_THRESHOLD and CS.out.brake > 0.):
       self.decel_active = True
       self.decel_val = apply_accel
     else:
       self.decel_active = False
 
-    if not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel > STOP_GAS_THRESHOLD):
+    if enabled and not self.decel_active and\
+            not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel > STOP_GAS_THRESHOLD):
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
 
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
         self.accel_active = True
         self.stop_req = False
-        self.go_req = CS.out.standstill
       else:
         self.trq_val = CS.axle_torq_min
         self.accel_active = False
