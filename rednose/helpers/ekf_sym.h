@@ -45,6 +45,7 @@ public:
   EKFSym(std::string name, Eigen::Map<MatrixXdr> Q, Eigen::Map<Eigen::VectorXd> x_initial,
       Eigen::Map<MatrixXdr> P_initial, int dim_main, int dim_main_err, int N = 0, int dim_augment = 0,
       int dim_augment_err = 0, std::vector<int> maha_test_kinds = std::vector<int>(),
+      std::vector<int> quaternion_idxs = std::vector<int>(),
       std::vector<std::string> global_vars = std::vector<std::string>(), double max_rewind_age = 1.0);
   void init_state(Eigen::Map<Eigen::VectorXd> state, Eigen::Map<MatrixXdr> covs, double filter_time);
 
@@ -52,13 +53,16 @@ public:
   MatrixXdr covs();
   void set_filter_time(double t);
   double get_filter_time();
-  void normalize_state(int slice_start, int slice_end_ex);
+  void normalize_quaternions();
+  void normalize_slice(int slice_start, int slice_end_ex);
   void set_global(std::string global_var, double val);
   void reset_rewind();
 
   void predict(double t);
   std::optional<Estimate> predict_and_update_batch(double t, int kind, std::vector<Eigen::Map<Eigen::VectorXd>> z,
-      std::vector<Eigen::Map<MatrixXdr>> R, std::vector<std::vector<double>> extra_args, bool augment = false);
+      std::vector<Eigen::Map<MatrixXdr>> R, std::vector<std::vector<double>> extra_args = {{}}, bool augment = false);
+
+  extra_routine_t get_extra_routine(const std::string& routine);
 
 private:
   std::deque<Observation> rewind(double t);
@@ -87,6 +91,7 @@ private:
   double filter_time;
 
   std::vector<int> maha_test_kinds;
+  std::vector<int> quaternion_idxs;
 
   std::vector<std::string> global_vars;
 

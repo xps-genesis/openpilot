@@ -76,6 +76,9 @@ class opParams:
                         'nonudgeLCA': Param(True, bool, 'Toggle to enable no nudge lane change'),
                         'nonudgeLCAspeed': Param(35, int, 'speed-mph above which no nudge lca is allowed'),
                         'yoloMode': Param(False, bool, 'Toggle to allow manual long control'),
+                        'slow_in_turns': Param(True, bool, 'Slow while in turns'),
+                        'slow_in_turns_ratio': Param(1, VT.number, 'Adjust how much slowing occurs. (1.25 = 25% faster in turns than the default)'),
+                        'slow_in_turns_rotate': Param(1, VT.number, 'This adjusts how much amount the vehicle slows as the curve increases'),
                         }
 
 

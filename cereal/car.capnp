@@ -53,6 +53,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     lowSpeedLockout @31;
     plannerError @32;
     debugAlert @34;
+    steerTempUnavailableUserOverride @35;
     resumeRequired @36;
     preDriverDistracted @37;
     promptDriverDistracted @38;
@@ -88,6 +89,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     startupNoCar @76;
     startupNoControl @77;
     startupMaster @78;
+    startupFuzzyFingerprint @97;
     fcw @79;
     steerSaturated @80;
     belowEngageSpeed @84;
@@ -100,8 +102,15 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     gpsMalfunction @94;
     processNotRunning @95;
     dashcamMode @96;
-    visiononlyWarning @ 97;
-    belowSteerSpeedDing @ 98;
+    controlsInitializing @98;
+    usbError @99;
+    roadCameraError @100;
+    driverCameraError @101;
+    wideRoadCameraError @102;
+
+    hightorqsteerUnavailable @ 103;
+    visiononlyWarning @ 104;
+    belowSteerSpeedDing @ 105;
 
     radarCanErrorDEPRECATED @15;
     radarCommIssueDEPRECATED @67;
@@ -122,7 +131,6 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     neosUpdateRequiredDEPRECATED @88;
     modelLagWarningDEPRECATED @93;
     startupOneplusDEPRECATED @82;
-    steerTempUnavailableMuteDEPRECATED @35;
   }
 }
 
@@ -161,6 +169,8 @@ struct CarState {
   stockAeb @30 :Bool;
   stockFcw @31 :Bool;
   espDisabled @32 :Bool;
+  hightorqUnavailable @37 :Bool;
+  accgasOverride @38 :Bool;
 
   # cruise state
   cruiseState @10 :CruiseState;
@@ -316,9 +326,11 @@ struct CarControl {
     leftLaneVisible @7: Bool;
     rightLaneDepart @8: Bool;
     leftLaneDepart @9: Bool;
-    leadDistance @10:Float32;
+    leadDistance @10: Float32;
     leadvRel @11:Float32;
     leadyRel @12:Float32;
+    longStopping @13: Bool;
+    longStarting @14: Bool;
 
     enum VisualAlert {
       # these are the choices from the Honda
@@ -358,12 +370,15 @@ struct CarControl {
 struct CarParams {
   carName @0 :Text;
   carFingerprint @1 :Text;
+  fuzzyFingerprint @55 :Bool;
 
   enableGasInterceptor @2 :Bool;
   enableCruise @3 :Bool;
   enableCamera @4 :Bool;
   enableDsu @5 :Bool; # driving support unit
   enableApgs @6 :Bool; # advanced parking guidance system
+  enableBsm @56 :Bool; # blind spot monitoring
+  enablehybridEcu @57 :Bool; #hydrid ecu
 
   minEnableSpeed @7 :Float32;
   minSteerSpeed @8 :Float32;
@@ -419,13 +434,14 @@ struct CarParams {
   dashcamOnly @41: Bool;
   transmissionType @43 :TransmissionType;
   carFw @44 :List(CarFw);
+
   radarTimeStep @45: Float32 = 0.05;  # time delta between radar updates, 20Hz is very standard
   communityFeature @46: Bool;  # true if a community maintained feature is detected
   fingerprintSource @49: FingerprintSource;
   networkLocation @50 :NetworkLocation;  # Where Panda/C2 is integrated into the car's CAN network
-  mdpsHarness @55: Bool;
-  sasBus @56: Int8;
-  fcaBus @57: Int8;
+  mdpsHarness @65: Bool;
+  sasBus @66: Int8;
+  fcaBus @67: Int8;
   bsmAvailable @58: Bool;
   lfaAvailable @59: Bool;
   sccBus @60: Int8;

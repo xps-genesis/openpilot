@@ -294,13 +294,19 @@ class CarState(CarStateBase):
 
     checks = [
       # address, frequency
-      ("TCS13", 50),
-      ("TCS15", 10),
-      ("CLU11", 50),
-      ("ESP12", 100),
-      ("CGW1", 10),
-      ("CGW4", 5),
-      ("WHL_SPD11", 50),
+      ("TCS13", 0),
+      ("TCS15", 0),
+      ("CLU11", 0),
+      ("ESP12", 0),
+      ("CGW1", 0),
+      ("CGW4", 0),
+      ("WHL_SPD11", 0),
+      ("SCC11", 0),
+      ("SCC12", 0),
+      ("CGW2", 0),
+      ("EMS16", 0),
+      ("LVR12", 0),
+      ("ESP11", 0),
     ]
 
     if CP.sccBus == 0:
@@ -319,8 +325,8 @@ class CarState(CarStateBase):
         ("CR_VSM_Alive", "SCC12", 0),
       ]
       checks += [
-        ("SCC11", 50),
-        ("SCC12", 50),
+        ("SCC11", 0),
+        ("SCC12", 0),
       ]
     if CP.fcaBus == 0:
       signals += [
@@ -329,7 +335,7 @@ class CarState(CarStateBase):
         ("CR_FCA_Alive", "FCA11", 0),
         ("Supplemental_Counter", "FCA11", 0),
       ]
-      checks += [("FCA11", 50)]
+      checks += [("FCA11", 0)]
 
     if not CP.mdpsHarness:
       signals += [
@@ -346,7 +352,7 @@ class CarState(CarStateBase):
         ("CR_Mdps_OutTq", "MDPS12", 0)
       ]
       checks += [
-        ("MDPS12", 50)
+        ("MDPS12", 0)
       ]
     if CP.sasBus == 0:
       signals += [
@@ -354,7 +360,7 @@ class CarState(CarStateBase):
         ("SAS_Speed", "SAS11", 0),
       ]
       checks += [
-        ("SAS11", 100)
+        ("SAS11", 0)
       ]
 
     if CP.bsmAvailable:
@@ -362,21 +368,21 @@ class CarState(CarStateBase):
         ("CF_Lca_IndLeft", "LCA11", 0),
         ("CF_Lca_IndRight", "LCA11", 0),
       ]
-      checks += [("LCA11", 50)]
+      checks += [("LCA11", 0)]
 
     if CP.carFingerprint in ELEC_VEH:
       signals += [
         ("Accel_Pedal_Pos", "E_EMS11", 0),
       ]
       checks += [
-        ("E_EMS11", 50),
+        ("E_EMS11", 0),
       ]
     elif CP.carFingerprint in HYBRID_VEH:
       signals += [
         ("CR_Vcu_AccPedDep_Pc", "EV_PC4", 0),
       ]
       checks += [
-        ("EV_PC4", 50),
+        ("EV_PC4", 0),
       ]
     elif CP.emsAvailable:
       signals += [
@@ -384,8 +390,8 @@ class CarState(CarStateBase):
         ("CF_Ems_AclAct", "EMS16", 0),
       ]
       checks += [
-        ("EMS12", 100),
-        ("EMS16", 100),
+        ("EMS12", 0),
+        ("EMS16", 0),
       ]
 
     if CP.carFingerprint in FEATURES["use_cluster_gears"]:
@@ -395,18 +401,18 @@ class CarState(CarStateBase):
         ("CF_Clu_InhibitN", "CLU15", 0),
         ("CF_Clu_InhibitR", "CLU15", 0),
       ]
-      checks += [("CLU15", 5)]
+      checks += [("CLU15", 0)]
     elif CP.carFingerprint in FEATURES["use_tcu_gears"]:
       signals += [
         ("CUR_GR", "TCU12", 0)
       ]
-      checks += [("TCU12", 100)]
+      checks += [("TCU12", 0)]
     elif CP.evgearAvailable:
       signals += [("Elect_Gear_Shifter", "ELECT_GEAR", 0)]
-      checks += [("ELECT_GEAR", 20)]
+      checks += [("ELECT_GEAR", 0)]
     elif CP.lvrAvailable:
       signals += [("CF_Lvr_Gear", "LVR12", 0)]
-      checks += [("LVR12", 100)]
+      checks += [("LVR12", 0)]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
 
@@ -429,7 +435,7 @@ class CarState(CarStateBase):
         ("CR_Mdps_OutTq", "MDPS12", 0)
       ]
       checks += [
-        ("MDPS12", 50)
+        ("MDPS12", 0)
       ]
     if CP.sasBus == 1:
       signals += [
@@ -437,7 +443,7 @@ class CarState(CarStateBase):
         ("SAS_Speed", "SAS11", 0),
       ]
       checks += [
-        ("SAS11", 100)
+        ("SAS11", 0)
       ]
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 1)
 
@@ -466,7 +472,7 @@ class CarState(CarStateBase):
     ]
 
     checks = [
-      ("LKAS11", 100)
+      ("LKAS11", 0)
     ]
     if CP.sccBus == 2 or CP.radarOffCan:
       signals += [
@@ -539,12 +545,19 @@ class CarState(CarStateBase):
         ("Supplemental_Counter", "FCA11", 0),
         ("PAINT1_Status", "FCA11", 1),
       ]
+      checks += [
+        ("SCC11", 0),
+        ("SCC12", 0),
+        ("SCC13", 0),
+        ("SCC14", 0),
+        ("FCA11", 0),
+      ]
       if CP.sccBus == 2:
         checks += [
-          ("SCC11", 50),
-          ("SCC12", 50),
+          ("SCC11", 0),
+          ("SCC12", 0),
         ]
         if CP.fcaBus == 2:
-          checks += [("FCA11", 50)]
+          checks += [("FCA11", 0)]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)
