@@ -213,8 +213,11 @@ class CarController():
     ####################################################################################################################
     # gas and brake
     self.accel_lim_prev = self.accel_lim
+    self.decel_val = DEFAULT_DECEL
+    self.trq_val = CS.axle_torq_min
+
     if self.decel_active:
-      actuators.gas = 0
+      actuators.gas = self.trq_val/CV.ACCEL_TO_NM
     apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
     accmaxBp = [20, 25, 40]
@@ -223,8 +226,6 @@ class CarController():
     else:
       accmaxhyb = [ACCEL_MAX, 1., .5]
 
-    self.decel_val = DEFAULT_DECEL
-    self.trq_val = CS.axle_torq_min
     if not self.go_req and enabled:
       self.go_req = long_starting
     else:
