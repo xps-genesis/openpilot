@@ -242,7 +242,7 @@ class CarController():
 
     if enabled and not CS.out.accgasOverride and\
             (apply_accel <= min((CS.axle_torq_min - 20.)/CV.ACCEL_TO_NM, START_BRAKE_THRESHOLD)
-             or self.decel_active and CS.out.brake > 10.):
+             or self.decel_active and CS.out.brake > 10. and apply_accel < STOP_BRAKE_THRESHOLD):
       self.decel_active = True
       self.decel_val = apply_accel
     else:
