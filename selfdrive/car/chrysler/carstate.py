@@ -1,6 +1,7 @@
 from cereal import car
 from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine
+from selfdrive.car.chrysler.chryslerlonghelper import SET_SPEED_MIN
 from selfdrive.config import Conversions as CV
 from selfdrive.car.interfaces import CarStateBase
 from selfdrive.car.chrysler.values import DBC, STEER_THRESHOLD
@@ -53,7 +54,7 @@ class CarState(CarStateBase):
 
     ret.cruiseState.enabled = bool(cp.vl["ACC_2"]['ACC_ENABLED'])  # ACC is green.
     ret.cruiseState.available = bool(cp.vl["ACC_2"]['ACC_AVAILABLE'])
-    ret.cruiseState.speed = cp.vl["DASHBOARD"]['ACC_SET_SPEED_KPH'] * CV.KPH_TO_MS
+    ret.cruiseState.speed = max(cp.vl["DASHBOARD"]['ACC_SET_SPEED_KPH'], SET_SPEED_MIN) * CV.KPH_TO_MS
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]['CRUISE_STATE'] in [1, 2]
 
