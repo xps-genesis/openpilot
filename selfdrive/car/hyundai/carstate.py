@@ -307,6 +307,7 @@ class CarState(CarStateBase):
       ("EMS16", 0),
       ("LVR12", 0),
       ("ESP11", 0),
+      ("FCA11", 0),
     ]
 
     if CP.sccBus == 0:
