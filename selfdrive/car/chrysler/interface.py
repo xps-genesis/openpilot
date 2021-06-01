@@ -38,8 +38,8 @@ class CarInterface(CarInterfaceBase):
     ret.brakeMaxV = [3.8, 3.8, 3.8]  # safety limits to stop unintended deceleration
     ret.longitudinalTuning.kfBP = [0., 5., 10., 20., 30.]
     ret.longitudinalTuning.kfV = [1., 1., 1., 1., .95]
-    ret.startAccel = .5
-    ret.minSpeedCan = 0.3
+    ret.startAccel = .75
+    ret.minSpeedCan = 0.
     ret.stoppingBrakeRate = 0.2 # brake_travel/s while trying to stop
     ret.startingBrakeRate = 2.0 # brake_travel/s while releasing on restart
     ret.stoppingControl = True

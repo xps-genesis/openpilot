@@ -216,8 +216,6 @@ class CarController():
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
 
-    #if self.decel_active:
-    #  actuators.gas = self.trq_val/CV.ACCEL_TO_NM
     apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
     accmaxBp = [20, 25, 40]
@@ -249,8 +247,8 @@ class CarController():
     else:
       self.decel_active = False
 
-    if enabled and not self.decel_active and\
-            not CS.out.brakePressed and (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel > STOP_GAS_THRESHOLD):
+    if enabled and not CS.out.brakePressed and\
+            (apply_accel >= START_GAS_THRESHOLD or self.accel_active and apply_accel > CS.axle_torq_min/CV.ACCEL_TO_NM):
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
 
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
