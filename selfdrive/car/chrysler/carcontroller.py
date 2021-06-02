@@ -227,8 +227,8 @@ class CarController():
     else:
       accmaxhyb = [ACCEL_MAX, 1., .5]
 
-    if not self.go_req and enabled and self.stop_req and CS.out.standstill:
-      self.go_req = long_starting
+    if not self.go_req and enabled and CS.out.standstill:
+      self.go_req = self.stop_req and (long_starting or CS.out.gasPressed or CS.acc_resume_button)
     else:
       self.go_req = CS.out.standstill and enabled
 
