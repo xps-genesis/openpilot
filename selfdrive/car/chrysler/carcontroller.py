@@ -59,6 +59,7 @@ class CarController():
     self.acc_counter = 0
     self.gas_timer = 0
     self.go_req = 0
+    self.decel_val_prev = 0.
 
     self.packer = CANPacker(dbc_name)
 
@@ -147,7 +148,7 @@ class CarController():
         self.op_cancel_cmd = True
       elif enabled and self.resume_press and not self.op_long_enable and ((CS.lead_dist > self.lead_dist_at_stop) or (op_lead_rvel > 0) or (15 > CS.lead_dist >= 6.)):
         button_type = 'ACC_RESUME'
-      elif self.go_req or long_starting:
+      elif self.go_req or self.stop_req:
         button_type = 'ACC_RESUME'
 
       if button_type is not None:
@@ -224,10 +225,11 @@ class CarController():
     else:
       accmaxhyb = [ACCEL_MAX, 1., .5]
 
-    if not self.go_req and enabled:
-      self.go_req = long_starting
+    if not self.go_req and enabled and self.stop_req and CS.out.standstill:
+      self.go_req = long_starting or CS.out.gasPressed or CS.acc_resume_button
     else:
       self.go_req = CS.out.standstill and enabled
+
     self.stop_req = enabled and CS.out.standstill and not CS.out.gasPressed and not self.go_req
     if self.go_req or self.stop_req:
       accmaxhyb = [.75, .75, .75]
@@ -240,16 +242,20 @@ class CarController():
     self.accel_lim = apply_accel
     apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
 
-    if enabled and not CS.out.accgasOverride and\
-            (apply_accel <= min((CS.axle_torq_min - 20.)/CV.ACCEL_TO_NM, START_BRAKE_THRESHOLD)
-             or self.decel_active and CS.out.brake > 10. or CS.hybrid_power_meter < 0.):
+    if enabled and not CS.out.gasPressed and\
+            (self.stop_req or (apply_accel <= min((CS.axle_torq_min - 20.)/CV.ACCEL_TO_NM, START_BRAKE_THRESHOLD))
+             or (self.decel_active and (CS.out.brake > 10. or CS.hybrid_power_meter < 0.))):
       self.decel_active = True
       self.decel_val = apply_accel
+      self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev)
+      self.decel_val_prev = self.decel_val
     else:
       self.decel_active = False
+      self.decel_val_prev = CS.out.aEgo
 
     if enabled and not CS.out.brakePressed and\
-            (apply_accel >= max(START_GAS_THRESHOLD, CS.axle_torq_min/CV.ACCEL_TO_NM) or self.accel_active and apply_accel > CS.axle_torq_min/CV.ACCEL_TO_NM):
+            (apply_accel >= max(START_GAS_THRESHOLD, CS.axle_torq_min/CV.ACCEL_TO_NM)
+             or self.accel_active and apply_accel > CS.axle_torq_min/CV.ACCEL_TO_NM):
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
 
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
