@@ -61,6 +61,7 @@ class CarController():
     self.go_req = False
     self.stop_req = False
     self.decel_val_prev = 0.
+    self.done = False
 
     self.packer = CANPacker(dbc_name)
 
@@ -248,11 +249,14 @@ class CarController():
              or (self.decel_active and (CS.out.brake > 10. or CS.hybrid_power_meter < 0.))):
       self.decel_active = True
       self.decel_val = apply_accel
-      self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev)
+      if self.decel_val_prev > self.decel_val and self.done:
+        self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev)
+        self.done = True
       self.decel_val_prev = self.decel_val
     else:
       self.decel_active = False
-      self.decel_val_prev = CS.out.aEgo
+      self.done = False
+      self.decel_val_prev = CS.out.aEgo if (CS.out.aEgo > 0.) else 0.
 
     if enabled and not CS.out.brakePressed and\
             (apply_accel >= max(START_GAS_THRESHOLD, CS.axle_torq_min/CV.ACCEL_TO_NM)
