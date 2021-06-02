@@ -251,12 +251,13 @@ class CarController():
       self.decel_val = apply_accel
       if self.decel_val_prev > self.decel_val and not self.done:
         self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev)
+      else:
         self.done = True
       self.decel_val_prev = self.decel_val
     else:
       self.decel_active = False
       self.done = False
-      self.decel_val_prev = CS.out.aEgo if (CS.out.aEgo > 0.) else 0.
+      self.decel_val_prev = CS.out.aEgo
 
     if enabled and not CS.out.brakePressed and\
             (apply_accel >= max(START_GAS_THRESHOLD, CS.axle_torq_min/CV.ACCEL_TO_NM)
