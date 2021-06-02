@@ -58,7 +58,8 @@ class CarController():
     self.allow_resume_button = False
     self.acc_counter = 0
     self.gas_timer = 0
-    self.go_req = 0
+    self.go_req = False    
+    self.stop_req = False
 
     self.packer = CANPacker(dbc_name)
 
