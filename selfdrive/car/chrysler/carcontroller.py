@@ -219,7 +219,7 @@ class CarController():
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
 
-    apply_accel = (actuators.gas - actuators.brake -) if enabled else 0.
+    apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
     accmaxBp = [20, 25, 40]
     if Params().get_bool('ChryslerMadGas'):
