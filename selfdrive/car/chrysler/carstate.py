@@ -57,7 +57,7 @@ class CarState(CarStateBase):
 
     ret.cruiseState.enabled = bool(cp.vl["ACC_2"]['ACC_ENABLED'])  # ACC is green.
     ret.cruiseState.available = bool(cp.vl["ACC_2"]['ACC_AVAILABLE'])
-    ret.cruiseState.speed = max(cp.vl["DASHBOARD"]['ACC_SET_SPEED_MPH'], SET_SPEED_MIN) * CV.MPH_TO_MS
+    ret.cruiseState.speed = max(cp.vl["DASHBOARD"]['ACC_SET_SPEED_MPH'] * CV.MPH_TO_MS, SET_SPEED_MIN)
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]['CRUISE_STATE'] in [1, 2]
 
