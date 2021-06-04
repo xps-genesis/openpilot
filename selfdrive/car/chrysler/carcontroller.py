@@ -219,7 +219,7 @@ class CarController():
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
 
-    apply_accel = (actuators.gas - actuators.brake - CS.hill_accel) if enabled else 0.
+    apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
     accmaxBp = [20, 25, 40]
     if Params().get_bool('ChryslerMadGas'):
@@ -250,15 +250,15 @@ class CarController():
              or (self.decel_active and not self.stop_req and (CS.out.brake > 10. or CS.hybrid_power_meter < 0.))):
       self.decel_active = True
       self.decel_val = apply_accel
-      #if self.decel_val_prev > self.decel_val and not self.done:
-      #  self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev)
-      #else:
-      #  self.done = True
-      #self.decel_val_prev = self.decel_val
+      if self.decel_val_prev > self.decel_val and not self.done:
+        self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev)
+      else:
+        self.done = True
+      self.decel_val_prev = self.decel_val
     else:
       self.decel_active = False
-      #self.done = False
-      #self.decel_val_prev = CS.out.aEgo
+      self.done = False
+      self.decel_val_prev = CS.out.aEgo
 
     if enabled and not CS.out.brakePressed and\
             (apply_accel >= max(START_GAS_THRESHOLD, CS.axle_torq_min/CV.ACCEL_TO_NM)
