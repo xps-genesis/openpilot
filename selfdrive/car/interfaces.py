@@ -184,6 +184,10 @@ class CarStateBase:
                          A=[[1.0, DT_CTRL], [0.0, 1.0]],
                          C=[1.0, 0.0],
                          K=[[0.12287673], [0.29666309]])
+    self.hill_kf = KF1D(x0=[[0.0], [0.0]],
+                         A=[[1.0, DT_CTRL], [0.0, 1.0]],
+                         C=[1.0, 0.0],
+                         K=[[0.12287673], [0.29666309]])
 
   def update_speed_kf(self, v_ego_raw):
     if abs(v_ego_raw - self.v_ego_kf.x[0][0]) > 2.0:  # Prevent large accelerations when car starts at non zero speed
@@ -191,6 +195,13 @@ class CarStateBase:
 
     v_ego_x = self.v_ego_kf.update(v_ego_raw)
     return float(v_ego_x[0]), float(v_ego_x[1])
+
+  def update_hill_kf(self, hill_raw):
+    if abs(hill_raw - self.hill_kf.x[0][0]) > 2.0:  # Prevent large accelerations when car starts at non zero speed
+      self.hill_kf.x = [[hill_raw], [0.0]]
+
+    hill_x = self.hill_kf.update(hill_raw)
+    return float(hill_x[0]), float(hill_x[1])
 
   def update_blinker(self, blinker_time: int, left_blinker_lamp: bool, right_blinker_lamp: bool):
     self.left_blinker_cnt = blinker_time if left_blinker_lamp else max(self.left_blinker_cnt - 1, 0)

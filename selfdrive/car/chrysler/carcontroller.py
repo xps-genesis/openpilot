@@ -248,7 +248,7 @@ class CarController():
             (self.stop_req or (apply_accel <= min((CS.axle_torq_min - 20.)/CV.ACCEL_TO_NM, START_BRAKE_THRESHOLD))
              or (self.decel_active and not CS.out.standstill and (CS.out.brake > 10. or CS.hybrid_power_meter < 0.))):
       self.decel_active = True
-      self.decel_val = apply_accel
+      self.decel_val = apply_accel - self.hill_accel
       if self.decel_val_prev > self.decel_val and not self.done:
         self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev)
       else:

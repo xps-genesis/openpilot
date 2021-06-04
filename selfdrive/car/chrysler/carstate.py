@@ -42,6 +42,9 @@ class CarState(CarStateBase):
     ret.vEgoRaw = cp.vl['BRAKE_1']['VEHICLE_SPEED_KPH'] * CV.KPH_TO_MS
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.standstill = bool(cp.vl['BRAKE_1']['STANDSTILL'])
+    self.long_accel = cp.vl['INERTIAL_SENSOR']['LONG_ACCEL']
+    self.hill_accel_raw = self.long_accel - ret.aEgo
+    self.hill_accel, self.hill_accel_rate = self.update_hill_kf(self.hill_accel_raw)
 
     ret.leftBlinker = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 1
     ret.rightBlinker = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 2
@@ -54,7 +57,7 @@ class CarState(CarStateBase):
 
     ret.cruiseState.enabled = bool(cp.vl["ACC_2"]['ACC_ENABLED'])  # ACC is green.
     ret.cruiseState.available = bool(cp.vl["ACC_2"]['ACC_AVAILABLE'])
-    ret.cruiseState.speed = max(cp.vl["DASHBOARD"]['ACC_SET_SPEED_KPH'], SET_SPEED_MIN) * CV.KPH_TO_MS
+    ret.cruiseState.speed = max(cp.vl["DASHBOARD"]['ACC_SET_SPEED_MPH'], SET_SPEED_MIN) * CV.MPH_TO_MS
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
     ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]['CRUISE_STATE'] in [1, 2]
 
@@ -165,6 +168,7 @@ class CarState(CarStateBase):
       ("ACC_BRAKE_FAIL", "BRAKE_2", 0),
       ("ACC_ENG_OK", "ACCEL_RELATED_120", 0),
       ("ACC_ERROR", "ACC_ERROR", 0),
+      ("LONG_ACCEL", "INERTIAL_SENSOR", 0),
     ]
 
     checks = [
