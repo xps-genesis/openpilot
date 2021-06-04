@@ -193,6 +193,7 @@ class CarState(CarStateBase):
       ("ACCEL_GAS_22F", 50),
       ("ACCEL_RELATED_120", 50),
       ("ACC_ERROR", 0),
+      ("INERTIAL_SENSOR", 50),
     ]
 
     if CP.enablehybridEcu:
