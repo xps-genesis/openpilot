@@ -135,7 +135,7 @@ class CarState(CarStateBase):
       ("ACC_ENABLED", "ACC_2", 0),
       ("ACC_AVAILABLE", "ACC_2", 0),
       ("HIGH_BEAM_FLASH", "STEERING_LEVERS", 0),
-      ("ACC_SET_SPEED_KPH", "DASHBOARD", 0),
+      ("ACC_SET_SPEED_MPH", "DASHBOARD", 0),
       ("LEAD_DIST", "DASHBOARD", 0),
       ("CRUISE_STATE", "DASHBOARD", 0),
       ("TORQUE_DRIVER", "EPS_STATUS", 0),
