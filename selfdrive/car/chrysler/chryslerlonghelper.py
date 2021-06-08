@@ -154,7 +154,7 @@ def cluster_chime(chime_val, enabled, enabled_prev, chime_timer, gap_timer):
       chime_timer = CHIME_TIME
 
   return chime_val, chime_timer, gap_timer
-
+'''
 def cal_curve_speed(self, sm, v_ego, frame):
 
   if frame % 10 == 0:
@@ -179,3 +179,4 @@ def cal_curve_speed(self, sm, v_ego, frame):
         self.curve_speed_ms = 255.
     else:
       self.curve_speed_ms = 255.
+'''
