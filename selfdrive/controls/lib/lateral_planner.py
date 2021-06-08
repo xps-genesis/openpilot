@@ -11,6 +11,7 @@ from selfdrive.config import Conversions as CV
 import cereal.messaging as messaging
 from cereal import log
 from common.op_params import opParams
+from common.params import Params
 
 LaneChangeState = log.LateralPlan.LaneChangeState
 LaneChangeDirection = log.LateralPlan.LaneChangeDirection
