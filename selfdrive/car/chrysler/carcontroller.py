@@ -151,7 +151,7 @@ class CarController():
       elif enabled and self.resume_press and not self.op_long_enable and ((CS.lead_dist > self.lead_dist_at_stop) or (op_lead_rvel > 0) or (15 > CS.lead_dist >= 6.)):
         button_type = 'ACC_RESUME'
       elif self.go_req or self.stop_req:
-        button_type = 'ACC_RESUME'
+        button_type = 'ACC_CANCEL'
 
       if button_type is not None:
         new_msg = create_wheel_buttons(self.packer, CS.wheel_button_counter + 1, button_type)
@@ -228,7 +228,7 @@ class CarController():
       accmaxhyb = [ACCEL_MAX, 1., .5]
 
     if not self.go_req and enabled and CS.out.standstill:
-      self.go_req = self.stop_req and (long_starting or CS.out.gasPressed or CS.acc_resume_button)
+      self.go_req = self.stop_req and long_starting
     else:
       self.go_req = CS.out.standstill and enabled
 

@@ -63,11 +63,12 @@ class opParams:
     VT = ValueTypes()
     self.fork_params = {
                         'slow_in_turns': Param(True, bool, 'Slow while in turns'),
-                        'slow_in_turns_ratio': Param(1, VT.number, 'Adjust how much slowing occurs. (1.25 = 25% faster in turns than the default)'),
-                        'slow_in_turns_rotate': Param(1, VT.number, 'This adjusts how much amount the vehicle slows as the curve increases'),
-                        'nonudgeLCA': Param(True, bool, 'Toggle to enable no nudge lane change'),
+                        'slow_in_turns_ratio': Param(.85, VT.number, 'Adjust how much slowing occurs. (1.25 = 25% faster in turns than the default)'),
+                        'slow_in_turns_rotate': Param(2., VT.number, 'This adjusts how much amount the vehicle slows as the curve increases'),
+                        'nonudgeLCA': Param(False, bool, 'Toggle to enable no nudge lane change'),
                         'nonudgeLCAspeed': Param(35, int, 'speed-mph above which no nudge lca is allowed'),
-                        'brakereleaseAutoResume': Param(False, bool, 'Toggle to enable auto resume ACC on brake release')
+                        'brakereleaseAutoResume': Param(False, bool, 'Toggle to enable auto resume ACC on brake release'),
+                        'not_visible_to_dm_cam': Param(False, bool, 'Toggle on if you are not visible to dm cam due to placement')
                         }
 
 

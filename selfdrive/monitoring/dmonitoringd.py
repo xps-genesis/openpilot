@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from cereal import car
+from common import op_params
 from common.params import Params
 import cereal.messaging as messaging
 from selfdrive.controls.lib.events import Events
@@ -38,7 +39,7 @@ def dmonitoringd_thread(sm=None, pm=None):
                         v_cruise != v_cruise_last or \
                         sm['carState'].steeringPressed or \
                         sm['carState'].gasPressed or \
-                        1 == 1
+                        op_params.get('not_visible_to_dm_cam')
       if driver_engaged:
         driver_status.update(Events(), True, sm['controlsState'].enabled, sm['carState'].standstill)
       v_cruise_last = v_cruise
