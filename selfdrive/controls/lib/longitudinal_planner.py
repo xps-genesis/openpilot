@@ -234,9 +234,7 @@ class Planner():
     v_ego = sm['carState'].vEgo
     a_y_max = 2.975 - v_ego * 0.0375  # ~1.85 @ 75mph, ~2.6 @ 25mph
 
-    # drop off
-    drop_off = self.op_params.get('slow_in_turns_rotate')
-    if drop_off != 2 and a_y_max > 0:
+    if a_y_max > 0:
       a_y_max = np.sqrt(a_y_max) ** a_y_max
 
     v_curvature = np.sqrt(a_y_max / np.clip(curv, 1e-4, None))
