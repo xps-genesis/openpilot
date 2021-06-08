@@ -261,7 +261,7 @@ class CarController():
       self.done = False
       self.decel_val_prev = CS.out.aEgo
 
-    if enabled and not CS.out.brakePressed and (not self.decel_active or self.go_req) and\
+    if enabled and not CS.out.brakePressed and\
             (apply_accel >= max(START_GAS_THRESHOLD, CS.axle_torq_min/CV.ACCEL_TO_NM)
              or self.accel_active and apply_accel > CS.axle_torq_min/CV.ACCEL_TO_NM):
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
