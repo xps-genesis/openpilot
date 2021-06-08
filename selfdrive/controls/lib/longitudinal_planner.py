@@ -124,6 +124,14 @@ class Planner():
     v_cruise_kph = min(v_cruise_kph, V_CRUISE_MAX)
     v_cruise_setpoint = v_cruise_kph * CV.KPH_TO_MS
 
+    if self.op_params.get('slow_in_turns'):
+      curvs = list(lateral_planner.mpc_solution.curvature)
+      if len(curvs):
+        # find the largest curvature in the solution and use that.
+        curv = max(abs(min(curvs)), abs(max(curvs)))
+        if curv != 0:
+          v_cruise_setpoint = float(min(v_cruise_setpoint, self.limit_speed_in_curv(sm, curv)))
+
     lead_1 = sm['radarState'].leadOne
     lead_2 = sm['radarState'].leadTwo
 
@@ -191,15 +199,6 @@ class Planner():
     v_acc_sol = self.v_acc_start + CP.radarTimeStep * (a_acc_sol + self.a_acc_start) / 2.0
     self.v_acc_next = v_acc_sol
     self.a_acc_next = a_acc_sol
-
-    if self.op_params.get('slow_in_turns'):
-      curvs = list(lateral_planner.mpc_solution.curvature)
-      if len(curvs):
-        # find the largest curvature in the solution and use that.
-        curv = max(abs(min(curvs)), abs(max(curvs)))
-        if curv != 0:
-          self.v_acc = float(min(self.v_acc, self.limit_speed_in_curv(sm, curv)))
-          self.v_acc_future = float(min(self.v_acc_future, self.limit_speed_in_curv(sm, curv)))
 
     self.first_loop = False
 

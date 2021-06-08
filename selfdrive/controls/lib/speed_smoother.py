@@ -20,7 +20,7 @@ def speed_smoother(vEgo, aEgo, vT, aMax, aMin, jMax, jMin, ts):
   jmaxBp = [0., 15., 30.]
   jmaxV = [3., 2., 1.]
   jminBp = [0., 15., 30.]
-  jminV = [3., 2., 1.]
+  jminV = [1., 1., 1.]
 
   jmaxtbl = interp(vEgo, jmaxBp, jmaxV)
   jmintbl = interp(vEgo, jminBp, jminV)
