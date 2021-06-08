@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from cereal import car
-from common import op_params
+from common.op_params import opParams
 from common.params import Params
 import cereal.messaging as messaging
 from selfdrive.controls.lib.events import Events
