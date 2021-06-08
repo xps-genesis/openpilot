@@ -7,7 +7,7 @@ hyundai_checksum = crcmod.mkCrcFun(0x11D, initCrc=0xFD, rev=False, xorOut=0xdf)
 
 
 def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
-                  lkas11, sys_warning, sys_state, enabled,
+                  steer_wind_down, lkas11, sys_warning, sys_state, enabled,
                   left_lane, right_lane,
                   left_lane_depart, right_lane_depart, lfa_available, bus):
   values = lkas11
@@ -17,7 +17,7 @@ def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
   values["CF_Lkas_LdwsRHWarning"] = right_lane_depart
   values["CR_Lkas_StrToqReq"] = apply_steer
   values["CF_Lkas_ActToi"] = steer_req
-  values["CF_Lkas_ToiFlt"] = 0
+  values["CF_Lkas_ToiFlt"] = steer_wind_down
   values["CF_Lkas_MsgCount"] = frame % 0x10
   values["CF_Lkas_Chksum"] = 0
 

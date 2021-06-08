@@ -98,6 +98,7 @@ class CarController():
     self.sendaccmode = not CP.radarDisablePossible
     self.enabled = False
     self.sm = messaging.SubMaster(['controlsState'])
+    self.steer_wind_down = False
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert,
              left_lane, right_lane, left_lane_depart, right_lane_depart,
@@ -150,6 +151,11 @@ class CarController():
         self.gapsettingdance = 2
         self.gapcount = 0
 
+    if apply_steer != 0 or CS.out.steeringPressed:
+      self.steer_wind_down = False
+    elif self.apply_steer_last != 0 and apply_steer == 0:
+      self.steer_wind_down = True
+
     self.apply_steer_last = apply_steer
 
     sys_warning, sys_state, left_lane_warning, right_lane_warning =\
@@ -174,7 +180,7 @@ class CarController():
     self.lfa_available = True if self.lfainFingerprint or self.car_fingerprint in FEATURES["send_lfa_mfa"] else False
 
     can_sends.append(create_lkas11(self.packer, frame, self.car_fingerprint, apply_steer, lkas_active,
-                                   CS.lkas11, sys_warning, sys_state, enabled,
+                                   self.steer_wind_down, CS.lkas11, sys_warning, sys_state, enabled,
                                    left_lane, right_lane,
                                    left_lane_warning, right_lane_warning, self.lfa_available, 0))
 
