@@ -21,6 +21,7 @@ public:
   explicit DevicePanel(QWidget* parent = nullptr);
 signals:
   void reviewTrainingGuide();
+  void showDriverView();
 };
 
 class TogglesPanel : public QWidget {
@@ -29,10 +30,10 @@ public:
   explicit TogglesPanel(QWidget *parent = nullptr);
 };
 
-class DeveloperPanel : public QFrame {
+class SoftwarePanel : public QFrame {
   Q_OBJECT
 public:
-  explicit DeveloperPanel(QWidget* parent = nullptr);
+  explicit SoftwarePanel(QWidget* parent = nullptr);
 
 protected:
   void showEvent(QShowEvent *event) override;
@@ -41,6 +42,7 @@ private:
   QList<LabelControl *> labels;
   LabelControl *versionLbl;
   LabelControl *lastUpdateTimeLbl;
+  ButtonControl *updateButton;
   void updateLabels();
 
   QFileSystemWatcher *fs_watch;
@@ -50,7 +52,7 @@ class SettingsWindow : public QFrame {
   Q_OBJECT
 
 public:
-  explicit SettingsWindow(QWidget *parent = 0) : QFrame(parent) {};
+  explicit SettingsWindow(QWidget *parent = 0);
 
 protected:
   void hideEvent(QHideEvent *event) override;
@@ -60,6 +62,7 @@ signals:
   void closeSettings();
   void offroadTransition(bool offroad);
   void reviewTrainingGuide();
+  void showDriverView();
 
 private:
   QPushButton *sidebar_alert_widget;

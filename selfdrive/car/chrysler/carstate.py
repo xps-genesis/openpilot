@@ -11,8 +11,8 @@ from common.params import Params
 class CarState(CarStateBase):
   def __init__(self, CP):
     super().__init__(CP)
-    can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
-    self.shifter_values = can_define.dv["GEAR"]['PRNDL']
+    can_define = CANDefine(DBC[CP.carFingerprint]["pt"])
+    self.shifter_values = can_define.dv["GEAR"]["PRNDL"]
     self.acc_on_button = False
     self.veh_on_timer = 0
     self.axle_torq = 0
@@ -21,72 +21,72 @@ class CarState(CarStateBase):
 
     ret = car.CarState.new_message()
 
-    ret.doorOpen = any([cp.vl["DOORS"]['DOOR_OPEN_FL'],
-                        cp.vl["DOORS"]['DOOR_OPEN_FR'],
-                        cp.vl["DOORS"]['DOOR_OPEN_RL'],
-                        cp.vl["DOORS"]['DOOR_OPEN_RR']])
-    ret.seatbeltUnlatched = cp.vl["SEATBELT_STATUS"]['SEATBELT_DRIVER_UNLATCHED'] == 1
+    ret.doorOpen = any([cp.vl["DOORS"]["DOOR_OPEN_FL"],
+                        cp.vl["DOORS"]["DOOR_OPEN_FR"],
+                        cp.vl["DOORS"]["DOOR_OPEN_RL"],
+                        cp.vl["DOORS"]["DOOR_OPEN_RR"]])
+    ret.seatbeltUnlatched = cp.vl["SEATBELT_STATUS"]["SEATBELT_DRIVER_UNLATCHED"] == 1
 
-    ret.brakePressed = cp.vl["BRAKE_2"]['BRAKE_PEDAL'] == 1  # driver-only
-    ret.brake = cp.vl["BRAKE_1"]['BRAKE_VAL_TOTAL']
-    ret.brakeLights = bool(cp.vl["BRAKE_2"]['BRAKE_LIGHT'])
-    ret.gas = cp.vl["ACCEL_GAS_22F"]['GAS_PEDAL_POS']
+    ret.brakePressed = cp.vl["BRAKE_2"]["BRAKE_PEDAL"] == 1  # driver-only
+    ret.brake = cp.vl["BRAKE_1"]["BRAKE_VAL_TOTAL"]
+    ret.brakeLights = bool(cp.vl["BRAKE_2"]["BRAKE_LIGHT"])
+    ret.gas = cp.vl["ACCEL_GAS_22F"]["GAS_PEDAL_POS"]
     ret.gasPressed = ret.gas > 1e-5
 
-    ret.espDisabled = (cp.vl["TRACTION_BUTTON"]['TRACTION_OFF'] == 1)
+    ret.espDisabled = (cp.vl["TRACTION_BUTTON"]["TRACTION_OFF"] == 1)
 
-    ret.wheelSpeeds.fl = cp.vl['WHEEL_SPEEDS']['WHEEL_SPEED_FL']
-    ret.wheelSpeeds.rr = cp.vl['WHEEL_SPEEDS']['WHEEL_SPEED_RR']
-    ret.wheelSpeeds.rl = cp.vl['WHEEL_SPEEDS']['WHEEL_SPEED_RL']
-    ret.wheelSpeeds.fr = cp.vl['WHEEL_SPEEDS']['WHEEL_SPEED_FR']
-    ret.vEgoRaw = cp.vl['BRAKE_1']['VEHICLE_SPEED_KPH'] * CV.KPH_TO_MS
+    ret.wheelSpeeds.fl = cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"]
+    ret.wheelSpeeds.rr = cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_RR"]
+    ret.wheelSpeeds.rl = cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_RL"]
+    ret.wheelSpeeds.fr = cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FR"]
+    ret.vEgoRaw = cp.vl["BRAKE_1"]["VEHICLE_SPEED_KPH"] * CV.KPH_TO_MS
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
-    ret.standstill = bool(cp.vl['BRAKE_1']['STANDSTILL'])
-    self.long_accel = cp.vl['INERTIAL_SENSOR']['LONG_ACCEL']
+    ret.standstill = bool(cp.vl["BRAKE_1"]["STANDSTILL"])
+    self.long_accel = cp.vl["INERTIAL_SENSOR"]["LONG_ACCEL"]
     self.hill_accel_raw = self.long_accel - ret.aEgo
     self.hill_accel, self.hill_accel_rate = self.update_hill_kf(self.hill_accel_raw)
 
-    ret.leftBlinker = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 1
-    ret.rightBlinker = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 2
-    ret.steeringAngleDeg = cp.vl["STEERING"]['STEER_ANGLE']
-    ret.steeringRateDeg = cp.vl["STEERING"]['STEERING_RATE']
-    ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(cp.vl['GEAR']['PRNDL'], None))
+    ret.leftBlinker = cp.vl["STEERING_LEVERS"]["TURN_SIGNALS"] == 1
+    ret.rightBlinker = cp.vl["STEERING_LEVERS"]["TURN_SIGNALS"] == 2
+    ret.steeringAngleDeg = cp.vl["STEERING"]["STEER_ANGLE"]
+    ret.steeringRateDeg = cp.vl["STEERING"]["STEERING_RATE"]
+    ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(cp.vl["GEAR"]["PRNDL"], None))
 
     self.acc_on_button_prev = self.acc_on_button
-    self.acc_on_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_BUTTON_ON'])
+    self.acc_on_button = bool(cp.vl["WHEEL_BUTTONS"]["ACC_BUTTON_ON"])
 
-    ret.cruiseState.enabled = bool(cp.vl["ACC_2"]['ACC_ENABLED'])  # ACC is green.
-    ret.cruiseState.available = bool(cp.vl["ACC_2"]['ACC_AVAILABLE'])
-    ret.cruiseState.speed = max(cp.vl["DASHBOARD"]['ACC_SET_SPEED_MPH'] * CV.MPH_TO_MS, SET_SPEED_MIN)
+    ret.cruiseState.enabled = bool(cp.vl["ACC_2"]["ACC_ENABLED"])  # ACC is green.
+    ret.cruiseState.available = bool(cp.vl["ACC_2"]["ACC_AVAILABLE"])
+    ret.cruiseState.speed = max(cp.vl["DASHBOARD"]["ACC_SET_SPEED_MPH"] * CV.MPH_TO_MS, SET_SPEED_MIN)
     # CRUISE_STATE is a three bit msg, 0 is off, 1 and 2 are Non-ACC mode, 3 and 4 are ACC mode, find if there are other states too
-    ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]['CRUISE_STATE'] in [1, 2]
+    ret.cruiseState.nonAdaptive = cp.vl["DASHBOARD"]["CRUISE_STATE"] in [1, 2]
 
     ret.steeringTorque = cp.vl["EPS_STATUS"]["TORQUE_DRIVER"]/4
-    ret.steeringTorqueEps = cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]/4 if Params().get_bool('ChryslerMangoLat') else cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]
+    ret.steeringTorqueEps = cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]/4 if Params().get_bool("ChryslerMangoLat") else cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD/4
     self.steerError = cp.vl["EPS_STATUS"]["LKAS_STEER_FAULT"] == 4
     self.apaFault = cp.vl["EPS_STATUS"]["APA_STEER_FAULT"] == 1
     self.apasteerOn = cp.vl["EPS_STATUS"]["APA_ACTIVE"] == 1
 
-    ret.genericToggle = bool(cp.vl["STEERING_LEVERS"]['HIGH_BEAM_FLASH'])
-    
-    if self.CP.enableBsm:
-      ret.leftBlindspot = cp.vl["BLIND_SPOT_WARNINGS"]['BLIND_SPOT_LEFT'] == 1
-      ret.rightBlindspot = cp.vl["BLIND_SPOT_WARNINGS"]['BLIND_SPOT_RIGHT'] == 1
+    ret.genericToggle = bool(cp.vl["STEERING_LEVERS"]["HIGH_BEAM_FLASH"])
 
-    self.lkas_counter = cp_cam.vl["LKAS_COMMAND"]['COUNTER']
-    self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]['LKAS_BUTTON_LED']
-    self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]['APA_STEER_ACT'] == 1
+    if self.CP.enableBsm:
+      ret.leftBlindspot = cp.vl["BLIND_SPOT_WARNINGS"]["BLIND_SPOT_LEFT"] == 1
+      ret.rightBlindspot = cp.vl["BLIND_SPOT_WARNINGS"]["BLIND_SPOT_RIGHT"] == 1
+
+    self.lkas_counter = cp_cam.vl["LKAS_COMMAND"]["COUNTER"]
+    self.lkas_status_ok = cp_cam.vl["LKAS_HEARTBIT"]["LKAS_BUTTON_LED"]
+    self.apa_steer_status = cp.vl["AUTO_PARK_REQUEST"]["APA_STEER_ACT"] == 1
     if self.CP.enablehybridEcu:
-       if cp.vl["HYBRID_ECU"]['VEH_ON'] == 1:
+       if cp.vl["HYBRID_ECU"]["VEH_ON"] == 1:
          self.veh_on_timer += 1
        else:
          self.veh_on_timer = 0
        self.veh_on = self.veh_on_timer >= 50
-       self.axle_torq = cp.vl["AXLE_TORQ"]['AXLE_TORQ']
-       self.axle_torq_max = cp.vl["AXLE_TORQ"]['AXLE_TORQ_MAX']
-       self.axle_torq_min = cp.vl["AXLE_TORQ"]['AXLE_TORQ_MIN']
-       self.hybrid_power_meter = cp.vl["HEV_HMI"]['ELEC_MODE_PERCENT']
+       self.axle_torq = cp.vl["AXLE_TORQ"]["AXLE_TORQ"]
+       self.axle_torq_max = cp.vl["AXLE_TORQ"]["AXLE_TORQ_MAX"]
+       self.axle_torq_min = cp.vl["AXLE_TORQ"]["AXLE_TORQ_MIN"]
+       self.hybrid_power_meter = cp.vl["HEV_HMI"]["ELEC_MODE_PERCENT"]
     else:
       self.veh_on_timer += 1
       self.veh_on = self.veh_on_timer >= 200
@@ -94,23 +94,23 @@ class CarState(CarStateBase):
       self.axle_torq_max = 300.
       self.hybrid_power_meter = 1
 
-    self.acc_hold = bool(cp.vl["ACC_2"]['ACC_STOP'])
-    self.lead_dist = cp.vl["DASHBOARD"]['LEAD_DIST']
-    self.wheel_button_counter = cp.vl["WHEEL_BUTTONS"]['COUNTER']
+    self.acc_hold = bool(cp.vl["ACC_2"]["ACC_STOP"])
+    self.lead_dist = cp.vl["DASHBOARD"]["LEAD_DIST"]
+    self.wheel_button_counter = cp.vl["WHEEL_BUTTONS"]["COUNTER"]
 
-    self.acc_cancel_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_CANCEL'])
-    self.acc_resume_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_RESUME'])
-    self.acc_setplus_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_INC'])
-    self.acc_setminus_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_SPEED_DEC'])
-    self.acc_followdec_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_DEC'])
-    self.acc_followinc_button = bool(cp.vl["WHEEL_BUTTONS"]['ACC_FOLLOW_INC'])
+    self.acc_cancel_button = bool(cp.vl["WHEEL_BUTTONS"]["ACC_CANCEL"])
+    self.acc_resume_button = bool(cp.vl["WHEEL_BUTTONS"]["ACC_RESUME"])
+    self.acc_setplus_button = bool(cp.vl["WHEEL_BUTTONS"]["ACC_SPEED_INC"])
+    self.acc_setminus_button = bool(cp.vl["WHEEL_BUTTONS"]["ACC_SPEED_DEC"])
+    self.acc_followdec_button = bool(cp.vl["WHEEL_BUTTONS"]["ACC_FOLLOW_DEC"])
+    self.acc_followinc_button = bool(cp.vl["WHEEL_BUTTONS"]["ACC_FOLLOW_INC"])
 
     self.acc_button_pressed = self.acc_cancel_button or self.acc_resume_button or self.acc_setplus_button or \
                               self.acc_setminus_button or self.acc_followdec_button or self.acc_followinc_button
 
-    ret.accgasOverride = bool(cp.vl["ACCEL_RELATED_120"]['ACC_OVERRIDE'])
-    self.accbrakeFaulted = ((cp.vl["BRAKE_2"]['ACC_BRAKE_FAIL']) > 0) or ((cp.vl["ACC_ERROR"]['ACC_ERROR']) > 0)
-    self.accengFaulted = (cp.vl["ACCEL_RELATED_120"]['ACC_ENG_OK']) == 0
+    ret.accgasOverride = bool(cp.vl["ACCEL_RELATED_120"]["ACC_OVERRIDE"])
+    self.accbrakeFaulted = ((cp.vl["BRAKE_2"]["ACC_BRAKE_FAIL"]) > 0) or ((cp.vl["ACC_ERROR"]["ACC_ERROR"]) > 0)
+    self.accengFaulted = (cp.vl["ACCEL_RELATED_120"]["ACC_ENG_OK"]) == 0
 
     return ret
 
@@ -217,7 +217,7 @@ class CarState(CarStateBase):
       ]
       checks += [("BLIND_SPOT_WARNINGS", 2)]
 
-    return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
+    return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 0)
 
   @staticmethod
   def get_cam_can_parser(CP):
@@ -232,4 +232,4 @@ class CarState(CarStateBase):
       ("LKAS_HUD", 4),
     ]
 
-    return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)
+    return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 2)

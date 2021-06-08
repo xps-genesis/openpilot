@@ -16,8 +16,8 @@ ACCEL_SCALE = 1.
 DEFAULT_DECEL = 4.0 # m/s2
 START_BRAKE_THRESHOLD = -0.00001 # m/s2
 STOP_BRAKE_THRESHOLD = 0. # m/s2
-START_GAS_THRESHOLD = 0.25 # m/s2
-STOP_GAS_THRESHOLD = -0.25 # m/s2
+START_GAS_THRESHOLD = 0.00001 # m/s2
+STOP_GAS_THRESHOLD = 0.0 # m/s2
 
 CHIME_TIME = 8
 CHIME_GAP_TIME = 5
@@ -29,6 +29,12 @@ def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, r
 
     if not acc_enabled and acc_enabled_prev:
       ressetspeed = set_speed
+
+    if not gas or (gas_timer > 200 and setminus):
+      gas_set = False
+      gas_timer = 0
+    elif gas_set:
+      gas_timer += 1
 
     if acc_enabled_prev and acc_enabled:
       if setplus:
@@ -72,12 +78,6 @@ def setspeedlogic(set_speed, acc_enabled, acc_enabled_prev, setplus, setminus, r
       short_press = False
       timer = 0
 
-    if not gas or gas_timer > 200:
-      gas_set = False
-      gas_timer = 0
-    elif gas_set:
-      gas_timer += 1
-
     set_speed = set_speed * CV.MPH_TO_MS
     set_speed = clip(set_speed, SET_SPEED_MIN, SET_SPEED_MAX)
 
@@ -116,8 +116,8 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
  # acceleration jerk = 2.0 m/s/s/s
  # brake jerk = 3.8 m/s/s/s
 
-  drBp = [   0., -0.15, -0.50,  -1.0, -1.5, -5.0]
-  dra = [ 0.005, 0.007,  0.008, 0.010, 0.02, 0.04]
+  drBp = [   0., -0.15, -0.50,  -1.0,  -5.0]
+  dra = [ 0.005, 0.007,  0.008, 0.01,  0.04]
 
   decel_rate = interp(accel_lim, drBp, dra)
 
