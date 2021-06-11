@@ -39,6 +39,7 @@ def manager_init():
     ("ChryslerMangoLong", "1"),
     ("ChryslerMadGas", "1"),
     ("DisableUpdates", "0"),
+    ("UploadRaw", "1"),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))
