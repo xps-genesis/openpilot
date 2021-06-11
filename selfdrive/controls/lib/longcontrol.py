@@ -120,9 +120,9 @@ class LongControl():
 
     # Intention is to move again, release brake fast before handing control to PID
     elif self.long_control_state == LongCtrlState.starting:
-      if output_gb < -0.5:
-        output_gb = -0.5
-      if output_gb < -0.2:
+      if output_gb < -BRAKE_THRESHOLD_TO_PID:
+        output_gb = -BRAKE_THRESHOLD_TO_PID
+      if output_gb < -BRAKE_THRESHOLD_TO_PID:
         output_gb += CP.startingBrakeRate / RATE
       self.reset(CS.vEgo)
 
