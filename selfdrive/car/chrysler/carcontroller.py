@@ -218,7 +218,6 @@ class CarController():
     self.accel_lim_prev = self.accel_lim
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
-    v_error = self.set_speed - CS.out.vEgo
 
     apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
@@ -248,9 +247,10 @@ class CarController():
     apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, CS.out.standstill)
 
     if enabled and not CS.out.gasPressed and not self.go_req and\
-            (self.stop_req or (apply_accel <= min((CS.axle_torq_min - 20.)/CV.ACCEL_TO_NM, START_BRAKE_THRESHOLD))
-             or (self.decel_active and not self.stop_req and ((CS.out.brake > 10.) or (CS.hybrid_power_meter < 0.)) and\
-                 (apply_accel < max((CS.axle_torq_min)/CV.ACCEL_TO_NM, STOP_BRAKE_THRESHOLD)))):
+            (self.stop_req
+             or (apply_accel <= min(CS.axle_torq_min/CV.ACCEL_TO_NM, START_BRAKE_THRESHOLD))
+             or (self.decel_active and ((CS.out.brake > 10.) or (CS.hybrid_power_meter < 0.)) and
+                 (apply_accel < max((CS.axle_torq_min + 20.)/CV.ACCEL_TO_NM, STOP_BRAKE_THRESHOLD)))):
       self.decel_active = True
       self.decel_val = apply_accel
       if self.decel_val_prev > self.decel_val and not self.done:
@@ -264,9 +264,9 @@ class CarController():
       self.done = False
       self.decel_val_prev = CS.out.aEgo
 
-    if enabled and not CS.out.brakePressed and (not CS.out.standstill or not self.decel_active or self.go_req) and\
-            (apply_accel >= max(START_GAS_THRESHOLD, CS.axle_torq_min/CV.ACCEL_TO_NM)
-             or self.accel_active and not self.decel_active and apply_accel > CS.axle_torq_min/CV.ACCEL_TO_NM):
+    if enabled and not CS.out.brakePressed and not (CS.out.standstill and (self.stop_req or self.decel_active)) and\
+            (apply_accel >= max(START_GAS_THRESHOLD, (CS.axle_torq_min + 20.)/CV.ACCEL_TO_NM)
+             or self.accel_active and not self.decel_active and apply_accel > (CS.axle_torq_min - 20.)/CV.ACCEL_TO_NM):
       self.trq_val = apply_accel * CV.ACCEL_TO_NM
 
       if CS.axle_torq_max > self.trq_val > CS.axle_torq_min:
