@@ -218,6 +218,7 @@ class CarController():
     self.accel_lim_prev = self.accel_lim
     self.decel_val = DEFAULT_DECEL
     self.trq_val = CS.axle_torq_min
+    v_error = self.set_speed - CS.out.vEgo
 
     apply_accel = (actuators.gas - actuators.brake) if enabled else 0.
 
@@ -235,7 +236,7 @@ class CarController():
     self.stop_req = enabled and CS.out.standstill and not CS.out.gasPressed and not self.go_req
     if self.go_req or self.stop_req:
       start_accel_max = max(0, CS.hill_accel) * CV.ACCEL_TO_NM
-      start_accel_max = max(start_accel_max, CS.axle_torq_min/CV.ACCEL_TO_NM)
+      start_accel_max = max(start_accel_max, (CS.axle_torq_min + 50)/CV.ACCEL_TO_NM)
       accmaxhyb = [start_accel_max, start_accel_max, start_accel_max]
 
     apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady)
@@ -244,17 +245,19 @@ class CarController():
     apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, accel_max_tbl)
 
     self.accel_lim = apply_accel
-    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
+    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, CS.out.standstill)
 
-    if enabled and not CS.out.gasPressed and\
+    if enabled and not CS.out.gasPressed and not self.go_req and\
             (self.stop_req or (apply_accel <= min((CS.axle_torq_min - 20.)/CV.ACCEL_TO_NM, START_BRAKE_THRESHOLD))
-             or (self.decel_active and not self.stop_req and ((CS.out.brake > 10. and CS.out.vEgo > 1.) or CS.hybrid_power_meter < 0.))):
+             or (self.decel_active and not self.stop_req and ((CS.out.brake > 10.) or (CS.hybrid_power_meter < 0.)) and\
+                 (apply_accel < max((CS.axle_torq_min)/CV.ACCEL_TO_NM, STOP_BRAKE_THRESHOLD)))):
       self.decel_active = True
       self.decel_val = apply_accel
       if self.decel_val_prev > self.decel_val and not self.done:
-        self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev)
+        self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev, CS.out.standstill)
       else:
         self.done = True
+
       self.decel_val_prev = self.decel_val
     else:
       self.decel_active = False

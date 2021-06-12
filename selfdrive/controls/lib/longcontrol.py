@@ -72,7 +72,7 @@ class LongControl():
     self.pid.reset()
     self.v_pid = v_pid
 
-  def update(self, active, CS, v_target, v_target_future, a_target, CP, drel):
+  def update(self, active, CS, v_target, v_target_future, a_target, CP, drel, vrel, has_lead):
     """Update longitudinal control. This updates the state machine and runs a PID loop"""
     # Actuation limits
     gas_max = interp(CS.vEgo, CP.gasMaxBP, CP.gasMaxV)
@@ -100,6 +100,10 @@ class LongControl():
       # Freeze the integrator so we don't accelerate to compensate, and don't allow positive acceleration
       prevent_overshoot = not CP.stoppingControl and CS.vEgo < 1.5 and v_target_future < 0.7
       deadzone = interp(v_ego_pid, CP.longitudinalTuning.deadzoneBP, CP.longitudinalTuning.deadzoneV)
+
+      if has_lead and CS.vEgo > 16. and (-CS.vEgo * 1.025 <= vrel < -CS.vEgo * 0.9) and a_target > -0.2:
+        a_target = -0.1
+        self.v_pid = v_ego_pid - .5
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot, reset=False)
 

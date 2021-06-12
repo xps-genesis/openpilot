@@ -15,7 +15,7 @@ ACCEL_SCALE = 1.
 
 DEFAULT_DECEL = 4.0 # m/s2
 START_BRAKE_THRESHOLD = -0.00001 # m/s2
-STOP_BRAKE_THRESHOLD = 0. # m/s2
+STOP_BRAKE_THRESHOLD = 0.1 # m/s2
 START_GAS_THRESHOLD = 0.00001 # m/s2
 STOP_GAS_THRESHOLD = 0.0 # m/s2
 
@@ -112,7 +112,7 @@ def accel_hysteresis(accel, accel_steady):
 
   return accel, accel_steady
 
-def accel_rate_limit(accel_lim, prev_accel_lim):
+def accel_rate_limit(accel_lim, prev_accel_lim, stopped):
  # acceleration jerk = 2.0 m/s/s/s
  # brake jerk = 3.8 m/s/s/s
 
@@ -120,17 +120,19 @@ def accel_rate_limit(accel_lim, prev_accel_lim):
   dra = [ 0.005, 0.007,  0.008, 0.01,  0.04]
 
   decel_rate = interp(accel_lim, drBp, dra)
+  accel_rate = 0.005
 
-  if accel_lim > 0:
-    if accel_lim > prev_accel_lim:
-      accel_lim = min(accel_lim, prev_accel_lim + 0.005)
+  if not stopped:
+    if accel_lim > 0:
+      if accel_lim > prev_accel_lim:
+        accel_lim = min(accel_lim, prev_accel_lim + accel_rate)
+      else:
+        accel_lim = max(accel_lim, prev_accel_lim - 0.02)
     else:
-      accel_lim = max(accel_lim, prev_accel_lim - 0.02)
-  else:
-    if accel_lim < prev_accel_lim:
-      accel_lim = max(accel_lim, prev_accel_lim - decel_rate)
-    else:
-      accel_lim = min(accel_lim, prev_accel_lim + 0.005)
+      if accel_lim < prev_accel_lim:
+        accel_lim = max(accel_lim, prev_accel_lim - decel_rate)
+      else:
+        accel_lim = min(accel_lim, prev_accel_lim + accel_rate)
 
   return accel_lim
 
