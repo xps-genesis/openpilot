@@ -42,9 +42,9 @@ void params_sig_handler(int signal) {
   params_do_exit = 1;
 }
 
-int fsync_dir(const char* path){
+int fsync_dir(const char* path) {
   int fd = HANDLE_EINTR(open(path, O_RDONLY, 0755));
-  if (fd < 0){
+  if (fd < 0) {
     return -1;
   }
 
@@ -78,7 +78,7 @@ int mkdir_p(std::string path) {
   return 0;
 }
 
-bool ensure_params_path(const std::string &param_path, const std::string &key_path) {
+static bool create_params_path(const std::string &param_path, const std::string &key_path) {
   // Make sure params path exists
   if (!util::file_exists(param_path) && mkdir_p(param_path) != 0) {
     return false;
@@ -115,6 +115,12 @@ bool ensure_params_path(const std::string &param_path, const std::string &key_pa
 
   // Ensure permissions are correct in case we didn't create the symlink
   return chmod(key_path.c_str(), 0777) == 0;
+}
+
+static void ensure_params_path(const std::string &params_path) {
+  if (!create_params_path(params_path, params_path + "/d")) {
+    throw std::runtime_error(util::string_format("Failed to ensure params path, errno=%d", errno));
+  }
 }
 
 class FileLock {
@@ -186,6 +192,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"LiveParameters", PERSISTENT},
     {"MapboxToken", PERSISTENT},
     {"NavDestination", CLEAR_ON_MANAGER_START | CLEAR_ON_IGNITION_OFF},
+    {"NavSettingTime24h", PERSISTENT},
     {"OpenpilotEnabledToggle", PERSISTENT},
     {"PandaFirmware", CLEAR_ON_MANAGER_START | CLEAR_ON_PANDA_DISCONNECT},
     {"PandaFirmwareHex", CLEAR_ON_MANAGER_START | CLEAR_ON_PANDA_DISCONNECT},
@@ -217,6 +224,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"Offroad_UnofficialHardware", CLEAR_ON_MANAGER_START},
     {"Offroad_NvmeMissing", CLEAR_ON_MANAGER_START},
     {"ForcePowerDown", CLEAR_ON_MANAGER_START},
+    {"JoystickDebugMode", CLEAR_ON_MANAGER_START | CLEAR_ON_IGNITION_OFF},
     {"LkasFullRangeAvailable", PERSISTENT},
     {"ChryslerMangoLat", PERSISTENT},
     {"ChryslerMangoLong", PERSISTENT},
@@ -227,9 +235,12 @@ std::unordered_map<std::string, uint32_t> keys = {
 
 Params::Params(bool persistent_param) : Params(persistent_param ? persistent_params_path : default_params_path) {}
 
+std::once_flag default_params_path_ensured;
 Params::Params(const std::string &path) : params_path(path) {
-  if (!ensure_params_path(params_path, params_path + "/d")) {
-    throw std::runtime_error(util::string_format("Failed to ensure params path, errno=%d", errno));
+  if (path == default_params_path) {
+    std::call_once(default_params_path_ensured, ensure_params_path, path);
+  } else {
+    ensure_params_path(path);
   }
 }
 
@@ -272,7 +283,7 @@ int Params::put(const char* key, const char* value, size_t value_size) {
     // fsync parent directory
     path = params_path + "/d";
     result = fsync_dir(path.c_str());
-  } while(0);
+  } while (false);
 
   close(tmp_fd);
   remove(tmp_path.c_str());

@@ -20,8 +20,8 @@ LOG_MPC = os.environ.get('LOG_MPC', False)
 
 LANE_CHANGE_SPEED_MIN = 19 * CV.MPH_TO_MS
 LANE_CHANGE_TIME_MAX = 10.
-# this corresponds to 5deg/s and 5deg/s steering angle in a toyota corolla
-MAX_CURVATURE_RATES = [0.0001745329, 0.0001745329]
+# this corresponds to 80deg/s and 20deg/s steering angle in a toyota corolla
+MAX_CURVATURE_RATES = [0.03762194918267951, 0.003441203371932992]
 MAX_CURVATURE_RATE_SPEEDS = [0, 35]
 
 sadBP = [0., 5., 10., 22., 25., 40.]

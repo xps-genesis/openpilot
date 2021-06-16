@@ -5,9 +5,7 @@
 #include <QFrame>
 #include <QLabel>
 #include <QPushButton>
-#include <QScrollArea>
 #include <QStackedWidget>
-#include <QTimer>
 #include <QWidget>
 
 
@@ -30,21 +28,23 @@ public:
   explicit TogglesPanel(QWidget *parent = nullptr);
 };
 
-class SoftwarePanel : public QFrame {
+class SoftwarePanel : public QWidget {
   Q_OBJECT
 public:
   explicit SoftwarePanel(QWidget* parent = nullptr);
 
-protected:
-  void showEvent(QShowEvent *event) override;
-
 private:
-  QList<LabelControl *> labels;
-  LabelControl *versionLbl;
-  LabelControl *lastUpdateTimeLbl;
-  ButtonControl *updateButton;
+  void showEvent(QShowEvent *event) override;
   void updateLabels();
 
+  LabelControl *gitBranchLbl;
+  LabelControl *gitCommitLbl;
+  LabelControl *osVersionLbl;
+  LabelControl *versionLbl;
+  LabelControl *lastUpdateLbl;
+  ButtonControl *updateBtn;
+
+  Params params;
   QFileSystemWatcher *fs_watch;
 };
 

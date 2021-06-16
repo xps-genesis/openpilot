@@ -116,7 +116,7 @@ class CarController():
             not CS.veh_on or CS.apa_steer_status:
       self.steer_type = int(0)
     
-    if self.steer_type == int(0) and CS.out.gearShifter in (GearShifter.drive, GearShifter.low) and not CS.apaFault:
+    if self.steer_type == int(0) and CS.out.gearShifter in (GearShifter.drive, GearShifter.low) and not CS.apaFault and self.mango_lat_active:
       self.hightorqUnavailable = True
 
     self.apaActive = CS.apasteerOn and self.steer_type == 2

@@ -1,5 +1,7 @@
 #include "selfdrive/ui/qt/sidebar.h"
 
+#include <QMouseEvent>
+
 #include "selfdrive/ui/qt/qt_window.h"
 #include "selfdrive/common/util.h"
 #include "selfdrive/hardware/hw.h"
@@ -35,7 +37,7 @@ void Sidebar::drawMetric(QPainter &p, const QString &label, const QString &val, 
 
 Sidebar::Sidebar(QWidget *parent) : QFrame(parent) {
   home_img = QImage("../assets/images/button_home.png").scaled(180, 180, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-  settings_img = QImage("../assets/images/button_settings.png").scaled(settings_btn.width(), settings_btn.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);;
+  settings_img = QImage("../assets/images/button_settings.png").scaled(settings_btn.width(), settings_btn.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
   connect(this, &Sidebar::valueChanged, [=] { update(); });
 
@@ -55,7 +57,8 @@ void Sidebar::updateState(const UIState &s) {
 
   auto deviceState = sm["deviceState"].getDeviceState();
   setProperty("netType", network_type[deviceState.getNetworkType()]);
-  setProperty("netStrength", (int)deviceState.getNetworkStrength());
+  int strength = (int)deviceState.getNetworkStrength();
+  setProperty("netStrength", strength > 0 ? strength + 1 : 0);
 
   auto last_ping = deviceState.getLastAthenaPingTime();
   if (last_ping == 0) {
