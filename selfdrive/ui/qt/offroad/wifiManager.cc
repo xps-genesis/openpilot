@@ -75,13 +75,13 @@ WifiManager::WifiManager(QWidget* parent) : QWidget(parent) {
   }
 
   QDBusInterface nm(nm_service, adapter, device_iface, bus);
-  bus.connect(nm_service, adapter, device_iface, "StateChanged", this, SLOT(change(unsigned int, unsigned int, unsigned int)));
+  bus.connect(nm_service, adapter, device_iface, "StateChanged", this, SLOT(stateChange(unsigned int, unsigned int, unsigned int)));
+  bus.connect(nm_service, adapter, props_iface, "PropertiesChanged", this, SLOT(propertyChange(QString, QVariantMap, QStringList)));
 
   QDBusInterface device_props(nm_service, adapter, props_iface, bus);
   device_props.setTimeout(dbus_timeout);
   QDBusMessage response = device_props.call("Get", device_iface, "State");
   raw_adapter_state = get_response<uint>(response);
-  change(raw_adapter_state, 0, 0);
 
   // Set tethering ssid as "weedle" + first 4 characters of a dongle id
   tethering_ssid = "weedle";
@@ -213,7 +213,7 @@ void WifiManager::connect(const Network &n, const QString &password) {
 void WifiManager::connect(const Network &n, const QString &username, const QString &password) {
   connecting_to_network = n.ssid;
   // disconnect();
-  forgetNetwork(n.ssid); //Clear all connections that may already exist to the network we are connecting
+  forgetConnection(n.ssid); //Clear all connections that may already exist to the network we are connecting
   connect(n.ssid, username, password, n.security_type);
 }
 
@@ -283,7 +283,7 @@ bool WifiManager::isKnownNetwork(const QString &ssid) {
   return !pathFromSsid(ssid).path().isEmpty();
 }
 
-void WifiManager::forgetNetwork(const QString &ssid) {
+void WifiManager::forgetConnection(const QString &ssid) {
   QDBusObjectPath path = pathFromSsid(ssid);
   if (!path.path().isEmpty()) {
     QDBusInterface nm2(nm_service, path.path(), nm_settings_conn_iface, bus);
@@ -291,7 +291,7 @@ void WifiManager::forgetNetwork(const QString &ssid) {
   }
 }
 
-void WifiManager::request_scan() {
+void WifiManager::requestScan() {
   QDBusInterface nm(nm_service, adapter, wireless_device_iface, bus);
   nm.setTimeout(dbus_timeout);
   nm.call("RequestScan",  QVariantMap());
@@ -363,13 +363,22 @@ QString WifiManager::get_adapter() {
   return adapter_path;
 }
 
-void WifiManager::change(unsigned int new_state, unsigned int previous_state, unsigned int change_reason) {
+void WifiManager::stateChange(unsigned int new_state, unsigned int previous_state, unsigned int change_reason) {
   raw_adapter_state = new_state;
   if (new_state == state_need_auth && change_reason == reason_wrong_password) {
     emit wrongPassword(connecting_to_network);
   } else if (new_state == state_connected) {
-    emit successfulConnection(connecting_to_network);
     connecting_to_network = "";
+    refreshNetworks();
+    emit refreshSignal();
+  }
+}
+
+// https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.Device.Wireless.html
+void WifiManager::propertyChange(const QString &interface, const QVariantMap &props, const QStringList &invalidated_props) {
+  if (interface == wireless_device_iface && props.contains("LastScan")) {
+    refreshNetworks();
+    emit refreshSignal();
   }
 }
 
@@ -421,6 +430,7 @@ QVector<QPair<QString, QDBusObjectPath>> WifiManager::listConnections() {
 void WifiManager::activateWifiConnection(const QString &ssid) {
   QDBusObjectPath path = pathFromSsid(ssid);
   if (!path.path().isEmpty()) {
+    connecting_to_network = ssid;
     QString devicePath = get_adapter();
     QDBusInterface nm3(nm_service, nm_path, nm_iface, bus);
     nm3.setTimeout(dbus_timeout);
@@ -479,8 +489,6 @@ bool WifiManager::tetheringEnabled() {
 
 void WifiManager::changeTetheringPassword(const QString &newPassword) {
   tetheringPassword = newPassword;
-  if (isKnownNetwork(tethering_ssid.toUtf8())) {
-    forgetNetwork(tethering_ssid.toUtf8());
-  }
+  forgetConnection(tethering_ssid.toUtf8());
   addTetheringConnection();
 }

@@ -16,6 +16,12 @@ class CarControllerParams():
       self.STEER_LOOKUP_BP = [v * -1 for v in CP.lateralParams.torqueBP][1:][::-1] + list(CP.lateralParams.torqueBP)
       self.STEER_LOOKUP_V = [v * -1 for v in CP.lateralParams.torqueV][1:][::-1] + list(CP.lateralParams.torqueV)
 
+      self.BOSCH_ACCEL_LOOKUP_BP = [-1., 0., 0.6]
+      self.BOSCH_ACCEL_LOOKUP_V = [-3.5, 0., 2.]
+      self.BOSCH_GAS_LOOKUP_BP = [0., 0.6]
+      self.BOSCH_GAS_LOOKUP_V = [0, 2000]
+
+
 # Car button codes
 class CruiseButtons:
   RES_ACCEL = 4
@@ -1141,6 +1147,7 @@ FW_VERSIONS = {
       b'78109-T6Z-A420\x00\x00',
       b'78109-T6Z-A510\x00\x00',
       b'78109-T6Z-A710\x00\x00',
+      b'78109-T6Z-A910\x00\x00',
       b'78109-T6Z-AA10\x00\x00',
       b'78109-T6Z-C620\x00\x00',
       b'78109-TJZ-A510\x00\x00',

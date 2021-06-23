@@ -36,13 +36,16 @@ HomeWindow::HomeWindow(QWidget* parent) : QWidget(parent) {
 
   home = new OffroadHome();
   slayout->addWidget(home);
-  QObject::connect(this, &HomeWindow::openSettings, home, &OffroadHome::refresh);
 
   driver_view = new DriverViewWindow(this);
   connect(driver_view, &DriverViewWindow::done, [=] {
     showDriverView(false);
   });
   slayout->addWidget(driver_view);
+}
+
+void HomeWindow::showSidebar(bool show) {
+  sidebar->setVisible(show);
 }
 
 void HomeWindow::offroadTransition(bool offroad) {
@@ -93,16 +96,15 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
   QHBoxLayout* header_layout = new QHBoxLayout();
 
   date = new QLabel();
-  date->setStyleSheet(R"(font-size: 55px;)");
   header_layout->addWidget(date, 0, Qt::AlignHCenter | Qt::AlignLeft);
 
   alert_notification = new QPushButton();
+  alert_notification->setObjectName("alert_notification");
   alert_notification->setVisible(false);
   QObject::connect(alert_notification, &QPushButton::released, this, &OffroadHome::openAlerts);
   header_layout->addWidget(alert_notification, 0, Qt::AlignHCenter | Qt::AlignRight);
 
   QLabel* version = new QLabel(getBrandVersion());
-  version->setStyleSheet(R"(font-size: 55px;)");
   header_layout->addWidget(version, 0, Qt::AlignHCenter | Qt::AlignRight);
 
   main_layout->addLayout(header_layout);
@@ -139,11 +141,23 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
   timer->start(10 * 1000);
 
   setStyleSheet(R"(
+    * {
+     color: white;
+    }
     OffroadHome {
       background-color: black;
     }
-    * {
-     color: white;
+    #alert_notification {
+      padding: 15px;
+      padding-left: 30px;
+      padding-right: 30px;
+      border: 1px solid;
+      border-radius: 5px;
+      font-size: 40px;
+      font-weight: 500;
+    }
+    OffroadHome>QLabel {
+      font-size: 55px;
     }
   )");
 }
@@ -188,20 +202,6 @@ void OffroadHome::refresh() {
     openAlerts();
   }
   alert_notification->setVisible(true);
-
   // Red background for alerts, blue for update available
-  QString style = QString(R"(
-    padding: 15px;
-    padding-left: 30px;
-    padding-right: 30px;
-    border: 1px solid;
-    border-radius: 5px;
-    font-size: 40px;
-    font-weight: 500;
-    background-color: #E22C2C;
-  )");
-  if (alerts_widget->updateAvailable) {
-    style.replace("#E22C2C", "#364DEF");
-  }
-  alert_notification->setStyleSheet(style);
+  alert_notification->setStyleSheet(alerts_widget->updateAvailable ? "background-color: #364DEF" : "background-color: #E22C2C");
 }

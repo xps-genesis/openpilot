@@ -33,7 +33,7 @@ Networking::Networking(QWidget* parent, bool show_advanced) : QWidget(parent), s
   main_layout->addWidget(warning);
 
   QTimer* timer = new QTimer(this);
-  QObject::connect(timer, &QTimer::timeout, this, &Networking::refresh);
+  QObject::connect(timer, &QTimer::timeout, this, &Networking::requestScan);
   timer->start(5000);
   attemptInitialization();
 }
@@ -47,11 +47,13 @@ void Networking::attemptInitialization() {
   }
 
   connect(wifi, &WifiManager::wrongPassword, this, &Networking::wrongPassword);
+  connect(wifi, &WifiManager::refreshSignal, this, &Networking::refreshSlot);
 
   QWidget* wifiScreen = new QWidget(this);
   QVBoxLayout* vlayout = new QVBoxLayout(wifiScreen);
   if (show_advanced) {
     QPushButton* advancedSettings = new QPushButton("Advanced");
+    advancedSettings->setObjectName("advancedBtn");
     advancedSettings->setStyleSheet("margin-right: 30px;");
     advancedSettings->setFixedSize(350, 100);
     connect(advancedSettings, &QPushButton::released, [=]() { main_layout->setCurrentWidget(an); });
@@ -61,6 +63,7 @@ void Networking::attemptInitialization() {
   }
 
   wifiWidget = new WifiUI(this, wifi);
+  wifiWidget->setObjectName("wifiWidget");
   connect(wifiWidget, &WifiUI::connectToNetwork, this, &Networking::connectToNetwork);
   vlayout->addWidget(new ScrollView(wifiWidget, this), 1);
 
@@ -71,7 +74,7 @@ void Networking::attemptInitialization() {
   main_layout->addWidget(an);
 
   setStyleSheet(R"(
-    QPushButton {
+    #wifiWidget > QPushButton, #back_btn, #advancedBtn {
       font-size: 50px;
       margin: 0px;
       padding: 15px;
@@ -80,16 +83,17 @@ void Networking::attemptInitialization() {
       color: #dddddd;
       background-color: #444444;
     }
-    QPushButton:disabled {
+    #wifiWidget > QPushButton:disabled {
       color: #777777;
       background-color: #222222;
     }
   )");
   main_layout->setCurrentWidget(wifiScreen);
   ui_setup_complete = true;
+  wifi->requestScan();
 }
 
-void Networking::refresh() {
+void Networking::requestScan() {
   if (!this->isVisible()) {
     return;
   }
@@ -99,6 +103,10 @@ void Networking::refresh() {
       return;
     }
   }
+  wifi->requestScan();
+}
+
+void Networking::refreshSlot() {
   wifiWidget->refresh();
   an->refresh();
 }
@@ -134,6 +142,7 @@ AdvancedNetworking::AdvancedNetworking(QWidget* parent, WifiManager* wifi): QWid
 
   // Back button
   QPushButton* back = new QPushButton("Back");
+  back->setObjectName("back_btn");
   back->setFixedSize(500, 100);
   connect(back, &QPushButton::released, [=]() { emit backPress(); });
   main_layout->addWidget(back, 0, Qt::AlignLeft);
@@ -145,7 +154,8 @@ AdvancedNetworking::AdvancedNetworking(QWidget* parent, WifiManager* wifi): QWid
   main_layout->addWidget(horizontal_line(), 0);
 
   // Change tethering password
-  editPasswordButton = new ButtonControl("Tethering Password", "EDIT", "", [=]() {
+  editPasswordButton = new ButtonControl("Tethering Password", "EDIT");
+  connect(editPasswordButton, &ButtonControl::released, [=]() {
     QString pass = InputDialog::getText("Enter new tethering password", 8);
     if (pass.size()) {
       wifi->changeTetheringPassword(pass);
@@ -181,7 +191,6 @@ void AdvancedNetworking::toggleTethering(bool enable) {
   editPasswordButton->setEnabled(!enable);
 }
 
-
 // WifiUI functions
 
 WifiUI::WifiUI(QWidget *parent, WifiManager* wifi) : QWidget(parent), wifi(wifi) {
@@ -195,8 +204,6 @@ WifiUI::WifiUI(QWidget *parent, WifiManager* wifi) : QWidget(parent), wifi(wifi)
 }
 
 void WifiUI::refresh() {
-  wifi->request_scan();
-  wifi->refreshNetworks();
   clearLayout(main_layout);
 
   connectButtons = new QButtonGroup(this); // TODO check if this is a leak
@@ -205,11 +212,36 @@ void WifiUI::refresh() {
   int i = 0;
   for (Network &network : wifi->seen_networks) {
     QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->addSpacing(50);
 
     QLabel *ssid_label = new QLabel(QString::fromUtf8(network.ssid));
     ssid_label->setStyleSheet("font-size: 55px;");
     hlayout->addWidget(ssid_label, 1, Qt::AlignLeft);
+
+    if (wifi->isKnownNetwork(network.ssid) && !wifi->tetheringEnabled()) {
+      QPushButton *forgetBtn = new QPushButton();
+      QPixmap pix("../assets/offroad/icon_close.svg");
+
+      forgetBtn->setIcon(QIcon(pix));
+      forgetBtn->setIconSize(QSize(35, 35));
+      forgetBtn->setStyleSheet("QPushButton { background-color: #E22C2C; }");
+      forgetBtn->setFixedSize(100, 90);
+
+      QObject::connect(forgetBtn, &QPushButton::released, [=]() {
+        if (ConfirmationDialog::confirm("Are you sure you want to forget " + QString::fromUtf8(network.ssid) + "?", this)) {
+          wifi->forgetConnection(network.ssid);
+        }
+      });
+
+      hlayout->addWidget(forgetBtn, 0, Qt::AlignRight);
+    } else if (network.security_type == SecurityType::WPA) {
+      QLabel *lockIcon = new QLabel();
+      QPixmap pix("../assets/offroad/icon_lock_closed.svg");
+      lockIcon->setPixmap(pix.scaledToWidth(35, Qt::SmoothTransformation));
+      lockIcon->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+      lockIcon->setStyleSheet("QLabel { margin: 0px; padding-left: 15px; padding-right: 15px; }");
+
+      hlayout->addWidget(lockIcon, 0, Qt::AlignRight);
+    }
 
     // strength indicator
     unsigned int strength_scale = network.strength / 17;
