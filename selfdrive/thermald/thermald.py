@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import datetime
+import json
 import os
+import subprocess
 import time
 from pathlib import Path
 from typing import Dict, Optional, Tuple
@@ -10,6 +12,7 @@ from smbus2 import SMBus
 
 import cereal.messaging as messaging
 from cereal import log
+from common.basedir import BASEDIR
 from common.filter_simple import FirstOrderFilter
 from common.numpy_fast import clip, interp
 from common.params import Params, ParamKeyType
@@ -189,6 +192,15 @@ def thermald_thread():
           pass
     cloudlog.event("CPR", data=cpr_data)
 
+    # modem logging
+    try:
+      binpath = os.path.join(BASEDIR, "selfdrive/hardware/eon/rat")
+      out = subprocess.check_output([binpath], encoding='utf8').strip()
+      dat = json.loads(out.splitlines()[1])
+      cloudlog.event("NV data", data=dat)
+    except Exception:
+      pass
+
   while 1:
     pandaState = messaging.recv_sock(pandaState_sock, wait=True)
     msg = read_thermal(thermal_config)
@@ -243,10 +255,8 @@ def thermald_thread():
           registered_count = 0
 
         if registered_count > 10:
-          cloudlog.warning(f"Modem stuck in registered state {network_info}")
-
-          os.system("nmcli radio wwan off")
-          os.system("nmcli radio wwan on")
+          cloudlog.warning(f"Modem stuck in registered state {network_info}. nmcli conn up lte")
+          os.system("nmcli conn up lte")
           registered_count = 0
 
       except Exception:
@@ -255,6 +265,7 @@ def thermald_thread():
     msg.deviceState.freeSpacePercent = get_available_percent(default=100.0)
     msg.deviceState.memoryUsagePercent = int(round(psutil.virtual_memory().percent))
     msg.deviceState.cpuUsagePercent = int(round(psutil.cpu_percent()))
+    msg.deviceState.gpuUsagePercent = int(round(HARDWARE.get_gpu_usage_percent()))
     msg.deviceState.networkType = network_type
     msg.deviceState.networkStrength = network_strength
     if network_info is not None:
@@ -376,9 +387,6 @@ def thermald_thread():
       params.put_bool("IsOnroad", should_start)
       params.put_bool("IsOffroad", not should_start)
       HARDWARE.set_power_save(not should_start)
-      if TICI and not params.get_bool("EnableLteOnroad"):
-        fxn = "off" if should_start else "on"
-        os.system(f"nmcli radio wwan {fxn}")
 
     if should_start:
       off_ts = None

@@ -13,6 +13,10 @@ AddOption('--test',
           action='store_true',
           help='build test files')
 
+AddOption('--setup',
+          action='store_true',
+          help='build setup and installer files')
+
 AddOption('--kaitai',
           action='store_true',
           help='Regenerate kaitai struct parsers')
@@ -315,7 +319,8 @@ qt_flags = [
   "-DQT_QUICK_LIB",
   "-DQT_QUICKWIDGETS_LIB",
   "-DQT_QML_LIB",
-  "-DQT_CORE_LIB"
+  "-DQT_CORE_LIB",
+  "-DQT_MESSAGELOGCONTEXT",
 ]
 qt_env['CXXFLAGS'] += qt_flags
 qt_env['LIBPATH'] += ['#selfdrive/ui']
@@ -409,6 +414,9 @@ SConscript(['selfdrive/loggerd/SConscript'])
 SConscript(['selfdrive/locationd/SConscript'])
 SConscript(['selfdrive/sensord/SConscript'])
 SConscript(['selfdrive/ui/SConscript'])
+
+if arch == "aarch64":
+  SConscript(['selfdrive/hardware/eon/SConscript'])
 
 if arch != "Darwin":
   SConscript(['selfdrive/logcatd/SConscript'])

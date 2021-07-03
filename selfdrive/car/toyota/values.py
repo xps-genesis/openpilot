@@ -57,6 +57,7 @@ class CAR:
   LEXUS_NX = "LEXUS NX 2018"
   LEXUS_NX_TSS2 = "LEXUS NX 2020"
   MIRAI = "TOYOTA MIRAI 2021" # TSS 2.5
+  ALPHARD_TSS2 = "TOYOTA ALPHARD 2020"
 
 # addr: (ecu, cars, bus, 1/freq*100, vl)
 STATIC_MSGS = [
@@ -286,17 +287,21 @@ FW_VERSIONS = {
     (Ecu.esp, 0x7b0, None): [
       b'F152641040\x00\x00\x00\x00\x00\x00',
       b'F152641061\x00\x00\x00\x00\x00\x00',
+      b'F152641050\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.dsu, 0x791, None): [
       b'881510704200\x00\x00\x00\x00',
+      b'881514107100\x00\x00\x00\x00',
     ],
     (Ecu.eps, 0x7a1, None): [
       b'8965B07010\x00\x00\x00\x00\x00\x00',
       b'8965B41090\x00\x00\x00\x00\x00\x00',
+      b'8965B41070\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.engine, 0x700, None): [
       b'\x02896630724000\x00\x00\x00\x00897CF3302002\x00\x00\x00\x00',
       b'\x02896630737000\x00\x00\x00\x00897CF3305001\x00\x00\x00\x00',
+      b'\x02896630728000\x00\x00\x00\x00897CF3302002\x00\x00\x00\x00',
     ],
     (Ecu.fwdRadar, 0x750, 0xf): [
       b'8821F4702300\x00\x00\x00\x00',
@@ -727,6 +732,7 @@ FW_VERSIONS = {
       b'\x02896630ZQ3000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
       b'\x02896630ZR2000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
       b'\x02896630ZT8000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
+      b'\x028966312Q3000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
       b'\x028966312Q4000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
       b'\x038966312L7000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00897CF1205001\x00\x00\x00\x00',
       b'\x038966312N1000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00897CF1203001\x00\x00\x00\x00',
@@ -1564,10 +1570,12 @@ FW_VERSIONS = {
   CAR.LEXUS_RXH_TSS2: {
     (Ecu.engine, 0x7e0, None): [
       b'\x02348X8000\x00\x00\x00\x00\x00\x00\x00\x00A4802000\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'\x0234D14000\x00\x00\x00\x00\x00\x00\x00\x00A4802000\x00\x00\x00\x00\x00\x00\x00\x00',
       b'\x0234D16000\x00\x00\x00\x00\x00\x00\x00\x00A4802000\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.esp, 0x7b0, None): [
       b'F152648831\x00\x00\x00\x00\x00\x00',
+      b'F152648D00\x00\x00\x00\x00\x00\x00',
       b'F152648D60\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.eps, 0x7a1, None): [
@@ -1610,6 +1618,12 @@ FW_VERSIONS = {
     (Ecu.fwdRadar, 0x750, 0xf): [b'\x018821F6201200\x00\x00\x00\x00',],
     (Ecu.fwdCamera, 0x750, 0x6d): [b'\x028646F6201400\x00\x00\x00\x008646G5301200\x00\x00\x00\x00',],
   },
+  CAR.ALPHARD_TSS2: {
+    (Ecu.engine, 0x7e0, None): [b'\x0235883000\x00\x00\x00\x00\x00\x00\x00\x00A0202000\x00\x00\x00\x00\x00\x00\x00\x00',],
+    (Ecu.eps, 0x7a1, None): [b'8965B58040\x00\x00\x00\x00\x00\x00',],
+    (Ecu.fwdRadar, 0x750, 0xf): [b'\x018821F3301400\x00\x00\x00\x00',],
+    (Ecu.fwdCamera, 0x750, 0x6d): [b'\x028646F5803200\x00\x00\x00\x008646G2601400\x00\x00\x00\x00',],
+  },
 }
 
 STEER_THRESHOLD = 100
@@ -1651,13 +1665,14 @@ DBC = {
   CAR.LEXUS_NX_TSS2: dbc_dict('toyota_nodsu_pt_generated', 'toyota_tss2_adas'),
   CAR.PRIUS_TSS2: dbc_dict('toyota_nodsu_hybrid_pt_generated', 'toyota_tss2_adas'),
   CAR.MIRAI: dbc_dict('toyota_nodsu_hybrid_pt_generated', 'toyota_tss2_adas'),
+  CAR.ALPHARD_TSS2: dbc_dict('toyota_nodsu_pt_generated', 'toyota_tss2_adas'),
 }
 
 
 # Toyota/Lexus Safety Sense 2.0 and 2.5
 TSS2_CAR = set([CAR.RAV4_TSS2, CAR.COROLLA_TSS2, CAR.COROLLAH_TSS2, CAR.LEXUS_ES_TSS2, CAR.LEXUS_ESH_TSS2, CAR.RAV4H_TSS2,
                 CAR.LEXUS_RX_TSS2, CAR.LEXUS_RXH_TSS2, CAR.HIGHLANDER_TSS2, CAR.HIGHLANDERH_TSS2, CAR.PRIUS_TSS2, CAR.CAMRY_TSS2, CAR.CAMRYH_TSS2,
-                CAR.MIRAI, CAR.LEXUS_NX_TSS2])
+                CAR.MIRAI, CAR.LEXUS_NX_TSS2, CAR.ALPHARD_TSS2])
 
 NO_DSU_CAR = TSS2_CAR | set([CAR.CHR, CAR.CHRH, CAR.CAMRY, CAR.CAMRYH])
 

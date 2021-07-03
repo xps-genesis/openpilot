@@ -279,6 +279,7 @@ struct DeviceState @0xa4d8b5af2aa492eb {
   freeSpacePercent @7 :Float32;
   memoryUsagePercent @19 :Int8;
   cpuUsagePercent @20 :Int8;
+  gpuUsagePercent @33 :Int8;
   usbOnline @12 :Bool;
   networkType @22 :NetworkType;
   networkInfo @31 :NetworkInfo;
@@ -322,6 +323,7 @@ struct DeviceState @0xa4d8b5af2aa492eb {
     cell3G @3;
     cell4G @4;
     cell5G @5;
+    ethernet @6;
   }
 
   enum NetworkStrength {
@@ -522,7 +524,6 @@ struct ControlsState @0x97ff69c53601abf1 {
   uiAccelCmd @5 :Float32;
   ufAccelCmd @33 :Float32;
   aTarget @35 :Float32;
-  steeringAngleDesiredDeg @29 :Float32;
   curvature @37 :Float32;  # path curvature from vehicle model
   forceDecel @51 :Bool;
 
@@ -651,6 +652,7 @@ struct ControlsState @0x97ff69c53601abf1 {
   mapValidDEPRECATED @49 :Bool;
   jerkFactorDEPRECATED @12 :Float32;
   steerOverrideDEPRECATED @20 :Bool;
+  steeringAngleDesiredDegDEPRECATED @29 :Float32;
 }
 
 struct ModelDataV2 {
@@ -677,6 +679,7 @@ struct ModelDataV2 {
 
   # predicted lead cars
   leads @11 :List(LeadDataV2);
+  leadsV3 @18 :List(LeadDataV3);
 
   meta @12 :MetaData;
 
@@ -701,6 +704,25 @@ struct ModelDataV2 {
     xyva @2 :List(Float32);
     xyvaStd @3 :List(Float32);
   }
+
+  struct LeadDataV3 {
+    prob @0 :Float32; # probability that car is your lead at time t
+    probTime @1 :Float32;
+    t @2 :List(Float32);
+
+    # x and y are relative position in device frame
+    # v absolute norm speed
+    # a is derivative of v
+    x @3 :List(Float32);
+    xStd @4 :List(Float32);
+    y @5 :List(Float32);
+    yStd @6 :List(Float32);
+    v @7 :List(Float32);
+    vStd @8 :List(Float32);
+    a @9 :List(Float32);
+    aStd @10 :List(Float32);
+  }
+
 
   struct MetaData {
     engagedProb @0 :Float32;
@@ -827,11 +849,11 @@ struct LateralPlan @0xe1e9318e2ae8b51e {
   laneChangeState @18 :LaneChangeState;
   laneChangeDirection @19 :LaneChangeDirection;
 
-  # curvature is in rad/m
-  curvature @22 :Float32;
-  curvatureRate @23 :Float32;
-  rawCurvature @24 :Float32;
-  rawCurvatureRate @25 :Float32;
+
+  # desired curvatures over next 2.5s in rad/m
+  psis @26 :List(Float32);
+  curvatures @27 :List(Float32);
+  curvatureRates @28 :List(Float32);
 
   enum Desire {
     none @0;
@@ -857,6 +879,10 @@ struct LateralPlan @0xe1e9318e2ae8b51e {
   }
 
   # deprecated
+  curvatureDEPRECATED @22 :Float32;
+  curvatureRateDEPRECATED @23 :Float32;
+  rawCurvatureDEPRECATED @24 :Float32;
+  rawCurvatureRateDEPRECATED @25 :Float32;
   cProbDEPRECATED @3 :Float32;
   dPolyDEPRECATED @1 :List(Float32);
   cPolyDEPRECATED @2 :List(Float32);

@@ -13,6 +13,7 @@ from selfdrive.boardd.boardd import can_list_to_can_capnp
 from selfdrive.car.car_helpers import get_car, get_startup_event, get_one_can
 from selfdrive.controls.lib.lane_planner import CAMERA_OFFSET
 from selfdrive.controls.lib.drive_helpers import update_v_cruise, initialize_v_cruise
+from selfdrive.controls.lib.drive_helpers import get_lag_adjusted_curvature
 from selfdrive.controls.lib.longcontrol import LongControl, STARTING_TARGET_SPEED
 from selfdrive.controls.lib.latcontrol_pid import LatControlPID
 from selfdrive.controls.lib.latcontrol_indi import LatControlINDI
@@ -86,7 +87,6 @@ class Controls:
     # read params
     self.is_metric = params.get_bool("IsMetric")
     self.is_ldw_enabled = params.get_bool("IsLdwEnabled")
-    self.enable_lte_onroad = params.get_bool("EnableLteOnroad")
     community_feature_toggle = params.get_bool("CommunityFeaturesToggle")
     openpilot_enabled_toggle = params.get_bool("OpenpilotEnabledToggle")
     passive = params.get_bool("Passive") or not openpilot_enabled_toggle
@@ -264,7 +264,7 @@ class Controls:
     if self.sm['longitudinalPlan'].fcw or (self.enabled and self.sm['modelV2'].meta.hardBrakePredicted):
       self.events.add(EventName.fcw)
 
-    if TICI and self.enable_lte_onroad:
+    if TICI:
       logs = messaging.drain_sock(self.log_sock, wait_for_one=False)
       messages = []
       for m in logs:
@@ -287,8 +287,7 @@ class Controls:
     # TODO: fix simulator
     if not SIMULATION:
       if not NOSENSOR:
-        if not self.sm['liveLocationKalman'].gpsOK and (self.distance_traveled > 1000) and \
-          (not TICI or self.enable_lte_onroad):
+        if not self.sm['liveLocationKalman'].gpsOK and (self.distance_traveled > 1000):
           # Not show in first 1 km to allow for driving out of garage. This event shows after 5 minutes
           self.events.add(EventName.noGps)
       if not self.sm.all_alive(self.camera_packets):
@@ -459,7 +458,12 @@ class Controls:
       actuators.gas, actuators.brake = self.LoC.update(self.active, CS, v_acc_sol, long_plan.vTargetFuture, a_acc_sol, self.CP, d_rel, v_rel, has_lead)
 
       # Steering PID loop and lateral MPC
-      actuators.steer, actuators.steeringAngleDeg, lac_log = self.LaC.update(self.active, CS, self.CP, self.VM, params, lat_plan)
+      desired_curvature, desired_curvature_rate = get_lag_adjusted_curvature(self.CP, CS.vEgo,
+                                                                             lat_plan.psis,
+                                                                             lat_plan.curvatures,
+                                                                             lat_plan.curvatureRates)
+      actuators.steer, actuators.steeringAngleDeg, lac_log = self.LaC.update(self.active, CS, self.CP, self.VM, params,
+                                                                             desired_curvature, desired_curvature_rate)
     else:
       lac_log = log.ControlsState.LateralDebugState.new_message()
       if self.sm.rcv_frame['testJoystick'] > 0 and self.active:
@@ -570,12 +574,8 @@ class Controls:
 
     # Curvature & Steering angle
     params = self.sm['liveParameters']
-    lat_plan = self.sm['lateralPlan']
-
     steer_angle_without_offset = math.radians(CS.steeringAngleDeg - params.angleOffsetAverageDeg)
     curvature = -self.VM.calc_curvature(steer_angle_without_offset, CS.vEgo)
-    angle_steers_des = math.degrees(self.VM.get_steer_from_curvature(-lat_plan.curvature, CS.vEgo))
-    angle_steers_des += params.angleOffsetDeg
 
     controlsState.alertText1 = self.AM.alert_text_1
     controlsState.alertText2 = self.AM.alert_text_2
@@ -590,7 +590,6 @@ class Controls:
     controlsState.enabled = self.enabled
     controlsState.active = self.active
     controlsState.curvature = curvature
-    controlsState.steeringAngleDesiredDeg = angle_steers_des
     controlsState.state = self.state
     controlsState.engageable = not self.events.any(ET.NO_ENTRY)
     controlsState.vPid = float(self.LoC.v_pid)
