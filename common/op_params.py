@@ -62,7 +62,7 @@ class opParams:
 
     VT = ValueTypes()
     self.fork_params = {
-                        'slow_in_turns': Param(True, bool, 'Slow while in turns'),
+                        'slow_in_turns': Param(False, bool, 'Slow while in turns'),
                         'slow_in_turns_ratio': Param(1.25, VT.number, 'Adjust how much slowing occurs. (1.25 = 25% faster in turns than the default)'),
                         'nonudgeLCA': Param(False, bool, 'Toggle to enable no nudge lane change'),
                         'nonudgeLCAspeed': Param(35, int, 'speed-mph above which no nudge lca is allowed'),
