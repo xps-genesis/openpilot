@@ -174,9 +174,6 @@ static void update_state(UIState *s) {
       scene.satelliteCount = data.getMeasurementReport().getNumMeas();
     }
   }
-  if (sm.updated("gpsLocationExternal")) {
-    scene.gpsAccuracy = sm["gpsLocationExternal"].getGpsLocationExternal().getAccuracy();
-  }
   if (sm.updated("carParams")) {
     scene.longitudinal_control = sm["carParams"].getCarParams().getOpenpilotLongitudinalControl();
   }
@@ -199,11 +196,11 @@ static void update_state(UIState *s) {
     auto camera_state = sm["roadCameraState"].getRoadCameraState();
 
     float max_lines = Hardware::EON() ? 5408 : 1757;
-    float gain = camera_state.getGainFrac();
+    float gain = camera_state.getGain();
 
     if (Hardware::TICI()) {
-      // gainFrac can go up to 4, with another 2.5x multiplier based on globalGain. Scale back to 0 - 1
-      gain *= (camera_state.getGlobalGain() > 100 ? 2.5 : 1.0) / 10.0;
+      // Max gain is 4 * 2.5 (High Conversion Gain)
+      gain /= 10.0;
     }
 
     scene.light_sensor = std::clamp<float>((1023.0 / max_lines) * (max_lines - camera_state.getIntegLines() * gain), 0.0, 1023.0);
@@ -280,9 +277,8 @@ static void update_status(UIState *s) {
 
 QUIState::QUIState(QObject *parent) : QObject(parent) {
   ui_state.sm = std::make_unique<SubMaster, const std::initializer_list<const char *>>({
-    "modelV2", "controlsState", "liveCalibration", "radarState", "deviceState", "liveLocationKalman",
+    "modelV2", "controlsState", "liveCalibration", "radarState", "deviceState", "roadCameraState",
     "pandaState", "carParams", "driverMonitoringState", "sensorEvents", "carState", "ubloxGnss",
-    "gpsLocationExternal", "roadCameraState",
   });
 
   ui_state.fb_w = vwp_w;

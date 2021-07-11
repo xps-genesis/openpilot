@@ -11,6 +11,7 @@ V_CRUISE_MIN = 8
 V_CRUISE_DELTA = 8
 V_CRUISE_ENABLE_MIN = 40
 LAT_MPC_N = 16
+LON_MPC_N = 32
 CONTROL_N = 17
 CAR_ROTATION_RADIUS = 0.0
 
@@ -67,7 +68,7 @@ def initialize_v_cruise(v_ego, buttonEvents, v_cruise_last):
 
 def get_lag_adjusted_curvature(CP, v_ego, psis, curvatures, curvature_rates):
 
-  if Params().get_bool('ChryslerMangoLat'):
+  if not Params().get_bool('ChryslerMangoLat'):
     sad = interp(v_ego, sadBP, sadV)
   else:
     sad = .2
