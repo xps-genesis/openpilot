@@ -1,5 +1,3 @@
-#include <sys/resource.h>
-
 #include <QApplication>
 #include <QSslConfiguration>
 
@@ -9,8 +7,6 @@
 #include "selfdrive/ui/qt/window.h"
 
 int main(int argc, char *argv[]) {
-  setpriority(PRIO_PROCESS, 0, -20);
-
   qInstallMessageHandler(swagLogMessageHandler);
   initApp();
 

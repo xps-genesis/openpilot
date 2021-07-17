@@ -8,18 +8,18 @@ ScrollView::ScrollView(QWidget *w, QWidget *parent) : QScrollArea(parent) {
   setWidgetResizable(true);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  setStyleSheet("background-color: transparent;");
+  setStyleSheet("ScrollView { background-color:transparent; }");
 
   QString style = R"(
     QScrollBar:vertical {
       border: none;
       background: transparent;
-      width: 10px;
+      width:10px;
       margin: 0;
     }
     QScrollBar::handle:vertical {
       min-height: 0px;
-      border-radius: 5px;
+      border-radius: 4px;
       background-color: white;
     }
     QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
@@ -29,6 +29,7 @@ ScrollView::ScrollView(QWidget *w, QWidget *parent) : QScrollArea(parent) {
       background: none;
     }
   )";
+
   verticalScrollBar()->setStyleSheet(style);
   horizontalScrollBar()->setStyleSheet(style);
 
