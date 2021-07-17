@@ -115,6 +115,14 @@ TogglesPanel::TogglesPanel(QWidget *parent) : QWidget(parent) {
     });
   }
 
+#ifdef ENABLE_MAPS
+  toggles.append(new ParamControl("NavSettingTime24h",
+                                  "Show ETA in 24h format",
+                                  "Use 24h format instead of am/pm",
+                                  "../assets/offroad/icon_metric.png",
+                                  this));
+#endif
+
   bool record_lock = Params().getBool("RecordFrontLock");
   record_toggle->setEnabled(!record_lock);
 
@@ -203,7 +211,7 @@ DevicePanel::DevicePanel(QWidget* parent) : QWidget(parent) {
   power_layout->setSpacing(30);
 
   QPushButton *reboot_btn = new QPushButton("Reboot");
-  reboot_btn->setStyleSheet("height: 120px;border-radius: 15px;background-color: #393939;");
+  reboot_btn->setStyleSheet("height: 120px;border-radius: 15px; background-color: #393939;");
   power_layout->addWidget(reboot_btn);
   QObject::connect(reboot_btn, &QPushButton::released, [=]() {
     if (ConfirmationDialog::confirm("Are you sure you want to reboot?", this)) {
@@ -212,7 +220,7 @@ DevicePanel::DevicePanel(QWidget* parent) : QWidget(parent) {
   });
 
   QPushButton *poweroff_btn = new QPushButton("Power Off");
-  poweroff_btn->setStyleSheet("height: 120px;border-radius: 15px;background-color: #E22C2C;");
+  poweroff_btn->setStyleSheet("height: 120px;border-radius: 15px; background-color: #E22C2C;");
   power_layout->addWidget(poweroff_btn);
   QObject::connect(poweroff_btn, &QPushButton::released, [=]() {
     if (ConfirmationDialog::confirm("Are you sure you want to power off?", this)) {

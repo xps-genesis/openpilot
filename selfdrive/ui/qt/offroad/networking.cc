@@ -82,7 +82,7 @@ void Networking::connectToNetwork(const Network &n) {
   } else if (n.security_type == SecurityType::OPEN) {
     wifi->connect(n);
   } else if (n.security_type == SecurityType::WPA) {
-    QString pass = InputDialog::getText("Enter password for \"" + n.ssid + "\"", this, 8);
+    QString pass = InputDialog::getText("Enter password", this, "for \"" + n.ssid + "\"", true, 8);
     if (!pass.isEmpty()) {
       wifi->connect(n, pass);
     }
@@ -92,13 +92,23 @@ void Networking::connectToNetwork(const Network &n) {
 void Networking::wrongPassword(const QString &ssid) {
   for (Network n : wifi->seen_networks) {
     if (n.ssid == ssid) {
-      QString pass = InputDialog::getText("Wrong password for \"" + n.ssid +"\"", this, 8);
+      QString pass = InputDialog::getText("Wrong password", this, "for \"" + n.ssid +"\"", true, 8);
       if (!pass.isEmpty()) {
         wifi->connect(n, pass);
       }
       return;
     }
   }
+}
+
+void Networking::showEvent(QShowEvent* event) {
+  // Wait to refresh to avoid delay when showing Networking widget
+  QTimer::singleShot(300, this, [=]() {
+    if (this->isVisible()) {
+      wifi->refreshNetworks();
+      refresh();
+    }
+  });
 }
 
 // AdvancedNetworking functions
@@ -125,7 +135,7 @@ AdvancedNetworking::AdvancedNetworking(QWidget* parent, WifiManager* wifi): QWid
   // Change tethering password
   ButtonControl *editPasswordButton = new ButtonControl("Tethering Password", "EDIT");
   connect(editPasswordButton, &ButtonControl::released, [=]() {
-    QString pass = InputDialog::getText("Enter new tethering password", this, 8, wifi->getTetheringPassword());
+    QString pass = InputDialog::getText("Enter new tethering password", this, "", true, 8, wifi->getTetheringPassword());
     if (!pass.isEmpty()) {
       wifi->changeTetheringPassword(pass);
     }
@@ -169,6 +179,12 @@ WifiUI::WifiUI(QWidget *parent, WifiManager* wifi) : QWidget(parent), wifi(wifi)
 
 void WifiUI::refresh() {
   clearLayout(main_layout);
+  if (wifi->seen_networks.size() == 0) {
+    QLabel *scanning = new QLabel("No networks found. Scanning...");
+    scanning->setStyleSheet(R"(font-size: 65px;)");
+    main_layout->addWidget(scanning, 0, Qt::AlignCenter);
+    return;
+  }
 
   int i = 0;
   for (Network &network : wifi->seen_networks) {

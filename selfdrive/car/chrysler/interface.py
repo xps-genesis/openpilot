@@ -22,14 +22,14 @@ class CarInterface(CarInterfaceBase):
     # Speed conversion:              20, 45 mph
     ret.wheelbase = 3.089  # in meters for Pacifica Hybrid 2017
     ret.steerRatio = 16.2  # Pacifica Hybrid 2017
-    ret.mass = 2858. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
+    ret.mass = 2242. + STD_CARGO_KG  # kg curb weight Pacifica Hybrid 2017
     ret.openpilotLongitudinalControl = Params().get_bool('ChryslerMangoLong')
 
     # Long tuning Params -  make individual params for cars, baseline Pacifica Hybrid
     ret.longitudinalTuning.kpBP = [0., .3, 10., 35.]
     ret.longitudinalTuning.kpV = [1.2, 1.2, .8, .6]
     ret.longitudinalTuning.kiBP = [0., .3, 15., 35.]
-    ret.longitudinalTuning.kiV = [0.10, .08, .05, .045]
+    ret.longitudinalTuning.kiV = [0.08, .08, .05, .045]
     ret.longitudinalTuning.deadzoneBP = [0., .5]
     ret.longitudinalTuning.deadzoneV = [0.00, 0.00]
     ret.gasMaxBP = [0., 1., 1.1, 15., 40.]
