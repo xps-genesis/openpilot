@@ -7,6 +7,7 @@
 #include <QStackedLayout>
 #include <QString>
 #include <QWidget>
+
 class KeyboardLayout : public QWidget {
   Q_OBJECT
 
@@ -27,5 +28,7 @@ private slots:
   void handleButton(QAbstractButton* m_button);
 
 signals:
-  void emitButton(const QString &s);
+  void emitKey(const QString &s);
+  void emitBackspace();
+  void emitEnter();
 };
