@@ -236,7 +236,8 @@ void usb_cb_ep3_out(void *usbdata, int len, bool hardwired) {
 }
 
 void usb_cb_ep3_out_complete(void) {
-  if (can_tx_check_min_slots_free(MAX_CAN_MSGS_PER_BULK_TRANSFER)) {
+  // TODO: how does a second USB packet sneek in? (why multiply by 2)
+  if (can_tx_check_min_slots_free(MAX_CAN_MSGS_PER_BULK_TRANSFER * 2U)) {
     usb_outep3_resume_if_paused();
   }
 }
@@ -452,19 +453,6 @@ int usb_cb_control_msg(USB_Setup_TypeDef *setup, uint8_t *resp, bool hardwired) 
                        (setup->b.wValue.w == SAFETY_NOOUTPUT) ||
                        (setup->b.wValue.w == SAFETY_ELM327)) {
         set_safety_mode(setup->b.wValue.w, (uint16_t) setup->b.wIndex.w);
-      }
-      break;
-    // **** 0xdd: enable can forwarding
-    case 0xdd:
-      // wValue = Can Bus Num to forward from
-      // wIndex = Can Bus Num to forward to
-      if ((setup->b.wValue.w < BUS_MAX) && (setup->b.wIndex.w < BUS_MAX) &&
-          (setup->b.wValue.w != setup->b.wIndex.w)) { // set forwarding
-        can_set_forwarding(setup->b.wValue.w, setup->b.wIndex.w & CAN_BUS_NUM_MASK);
-      } else if((setup->b.wValue.w < BUS_MAX) && (setup->b.wIndex.w == 0xFFU)){ //Clear Forwarding
-        can_set_forwarding(setup->b.wValue.w, -1);
-      } else {
-        puts("Invalid CAN bus forwarding\n");
       }
       break;
     // **** 0xde: set can bitrate

@@ -6,7 +6,8 @@ typedef struct {
 } can_ring;
 
 #define CAN_BUS_RET_FLAG 0x80U
-#define CAN_BUS_NUM_MASK 0x7FU
+#define CAN_BUS_BLK_FLAG 0x40U
+#define CAN_BUS_NUM_MASK 0x3FU
 
 #define BUS_MAX 4U
 
@@ -46,11 +47,16 @@ void process_can(uint8_t can_number);
   CAN_FIFOMailBox_TypeDef elems_##x[size]; \
   can_ring can_##x = { .w_ptr = 0, .r_ptr = 0, .fifo_size = (size), .elems = (CAN_FIFOMailBox_TypeDef *)&(elems_##x) };
 
+#ifdef STM32H7
+__attribute__((section(".ram_d1"))) can_buffer(rx_q, 0x1000)
+__attribute__((section(".ram_d1"))) can_buffer(txgmlan_q, 0x100)
+#else
 can_buffer(rx_q, 0x1000)
+can_buffer(txgmlan_q, 0x100)
+#endif
 can_buffer(tx1_q, 0x100)
 can_buffer(tx2_q, 0x100)
 can_buffer(tx3_q, 0x100)
-can_buffer(txgmlan_q, 0x100)
 // FIXME:
 // cppcheck-suppress misra-c2012-9.3
 can_ring *can_queues[] = {&can_tx1_q, &can_tx2_q, &can_tx3_q, &can_txgmlan_q};
@@ -150,13 +156,11 @@ void can_clear(can_ring *q) {
 // can number: numeric lookup for MCU CAN interfaces (0 = CAN1, 1 = CAN2, etc);
 // bus_lookup: Translates from 'can number' to 'bus number'.
 // can_num_lookup: Translates from 'bus number' to 'can number'.
-// can_forwarding: Given a bus num, lookup bus num to forward to. -1 means no forward.
 
 // Helpers
 // Panda:       Bus 0=CAN1   Bus 1=CAN2   Bus 2=CAN3
 uint8_t bus_lookup[] = {0,1,2};
 uint8_t can_num_lookup[] = {0,1,2,-1};
-int8_t can_forwarding[] = {-1,-1,-1,-1};
 uint32_t can_speed[] = {5000, 5000, 5000, 333};
 uint32_t can_data_speed[] = {5000, 5000, 5000}; //For CAN FD with BRS only
 #define CAN_MAX 3U
@@ -189,23 +193,30 @@ void ignition_can_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   ignition_can_cnt = 0U;  // reset counter
 
   if (bus == 0) {
+    // GM exception
     // TODO: verify on all supported GM models that we can reliably detect ignition using only this signal,
     // since the 0x1F1 signal can briefly go low immediately after ignition
     if ((addr == 0x160) && (len == 5)) {
       // this message isn't all zeros when ignition is on
       ignition_cadillac = GET_BYTES_04(to_push) != 0;
     }
-    // GM exception
     if ((addr == 0x1F1) && (len == 8)) {
       // Bit 5 is ignition "on"
       bool ignition_gm = ((GET_BYTE(to_push, 0) & 0x20) != 0);
       ignition_can = ignition_gm || ignition_cadillac;
     }
+
     // Tesla exception
     if ((addr == 0x348) && (len == 8)) {
       // GTW_status
       ignition_can = (GET_BYTE(to_push, 0) & 0x1) != 0;
     }
+
+    // Mazda exception
+    if ((addr == 0x9E) && (len == 8)) {
+      ignition_can = (GET_BYTE(to_push, 0) >> 4) == 0xDU;
+    }
+
   }
 }
 
@@ -230,9 +241,8 @@ void can_send(CAN_FIFOMailBox_TypeDef *to_push, uint8_t bus_number, bool skip_tx
         process_can(CAN_NUM_FROM_BUS_NUM(bus_number));
       }
     }
+  } else {
+    to_push->RDTR = (to_push->RDTR & 0xFFFF000FU) | ((CAN_BUS_RET_FLAG | CAN_BUS_BLK_FLAG | bus_number) << 4);
+    can_send_errs += can_push(&can_rx_q, to_push) ? 0U : 1U;
   }
-}
-
-void can_set_forwarding(int from, int to) {
-  can_forwarding[from] = to;
 }
